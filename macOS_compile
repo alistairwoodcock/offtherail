@@ -1,0 +1,1 @@
+g++ -o build/main src/main.cpp -framework OpenGL -framework GLUT -lglfw -lglew -lassimp
