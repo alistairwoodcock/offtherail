@@ -1,22 +1,61 @@
 #pragma once
 
-struct State;
-enum Screens;
-
-struct Game = {
-
-	struct get_state *(*int)();
-
-	void (*finalize)(struct state *s);
-
-	void (*reload)(struct state *s);
-
-	void (*unload)(struct state *s);
-
-	void (*update)(struct state *s);
+enum Screens {
+	MAIN_MENU,
+	CHOOSE,
+	GAME
 };
 
-extern const struct Game GAME_API;
+struct State {
+	bool game_started;
+	bool quit_game;
+	
+	Screens current_screen;
+
+	float time;
+
+	bool up;
+	bool down;
+	bool left;
+	bool right;
+
+	/* MENU SCREEN STATE */
+	bool start_active;
+	bool exit_active;
+
+
+
+	// Camera *camera;
+};
+
+struct GameAPI {
+
+	struct State* (*init)();
+
+	void (*finalize)(State *s);
+
+	void (*reload)(State *s);
+
+	void (*unload)(State *s);
+
+	void (*update)(State *s, float deltaTime);
+
+	// void (*handleInput)(State *s, Input input);
+
+	bool (*shouldClose)(State *s);
+};
+
+// struct Input {
+// 	bool left_pressed;
+// 	bool right_pressed;
+// 	bool up_pressed;
+// 	bool down_pressed;
+// 	bool space_pressed;
+// 	bool enter_pressed;
+// 	bool escape_pressed;
+// };
+
+extern const struct GameAPI GAME_API;
 
 
 //Old funcs we may add some of these back l8r

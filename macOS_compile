@@ -1,1 +1,3 @@
-g++ -o build/main src/main.cpp -framework OpenGL -framework GLUT -lglfw -lglew -lassimp
+g++ -dynamiclib -o build/game.dylib src/game.cpp
+
+g++ src/main.cpp -o build/main

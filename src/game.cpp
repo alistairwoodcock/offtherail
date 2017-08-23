@@ -1,56 +1,131 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include "game.h"
 // #include "screens/MainMenu.cpp"
 
 // #include "entities/Camera.cpp"
 // #include "entities/Particles.cpp"
 // #include "entities/Train.cpp"
 
-enum Screens {
-	MAIN_MENU,
-	CHOOSE,
-	GAME
-};
-
-struct State {
-	bool game_started;
-	bool quit_game;
-	
-	Screens current_screen;
-
-	bool left_pressed;
-	bool right_pressed;
-	bool up_pressed;
-	bool down_pressed;
-	bool space_pressed;
-	bool enter_pressed;
-	bool escape_pressed;
-
-	/* MENU SCREEN STATE */
-	bool start_active;
-	bool exit_active;
-};
-
-
-static struct State *game_init()
+static struct State *init()
 {
-    // int width, height;
-    // initscr();  // peek at terminal size
-    // getmaxyx(stdscr, height, width);
-    // endwin();
-    // struct game_state *state = malloc(sizeof(*state) + width * height * 2);
-    // state->select = 0;
-    // state->width = width;
-    // state->height = height;
-    // randomize(state);
-    
-    State *state = calloc(sizeof(*state));
+    State *state = (State *)malloc(sizeof(*state));
 
     state->game_started = false;
+    state->quit_game = false;
+
     state->current_screen = MAIN_MENU;
+    // state->camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
 		
 	// switchScreen(MAIN_MENU);
 
     return state;
 }
+
+static void finalize(State *state){
+	free(state);
+}
+
+static void reload(State *state){
+
+}
+
+static void unload(State *state){
+	
+}
+
+static void update(State *state, float deltaTime){
+	// Camera* camera = state->camera;
+	
+	state->time += deltaTime;
+
+	// view/projection transformations to pass to render functions
+	// glm::mat4 projection = glm::perspective(glm::radians(state->camera.Zoom), (float)state->screenWidth / (float)state->screenHeight, 0.1f, 100.0f);
+	// glm::mat4 view = camera->GetViewMatrix();
+
+	// switch(state->current_screen)
+	// {
+	// 	case MAIN_MENU: {
+			
+	// 		// MainMenu::update(state, time, deltaTime);
+
+	// 		// MainMenu::render(projection, view);
+
+	// 	} break;
+
+	// 	case CHOOSE: {
+
+
+
+	// 	} break;
+
+	// 	case GAME: {
+
+	// 		//update camera based on state
+	// 		//this is just for now, we're going to have a fixed camera in the future.
+	// 		// if(state->up) camera->ProcessKeyboard(FORWARD, deltaTime);
+	// 		// if(state->down) camera->ProcessKeyboard(BACKWARD, deltaTime);
+	// 		// if(state->left) camera->ProcessKeyboard(LEFT, deltaTime);
+	// 		// if(state->right) camera->ProcessKeyboard(RIGHT, deltaTime);
+			
+	// 		// Train::update(state, time, deltaTime);
+	// 		// Particles::update(state, time, deltaTime);
+		
+
+	// 		// Train::render(projection, view);
+	// 		// Particles::render(projection, view);
+
+	// 	} break;
+	// }
+	
+}
+
+static bool shouldClose(State *state){
+	return false;	
+}
+
+// static void *handleInput(State *state, Input input){
+// 	state->up = 
+// 	state->down = 
+// 	state->left = 
+// 	state->right = 
+// }
+
+static void switchScreen(State *state, Screens newScreen){
+	state->current_screen = newScreen;
+
+	switch(newScreen)
+	{
+		case MAIN_MENU: {
+
+			// MainMenu::setup(state);
+
+		} break;
+
+		case CHOOSE: {
+
+
+		} break;
+
+		case GAME: {
+
+			// Train::setup(state);
+			// Particles::setup(state);
+
+		} break;
+	}
+}
+
+
+const GameAPI GAME_API = {
+    .init = init,
+    .finalize = finalize,
+    .reload = reload,
+    .unload = unload,
+    .update = update,
+    .shouldClose = shouldClose
+};
+
 
 /*
 
