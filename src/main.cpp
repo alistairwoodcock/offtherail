@@ -13,7 +13,7 @@
 #include "libs/shader.h"
 #include "libs/model.h"
 
-#include "state.h" //Our state object definition + screens enum
+// #include "state.h" //Our state object definition + screens enum
 #include "game.h"
 #include "entities/Entity.h"
 

@@ -1,13 +1,63 @@
-#include "screens/MainMenu.cpp"
+// #include "screens/MainMenu.cpp"
 
-#include "entities/Camera.cpp"
-#include "entities/Particles.cpp"
-#include "entities/Train.cpp"
+// #include "entities/Camera.cpp"
+// #include "entities/Particles.cpp"
+// #include "entities/Train.cpp"
+
+enum Screens {
+	MAIN_MENU,
+	CHOOSE,
+	GAME
+};
+
+struct State {
+	bool game_started;
+	bool quit_game;
+	
+	Screens current_screen;
+
+	bool left_pressed;
+	bool right_pressed;
+	bool up_pressed;
+	bool down_pressed;
+	bool space_pressed;
+	bool enter_pressed;
+	bool escape_pressed;
+
+	/* MENU SCREEN STATE */
+	bool start_active;
+	bool exit_active;
+};
+
+
+static struct State *game_init()
+{
+    // int width, height;
+    // initscr();  // peek at terminal size
+    // getmaxyx(stdscr, height, width);
+    // endwin();
+    // struct game_state *state = malloc(sizeof(*state) + width * height * 2);
+    // state->select = 0;
+    // state->width = width;
+    // state->height = height;
+    // randomize(state);
+    
+    State *state = calloc(sizeof(*state));
+
+    state->game_started = false;
+    state->current_screen = MAIN_MENU;
+		
+	// switchScreen(MAIN_MENU);
+
+    return state;
+}
+
+/*
 
 namespace Game {
 
 	//Game state object
-	State state = {0};
+	// State state = {0};
 	
 	Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 	
@@ -125,3 +175,4 @@ namespace Game {
 		return state.quit_game;
 	}
 }
+*/
