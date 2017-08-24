@@ -44,6 +44,7 @@ namespace MainMenu{
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		stbi_image_free(data);
+		stbi_set_flip_vertically_on_load(false);
 
 		glGenVertexArrays(1, &image->VAO);
 		glGenBuffers(1, &image->VBO);
