@@ -1,0 +1,1 @@
+g++ -o build/main src/main.cpp -lGL -lglut -lGLEW -lglfw -lassimp
