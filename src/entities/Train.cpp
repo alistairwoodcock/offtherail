@@ -1,28 +1,35 @@
+#ifndef TRAIN
+#define TRAIN
 
-namespace Train {
+#include <glm/glm.hpp>
 
-	Model* trainModel;
-	Shader* trainShader;
+#include "../game.h"
+#include "../libs/shader.h"
+#include "../libs/model.h"
+#include "Entity.h"
+
+class Train {
+public:
 
 	Entity* train;
-	
-	void setup(State &state){
-		trainShader = new Shader("src/shaders/train.vs", "src/shaders/train.fs");
-		trainModel = new Model("models/train/locomotive/Locomotive C36.obj");
 
+	Train(State *state){
 		train = new Entity();
 		train->x = 0;
 		train->y = -2.0f;
 		train->z = 0.0f;
 	}
 
-	void update(State &state, float time, float deltaTime){
-
+	void update(State *state, float time, float deltaTime){
+		
 		train->y_rot += 10 * deltaTime;
 	}
 
-	void render(glm::mat4 &projection, glm::mat4 &view){
+	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
 		
+		Shader* trainShader = state->platform.getShader("train");
+		Model* trainModel = state->platform.getModel("train");
+
 		trainShader->use();
 		trainShader->setMat4("projection", projection);
 		trainShader->setMat4("view", view);
@@ -37,4 +44,6 @@ namespace Train {
 
 	}
 
-}
+};
+
+#endif

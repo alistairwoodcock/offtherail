@@ -1,47 +1,138 @@
 #include <stdlib.h>
 #include <stdio.h>
+
+#include "entities/Entity.h"
+#include "entities/Particles.h"
+#include "entities/Camera.h"
+
 #include "game.h"
+#include "platform.h"
+
+struct GameState {
+	bool game_started;
+	bool quit_game;
+	
+	Screens current_screen;
+	Input input;
+
+	/* PARTICLE STATE */
+	int particle_count;
+	Particle* particles;
+	unsigned int Particle_VBO;
+	unsigned int Particle_VAO;
+
+	/* MENU SCREEN STATE */
+	bool start_active;
+	bool exit_active;
+
+	Camera camera;
+	
+	/* TRAIN STATE */
+	// void *train;
+};
+
+struct State {
+	GameState game_state;
+	Platform platform;
+};
+
+#include "entities/Particles.cpp"
+// #include "entities/Train.cpp"
+
+
 // #include "screens/MainMenu.cpp"
 
-// #include "entities/Camera.cpp"
-// #include "entities/Particles.cpp"
-// #include "entities/Train.cpp"
+void loadShaders(State *state){
+	if(!state->platform.initialized) return;
+
+	float particle_vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	};
+
+	GLuint VAO;
+    GLuint VBO;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
+    glEnableVertexAttribArray(0);
+
+    state->game_state.Particle_VAO = VAO;
+    state->game_state.Particle_VBO = VBO;
+
+	state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
+    state->platform.loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
+}
 
 static struct State *init()
 {
+	printf("INIT\n");
+	/* -- Setup our entire program state -- */
     State *state = (State *)malloc(sizeof(*state));
+	// State *state = new State();
 
-    state->game_started = false;
-    state->quit_game = false;
+    //Game state for runtime
+    state->game_state.game_started = false;
+    state->game_state.quit_game = false;
+    state->game_state.current_screen = MAIN_MENU;
+    
+    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+    
+    //platform for input + rendering
+    state->platform.init();
 
-    state->current_screen = MAIN_MENU;
-    // state->camera = new Camera(glm::vec3(0.0f, 0.0f, 0.0f));
-		
-	// switchScreen(MAIN_MENU);
+    if(!state->platform.initialized) return NULL;
+
+    // loadShaders(state);
+
+    //load shaders
+    
+    /* -- Particles Setup -- */
+    
+    state->game_state.particle_count = 10000;
+
+    Particles::setup(state);
+
+    /* -- End Particle Setup -- */
+
+
+
+    // Shader s = state->platform.getShader("particle");
+    
+    //load models
+    // state->platform.loadModel("train", "models/train/locomotive/Locomotive C36.obj");
+
+    // state->game_state.train = (void*)new Train(state);
 
     return state;
 }
 
-static void finalize(State *state){
-	free(state);
-}
-
-static void reload(State *state){
-
-}
-
-static void unload(State *state){
+static void updateAndRender(State *state){
+	GameState *game = &state->game_state;
+	Camera *camera = &game->camera;
+	Platform *platform = &state->platform;
 	
-}
-
-static void update(State *state, float deltaTime){
-	// Camera* camera = state->camera;
+	platform->getTime();
+	Input input = platform->getInput();
+	platform->clearBuff(glm::vec3(1,1,1));
 	
-	state->time += deltaTime;
+	game->input = input;
+	
+	// printf("deltaTime: %f\n", platform->deltaTime);
 
 	// view/projection transformations to pass to render functions
-	// glm::mat4 projection = glm::perspective(glm::radians(state->camera.Zoom), (float)state->screenWidth / (float)state->screenHeight, 0.1f, 100.0f);
-	// glm::mat4 view = camera->GetViewMatrix();
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, 100.0f);
+	glm::mat4 view = camera->GetViewMatrix();
+	
 
 	// switch(state->current_screen)
 	// {
@@ -63,66 +154,95 @@ static void update(State *state, float deltaTime){
 
 	// 		//update camera based on state
 	// 		//this is just for now, we're going to have a fixed camera in the future.
-	// 		// if(state->up) camera->ProcessKeyboard(FORWARD, deltaTime);
-	// 		// if(state->down) camera->ProcessKeyboard(BACKWARD, deltaTime);
-	// 		// if(state->left) camera->ProcessKeyboard(LEFT, deltaTime);
-	// 		// if(state->right) camera->ProcessKeyboard(RIGHT, deltaTime);
+			if(game->input.up_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
+			if(game->input.down_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
+			if(game->input.left_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
+			if(game->input.right_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 			
-	// 		// Train::update(state, time, deltaTime);
-	// 		// Particles::update(state, time, deltaTime);
+			// ((Train*)game->train)->update(state, platform->currTime, platform->deltaTime);
+			
+			Particles::update(state, platform->currTime, platform->deltaTime);
 		
 
-	// 		// Train::render(projection, view);
-	// 		// Particles::render(projection, view);
+			
+			// ((Train*)game->train)->render(state, projection, view);
+			Particles::render(state, projection, view);
+			
+
 
 	// 	} break;
 	// }
 	
+	
+	platform->pollEvents();
+	platform->swapBuffs();	
 }
 
-static bool shouldClose(State *state){
-	return false;	
-}
+// static void switchScreen(State *state, Screens newScreen){
+// 	GameState *game = &state->game_state;
 
-// static void *handleInput(State *state, Input input){
-// 	state->up = 
-// 	state->down = 
-// 	state->left = 
-// 	state->right = 
+// 	game->current_screen = newScreen;
+
+// 	switch(newScreen)
+// 	{
+// 		case MAIN_MENU: {
+
+// 			// MainMenu::setup(state);
+
+// 		} break;
+
+// 		case CHOOSE: {
+
+
+// 		} break;
+
+// 		case GAME: {
+
+// 			// Train::setup(state);
+// 			// Particles::setup(state);
+
+// 		} break;
+// 	}
 // }
 
-static void switchScreen(State *state, Screens newScreen){
-	state->current_screen = newScreen;
+static bool shouldClose(State *state){
+	bool close = false;
 
-	switch(newScreen)
-	{
-		case MAIN_MENU: {
+	if(!state->platform.initialized) close = true;
+	if(state->platform.closeWindow) close = true;
 
-			// MainMenu::setup(state);
-
-		} break;
-
-		case CHOOSE: {
-
-
-		} break;
-
-		case GAME: {
-
-			// Train::setup(state);
-			// Particles::setup(state);
-
-		} break;
-	}
+	return close;	
 }
 
+static void finalize(State *state){
+	free(state);
+}
+
+static void reload(State *state){
+	printf("RELOAD\n");
+	bool success = state->platform.reinit();
+	if(!success){
+		printf("FAILED TO REINIT\n");
+	}
+
+	loadShaders(state);
+}
+static void unload(State *state){
+	printf("UNLOAD\n");
+	if(state->platform.initialized){
+		glDeleteVertexArrays(1, &state->game_state.Particle_VAO);
+    	glDeleteBuffers(1, &state->game_state.Particle_VBO);
+
+		state->platform.freeShaders();		
+	}
+}
 
 const GameAPI GAME_API = {
     .init = init,
     .finalize = finalize,
     .reload = reload,
     .unload = unload,
-    .update = update,
+    .updateAndRender = updateAndRender,
     .shouldClose = shouldClose
 };
 
@@ -230,16 +350,6 @@ namespace Game {
 	void updateDimensions(unsigned int width, unsigned int height){
 		screenWidth = width;
 		screenHeight = height;
-	}
-
-	void handleInput(GLFWwindow *window) {
-		state.escape_pressed = (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
-		state.up_pressed = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-		state.down_pressed = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
-		state.left_pressed = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
-		state.right_pressed = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
-		state.space_pressed = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-		state.enter_pressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
 	}
 
 	glm::vec3 getBackgroundColor(){

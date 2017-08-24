@@ -1,18 +1,3 @@
-// #define GLEW_STATIC
-// #include <GL/glew.h>
-
-// #include <GLFW/glfw3.h>
-
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
-// #include <glm/gtc/type_ptr.hpp>
-
-// #define STB_IMAGE_IMPLEMENTATION
-// #include "libs/stb_image.h"
-
-// #include "libs/shader.h"
-// #include "libs/model.h"
-
 #include <stdio.h>
 
 //dynamic lib loading on unix
@@ -89,51 +74,18 @@ int main(){
 		load_game_lib(&game);
 		if(game.handle){
 			
-			game.api.update(game.state, 0.01f); //TODO(AL): use GLFW
+			game.api.updateAndRender(game.state); //TODO(AL): use GLFW
 
 			if(game.api.shouldClose(game.state)) break;
+
+			usleep(1000);
 		}
+
 	}
 
 	return 0;
 
-	// glfwInit( );
-
-	// glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3);
-	// glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3);
-	// glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	// glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-	
-
-	// int screenWidth = 500, screenHeight = 500;
-	// GLFWwindow *window = glfwCreateWindow(screenWidth, screenHeight, "Off The Rail", NULL, NULL);
-
-	// glfwGetFramebufferSize( window, &screenWidth, &screenHeight );
-	// glfwSetFramebufferSizeCallback(window, window_resize);
-
 	// Game::updateDimensions(screenWidth, screenHeight);
-
-	// if(window == NULL) {
-	// 	printf("Failed to create GLFW window\n");
-	// 	glfwTerminate();
-	// 	return -1;
-	// }
-
-	// glfwMakeContextCurrent(window);
-
-	// glewExperimental = GL_TRUE;
-
-	// if(glewInit() != GLEW_OK) {
-	// 	printf("Failed to initialize GLEW\n");
-	// 	glfwTerminate();
-	// 	return -1;
-	// }
-
-	// glViewport(0, 0, screenWidth, screenHeight);
-	// glEnable(GL_DEPTH_TEST);  
-	// glEnable(GL_BLEND); 
-	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-
 
 	// Game::setup();
 

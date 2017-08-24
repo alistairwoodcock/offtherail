@@ -1,1 +1,1 @@
-g++ -dynamiclib -o build/game.dylib src/game.cpp
+g++ -framework OpenGL -framework GLUT -lglfw -lglew -lassimp -dynamiclib -o build/game.dylib src/game.cpp
