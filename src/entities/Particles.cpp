@@ -83,7 +83,7 @@ namespace Particles {
 			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
 			
 			platform->shaderSetMat4(ID, "model", model);
-			platform->shaderSetVec3(ID, "color", glm::vec3(1,0.6,0.8));
+			platform->shaderSetVec3(ID, "color", glm::vec3(1,0.0,0.0));
 			platform->shaderSetFloat(ID, "alpha", p->alpha);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
