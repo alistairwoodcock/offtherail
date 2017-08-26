@@ -1,85 +1,59 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#include "entities/Entity.h"
-#include "entities/Particles.h"
-#include "entities/Camera.h"
+#include <GL/glew.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "libs/stb_image.h"
+
 
 #include "game.h"
-#include "platform.h"
+#include "entities/Camera.h"
 
-struct GameState {
-	bool game_started;
-	bool quit_game;
-	
-	Screens current_screen;
-	Input input;
 
-	/* PARTICLE STATE */
-	int particle_count;
-	Particle* particles;
-	unsigned int Particle_VBO;
-	unsigned int Particle_VAO;
-
-	/* MENU SCREEN STATE */
-	bool start_active;
-	bool exit_active;
-
-	Camera camera;
-	
-	/* TRAIN STATE */
-	// void *train;
-};
-
-struct State {
-	GameState game_state;
-	Platform platform;
-};
-
-#include "entities/Particles.cpp"
 // #include "entities/Train.cpp"
 
 
 // #include "screens/MainMenu.cpp"
 
-void loadShaders(State *state){
-	if(!state->platform.initialized) return;
+// void loadShaders(State *state){
+	
+	// float particle_vertices[] = {
+ //        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+ //         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+ //         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+ //         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+ //        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+ //        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	// };
 
-	float particle_vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	};
+	// GLuint VAO;
+ //    GLuint VBO;
 
-	GLuint VAO;
-    GLuint VBO;
+ //    glGenVertexArrays(1, &VAO);
+ //    glGenBuffers(1, &VBO);
 
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+ //    glBindVertexArray(VAO);
+ //    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+ //    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
+ //    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
+ //    glEnableVertexAttribArray(0);
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
-    glEnableVertexAttribArray(0);
+    // state->game_state.Particle_VAO = VAO;
+    // state->game_state.Particle_VBO = VBO;
 
-    state->game_state.Particle_VAO = VAO;
-    state->game_state.Particle_VBO = VBO;
+	// state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
+    // state->platform.loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
+// }
 
-	state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    state->platform.loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
-}
-
-static struct State *init()
+static void init(State *state)
 {
-	printf("INIT\n");
-	/* -- Setup our entire program state -- */
-    State *state = (State *)malloc(sizeof(*state));
-	// State *state = new State();
-
+	//Setup our entire game and GL state 
+    
     //Game state for runtime
     state->game_state.game_started = false;
     state->game_state.quit_game = false;
@@ -87,20 +61,22 @@ static struct State *init()
     
     state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     
+    //GL Setup
+    glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
+	glEnable(GL_DEPTH_TEST);  
+	glEnable(GL_BLEND); 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+
     //platform for input + rendering
-    state->platform.init();
+	    
 
-    if(!state->platform.initialized) return NULL;
-
-    // loadShaders(state);
-
-    //load shaders
+    // //load shaders
     
-    /* -- Particles Setup -- */
+    // /* -- Particles Setup -- */
     
-    state->game_state.particle_count = 10000;
+    // state->game_state.particle_count = 10000;
 
-    Particles::setup(state);
+    // Particles::setup(state);
 
     /* -- End Particle Setup -- */
 
@@ -113,20 +89,22 @@ static struct State *init()
 
     // state->game_state.train = (void*)new Train(state);
 
-    return state;
 }
 
 static void updateAndRender(State *state){
+	glm::vec3 background(1,1,1);
+	glClearColor(background.x, background.y, background.z, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	GameState *game = &state->game_state;
+	PlatformState *platform = &state->platform;
+	
+	if(platform->windowResized){
+		glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
+	}
+
 	Camera *camera = &game->camera;
-	Platform *platform = &state->platform;
-	
-	platform->getTime();
-	Input input = platform->getInput();
-	platform->clearBuff(glm::vec3(1,1,1));
-	
-	game->input = input;
-	
+
 	// printf("deltaTime: %f\n", platform->deltaTime);
 
 	// view/projection transformations to pass to render functions
@@ -154,28 +132,24 @@ static void updateAndRender(State *state){
 
 	// 		//update camera based on state
 	// 		//this is just for now, we're going to have a fixed camera in the future.
-			if(game->input.up_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-			if(game->input.down_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-			if(game->input.left_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-			if(game->input.right_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+			if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
+			if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
+			if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
+			if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 			
 			// ((Train*)game->train)->update(state, platform->currTime, platform->deltaTime);
 			
-			Particles::update(state, platform->currTime, platform->deltaTime);
+			// Particles::update(state, platform->currTime, platform->deltaTime);
 		
 
 			
 			// ((Train*)game->train)->render(state, projection, view);
-			Particles::render(state, projection, view);
+			// Particles::render(state, projection, view);
 			
 
 
 	// 	} break;
 	// }
-	
-	
-	platform->pollEvents();
-	platform->swapBuffs();	
 }
 
 // static void switchScreen(State *state, Screens newScreen){
@@ -206,35 +180,26 @@ static void updateAndRender(State *state){
 // }
 
 static bool shouldClose(State *state){
-	bool close = false;
-
-	if(!state->platform.initialized) close = true;
-	if(state->platform.closeWindow) close = true;
-
-	return close;	
+	return state->game_state.quit_game;
 }
 
 static void finalize(State *state){
+	printf("UNLOAD\n");
 	free(state);
 }
 
 static void reload(State *state){
 	printf("RELOAD\n");
-	bool success = state->platform.reinit();
-	if(!success){
-		printf("FAILED TO REINIT\n");
-	}
-
-	loadShaders(state);
+	
 }
 static void unload(State *state){
 	printf("UNLOAD\n");
-	if(state->platform.initialized){
-		glDeleteVertexArrays(1, &state->game_state.Particle_VAO);
-    	glDeleteBuffers(1, &state->game_state.Particle_VBO);
+	// if(state->platform.initialized){
+	// 	glDeleteVertexArrays(1, &state->game_state.Particle_VAO);
+ //    	glDeleteBuffers(1, &state->game_state.Particle_VBO);
 
-		state->platform.freeShaders();		
-	}
+	// 	state->platform.freeShaders();		
+	// }
 }
 
 const GameAPI GAME_API = {

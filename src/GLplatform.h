@@ -1,9 +1,7 @@
-#ifndef GAME_PLATFORM
-#define GAME_PLATFORM
-
-
-#define GLEW_STATIC
-#include <GL/glew.h>
+#ifndef GAME_GL_PLATFORM
+#define GAME_GL_PLATFORM
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <GLFW/glfw3.h>
 
@@ -14,35 +12,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
-#include "libs/shader.h"
-#include "libs/model.h"
+// #include "libs/shader.h"
+// #include "libs/model.h"
 
 //Necessary for shader loading
-#include <stdio.h>
-#include <stdlib.h>
 
 
 
 // Default screen width and height
-const float WIDTH = 500;
-const float HEIGHT = 500;
-
 const int MAX_SHADERS = 32;
 const int MAX_MODELS = 32;
 
-struct Platform {
-	bool initialized;
-	bool closeWindow;
 
-	int screenWidth;
-	int screenHeight;
 
-	float currTime;
-	float prevTime;
-	float deltaTime;
-
-	Shader shaders[MAX_SHADERS];
-	int shaderCount;
 
 	// Model models[MAX_MODELS];
 	// int modelCount;
@@ -50,79 +32,24 @@ struct Platform {
 	GLFWwindow *window;
 
 	static void window_resize(GLFWwindow* window, int width, int height){ glViewport(0, 0, width, height); }
-
-	bool init(){
-		if(initialized) return false;
-
-		glfwInit();
-
-		glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3);
-		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3);
-		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-		glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Off The Rail", NULL, NULL);
+ 
+	bool init(GLFWwindow *w){
 		
-		if(window == NULL) {
-			printf("Failed to create GLFW window\n");
-			glfwTerminate();
-			return false;
-		}
-
-		glfwGetFramebufferSize(window, &screenWidth, &screenHeight );
-		glfwSetFramebufferSizeCallback(window, window_resize);
-
-		glfwMakeContextCurrent(window);
-
-		glewExperimental = GL_TRUE;
-		if(glewInit() != GLEW_OK) {
-			printf("Failed to initialize GLEW\n");
-			glfwTerminate();
-			return false;
-		}
-
-		glViewport(0, 0, screenWidth, screenHeight);
-		glEnable(GL_DEPTH_TEST);  
-		glEnable(GL_BLEND); 
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
-
-		/* Setup shader memory */
-		shaderCount = 0;
-		
-		/* Setup model memory */
-		// modelCount = 0;
-		
-		initialized = true;
-
-		return true;
 	}
 
     bool reinit(){
-        glfwTerminate();
+        // glfwTerminate();
         prevTime = 0;
         currTime = 0;
         deltaTime = 0;
         initialized = false;
-        return init();
+        printf("%x\n", window);
+        init(window);
+        return true;
     }
 
-	Input getInput() {
-		Input in = {0};
-
-		in.escape_pressed = (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
-		in.up_pressed = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
-		in.down_pressed = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
-		in.left_pressed = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
-		in.right_pressed = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
-		in.space_pressed = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
-		in.enter_pressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
-
-		return in;
-	}
 
 	void pollEvents(){
-		glfwGetFramebufferSize(window, &screenWidth, &screenHeight);
-		glfwPollEvents();
 		closeWindow = glfwWindowShouldClose(window);
 	}
 
@@ -137,9 +64,7 @@ struct Platform {
 	}
 
 	float getTime(){
-		prevTime = currTime;
-        currTime = glfwGetTime();
-        deltaTime = currTime - prevTime;
+		
 
 		return currTime;
 	}

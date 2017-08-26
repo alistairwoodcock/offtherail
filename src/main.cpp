@@ -1,4 +1,8 @@
+#include <stdlib.h>
 #include <stdio.h>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 
 //dynamic lib loading on unix
 #include <unistd.h>
@@ -13,13 +17,17 @@ const char *GAME_LIBRARY = "build/game.dylib";
 struct Game {
     void *handle;
     ino_t id;
-    struct GameAPI api;
-    struct State *state;
+    GameAPI api;
+    State *state;
+    GLFWwindow *window;
 };
 
 //Func definitions
-// void handle_input(GLFWwindow *window);
-// void window_resize(GLFWwindow* window, int width, int height);
+Input get_current_input(GLFWwindow *window);
+void window_resize(GLFWwindow* window, int width, int height);
+void load_game_lib(Game *game);
+void unload_game_lib(Game *game);
+
 
 void load_game_lib(Game *game){
 	struct stat attr;
@@ -36,7 +44,8 @@ void load_game_lib(Game *game){
             if (api != NULL) {
                 game->api = *api;
                 if (game->state == NULL)
-                    game->state = game->api.init();
+                    game->api.init(game->state);
+
                 game->api.reload(game->state);
             } else {
                 dlclose(game->handle);
@@ -61,66 +70,100 @@ void unload_game_lib(Game *game)
     }
 }
 
-//Timing
-float deltaTime = 0.0f;
-float prevTime = 0.0f;
+
+float screenWidth = 500;
+float screenHeight = 500;
+
+bool windowResized = false;
 
 int main(){
 
 	Game game = {0};
+	State *state = (State *)malloc(sizeof(*state));
 
-	while(true)
+	glfwInit();
+
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+
+	game.window = glfwCreateWindow(screenWidth, screenHeight, "Off The Rail", NULL, NULL);
+	
+	if(game.window == NULL) {
+		printf("Failed to create GLFW window\n");
+		glfwTerminate();
+		return false;
+	}
+
+	game.state = state;
+	game.state->platform.window = game.window;
+
+	glfwSetFramebufferSizeCallback(game.window, window_resize);
+    glfwMakeContextCurrent(game.window);
+
+    glewExperimental = GL_TRUE;
+	if(glewInit() != GLEW_OK) {
+		printf("Failed to initialize GLEW\n");
+		glfwTerminate();
+		return false;
+	}
+
+	bool close = false;
+	while(!close)
 	{
+		glfwPollEvents();
+		
 		load_game_lib(&game);
 		if(game.handle){
-			
-			game.api.updateAndRender(game.state); //TODO(AL): use GLFW
 
-			if(game.api.shouldClose(game.state)) break;
+			Input input = get_current_input(game.window);
+			game.state->platform.input = input;
+
+			//set width + height 
+			game.state->platform.windowResized = windowResized;
+			windowResized = false; //reset so we can flag for next resize
+			game.state->platform.screenWidth = screenWidth;
+			game.state->platform.screenHeight = screenHeight;
+
+			//time update
+			game.state->platform.prevTime = game.state->platform.currTime;
+			game.state->platform.currTime = glfwGetTime();
+			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
+			
+			game.api.updateAndRender(game.state);
+
+			close = game.api.shouldClose(game.state);
 
 			usleep(1000);
 		}
 
+		glfwSwapBuffers(game.window);
+
+		close = (close || glfwWindowShouldClose(game.window));
 	}
 
 	return 0;
-
-	// Game::updateDimensions(screenWidth, screenHeight);
-
-	// Game::setup();
-
-	// bool close = false;
-
-	// while(!close)
-	// {
-		
-	// 	//Time
-	// 	float currentTime = glfwGetTime();
-	// 	deltaTime = currentTime - prevTime;
-	// 	prevTime = currentTime;
-
-	// 	// input handling
-	// 	Game::handleInput(window);
-
-	// 	// clear buffer
-	// 	glm::vec3 bg = Game::getBackgroundColor();
-	// 	glClearColor(bg.x, bg.y, bg.z, 1.0f);
-	// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// 	//run game update
-	// 	Game::update(deltaTime);
-
-	// 	//flip that graphcis buff to the screen
-	// 	glfwSwapBuffers(window);
-	// 	glfwPollEvents();
-
-	// 	close = glfwWindowShouldClose(window) || Game::shouldClose();
-	// }
 }
 
-// void window_resize(GLFWwindow* window, int width, int height)
-// {
-// 	Game::updateDimensions(width, height);
-// 	glViewport(0, 0, width, height);
-// }
+Input get_current_input(GLFWwindow* window){
+	Input in = {0};
+
+	in.escape_pressed = (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS);
+	in.w_pressed = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS);
+	in.s_pressed = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
+	in.a_pressed = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
+	in.d_pressed = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
+	in.space_pressed = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
+	in.enter_pressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+
+	return in;
+}
+
+void window_resize(GLFWwindow* window, int width, int height)
+{
+	screenWidth = width;
+	screenHeight = height;
+	windowResized = true;
+}
 
