@@ -10,48 +10,19 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
+#include "GLPlatform.h"
 
 #include "game.h"
+
 #include "entities/Camera.h"
 
-
+#include "entities/Particles.cpp"
 // #include "entities/Train.cpp"
-
-
 // #include "screens/MainMenu.cpp"
-
-// void loadShaders(State *state){
-	
-	// float particle_vertices[] = {
- //        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
- //         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
- //         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
- //         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
- //        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
- //        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	// };
-
-	// GLuint VAO;
- //    GLuint VBO;
-
- //    glGenVertexArrays(1, &VAO);
- //    glGenBuffers(1, &VBO);
-
- //    glBindVertexArray(VAO);
- //    glBindBuffer(GL_ARRAY_BUFFER, VBO);
- //    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
- //    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
- //    glEnableVertexAttribArray(0);
-
-    // state->game_state.Particle_VAO = VAO;
-    // state->game_state.Particle_VBO = VBO;
-
-	// state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    // state->platform.loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
-// }
 
 static void init(State *state)
 {
+	printf("INIT");
 	//Setup our entire game and GL state 
     
     //Game state for runtime
@@ -70,13 +41,38 @@ static void init(State *state)
     //platform for input + rendering
 	    
 
-    // //load shaders
+    //load shaders
     
-    // /* -- Particles Setup -- */
-    
-    // state->game_state.particle_count = 10000;
+    /* -- Particles Setup -- */
+    float particle_vertices[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	};
 
-    // Particles::setup(state);
+	GLuint VAO;
+    GLuint VBO;
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
+    glEnableVertexAttribArray(0);
+
+    state->game_state.Particle_VAO = VAO;
+    state->game_state.Particle_VBO = VBO;
+
+	// state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
+    state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
+    state->game_state.particle_count = 10000;
+
+    Particles::setup(state);
 
     /* -- End Particle Setup -- */
 
@@ -92,6 +88,7 @@ static void init(State *state)
 }
 
 static void updateAndRender(State *state){
+	// printf("A\n");
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -103,6 +100,7 @@ static void updateAndRender(State *state){
 		glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
 	}
 
+	// printf("B\n");
 	Camera *camera = &game->camera;
 
 	// printf("deltaTime: %f\n", platform->deltaTime);
@@ -139,17 +137,19 @@ static void updateAndRender(State *state){
 			
 			// ((Train*)game->train)->update(state, platform->currTime, platform->deltaTime);
 			
-			// Particles::update(state, platform->currTime, platform->deltaTime);
+			// printf("C\n");
+			Particles::update(state, platform->currTime, platform->deltaTime);
 		
 
 			
 			// ((Train*)game->train)->render(state, projection, view);
-			// Particles::render(state, projection, view);
+			Particles::render(state, projection, view);
 			
 
 
 	// 	} break;
 	// }
+			// printf("D\n");
 }
 
 // static void switchScreen(State *state, Screens newScreen){

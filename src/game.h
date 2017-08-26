@@ -3,7 +3,10 @@
 
 #include <GLFW/glfw3.h>
 
+#include "libs/Shader.h"
+
 #include "entities/Camera.h"
+#include "entities/Particles.h"
 
 enum Screens {
 	MAIN_MENU,
@@ -47,10 +50,11 @@ struct GameState {
 	Screens current_screen;
 	
 	// /* PARTICLE STATE */
-	// int particle_count;
-	// Particle* particles;
-	// unsigned int Particle_VBO;
-	// unsigned int Particle_VAO;
+	int particle_count;
+	Particle* particles;
+	Shader particleShader;
+	unsigned int Particle_VBO;
+	unsigned int Particle_VAO;
 
 	// /* MENU SCREEN STATE */
 	// bool start_active;

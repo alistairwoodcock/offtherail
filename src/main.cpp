@@ -28,6 +28,7 @@ void window_resize(GLFWwindow* window, int width, int height);
 void load_game_lib(Game *game);
 void unload_game_lib(Game *game);
 
+bool first_load = true;
 
 void load_game_lib(Game *game){
 	struct stat attr;
@@ -43,8 +44,10 @@ void load_game_lib(Game *game){
             const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
             if (api != NULL) {
                 game->api = *api;
-                if (game->state == NULL)
+                if (first_load){
+                	first_load = false;
                     game->api.init(game->state);
+                }
 
                 game->api.reload(game->state);
             } else {
@@ -113,7 +116,7 @@ int main(){
 	while(!close)
 	{
 		glfwPollEvents();
-		
+
 		load_game_lib(&game);
 		if(game.handle){
 
