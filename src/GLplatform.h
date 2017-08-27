@@ -5,7 +5,9 @@
 #include <iostream>
 
 #include "libs/shader.h"
-// #include "libs/model.h"
+#include "libs/mesh.cpp"
+#include "libs/model.cpp"
+
 
 // Default screen width and height
 // const int MAX_SHADERS = 32;
@@ -17,16 +19,60 @@ void freeShaders(Shader s);
 Shader loadShader(const char* shaderName, const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr);
 
 
+unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
+{
+    std::string filename = std::string(path);
+    filename = directory + '/' + filename;
+
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
+}
+
+
 Shader loadShader(const char* shaderName, const char* vertexPath, const char* fragmentPath, const char* geometryPath){
     
     // 1. retrieve the vertex/fragment source code from filePath
     char* vShaderCode = loadFileText(vertexPath);
-    if(vShaderCode == NULL) return {0};
+
+    Shader shader = {0};
+
+    if(vShaderCode == NULL) return shader;
 
     char* fShaderCode = loadFileText(fragmentPath);
     if(fShaderCode == NULL){
         free(vShaderCode);
-        return {0};
+        return shader;
     } 
     
 
@@ -38,7 +84,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
         if(gShaderCode == NULL){
             free(vShaderCode);
             free(fShaderCode);
-            return {0};
+            return shader;
         }   
     }
 
@@ -83,14 +129,12 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
     if (geometryPath != nullptr)
         glDeleteShader(geometry);
 
-    Shader shader;
     shader.ID = ID;
     shader.name = "";
 
     int shaderNameLen = strlen(shaderName);
 
     if(shaderNameLen > 0){
-        printf("strlen('%s'):%i \n", shaderName, strlen(shaderName));
         
         shader.name = (char*)malloc(strlen(shaderName)+1);
         for(int i = 0; i < strlen(shaderName); i++){

@@ -3,9 +3,12 @@
 
 #include <GLFW/glfw3.h>
 
-#include "libs/Shader.h"
+#include "libs/shader.h"
+#include "libs/model.h"
+
 
 #include "entities/Camera.h"
+#include "entities/Train.h"
 #include "entities/Particles.h"
 
 enum Screens {
@@ -49,21 +52,25 @@ struct GameState {
 	
 	Screens current_screen;
 	
-	// /* PARTICLE STATE */
+	/* PARTICLE STATE */
 	int particle_count;
 	Particle* particles;
 	Shader particleShader;
 	unsigned int Particle_VBO;
 	unsigned int Particle_VAO;
 
-	// /* MENU SCREEN STATE */
+	/* TRAIN STATE */ 
+	Shader trainShader;
+	Model *trainModel;
+	Train *train;
+
+	/* MENU SCREEN STATE */
 	// bool start_active;
 	// bool exit_active;
 
 	Camera camera;
 	
-	/* TRAIN STATE */
-	// void *train;
+	
 };
 
 struct State {

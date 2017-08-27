@@ -17,7 +17,7 @@
 #include "entities/Camera.h"
 
 #include "entities/Particles.cpp"
-// #include "entities/Train.cpp"
+#include "entities/Train.cpp"
 // #include "screens/MainMenu.cpp"
 
 static void init(State *state)
@@ -68,7 +68,6 @@ static void init(State *state)
     state->game_state.Particle_VAO = VAO;
     state->game_state.Particle_VBO = VBO;
 
-	// state->platform.loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
     state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
     state->game_state.particle_count = 10000;
 
@@ -78,12 +77,10 @@ static void init(State *state)
 
 
 
-    // Shader s = state->platform.getShader("particle");
-    
-    //load models
-    // state->platform.loadModel("train", "models/train/locomotive/Locomotive C36.obj");
-
-    // state->game_state.train = (void*)new Train(state);
+    /* -- Train Setup -- */
+    state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
+	state->game_state.trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
+    state->game_state.train = new Train();
 
 }
 
@@ -135,14 +132,14 @@ static void updateAndRender(State *state){
 			if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
 			if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 			
-			// ((Train*)game->train)->update(state, platform->currTime, platform->deltaTime);
+			Trains::update(state, platform->currTime, platform->deltaTime);
 			
 			// printf("C\n");
 			Particles::update(state, platform->currTime, platform->deltaTime);
 		
 
 			
-			// ((Train*)game->train)->render(state, projection, view);
+			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			
 
