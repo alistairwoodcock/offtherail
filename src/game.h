@@ -11,7 +11,7 @@
 #include "entities/Train.h"
 #include "entities/Particles.h"
 
-// #include "screens/MainMenu.h"
+#include "screens/MainMenu.h"
 
 
 enum Screens {
@@ -19,11 +19,6 @@ enum Screens {
 	CHOOSE,
 	GAME
 };
-
-// struct GLState{
-// 	Shader shaders[MAX_SHADERS];
-// 	int shaderCount;
-// };
 
 struct Input {
 	bool a_pressed;
@@ -69,9 +64,9 @@ struct GameState {
 
 	/* MENU SCREEN STATE */
 	Shader textShader;
-	// MenuImage *logo;
-	// MenuImage *startText;
-	// MenuImage *exitText;
+	MenuImage *logo;
+	MenuImage *startText;
+	MenuImage *exitText;
 
 	bool start_active;
 	bool exit_active;

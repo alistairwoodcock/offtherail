@@ -18,7 +18,7 @@
 
 #include "entities/Particles.cpp"
 #include "entities/Train.cpp"
-// #include "screens/MainMenu.cpp"
+#include "screens/MainMenu.cpp"
 
 static void init(State *state)
 {
@@ -78,7 +78,7 @@ static void init(State *state)
 
 
     /* -- Menu Setup --*/
-    // MainMenu::setup(state);
+    MainMenu::setup(state);
 
 
     /* -- Train Setup -- */
@@ -96,44 +96,36 @@ static void updateAndRender(State *state){
 	
 	GameState *game = &state->game_state;
 	PlatformState *platform = &state->platform;
+	Camera *camera = &game->camera;
 	
 	if(platform->windowResized){
 		printf("screenWidth: %i\n", platform->screenWidth);
 		glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
 	}
 
-	// printf("B\n");
-	Camera *camera = &game->camera;
-
-	// printf("deltaTime: %f\n", platform->deltaTime);
-
 	// view/projection transformations to pass to render functions
 	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, 100.0f);
 	glm::mat4 view = camera->GetViewMatrix();
 	
-	// game->current_screen = GAME;
-
-	// switch(game->current_screen)
-	// {
-		// case MAIN_MENU: {
-
-			// printf("MAIN_MENU\n");
+	switch(game->current_screen)
+	{
+		case MAIN_MENU: {
 			
-			// MainMenu::update(state, platform->currTime, platform->deltaTime);
+			MainMenu::update(state, platform->currTime, platform->deltaTime);
 			
-			// MainMenu::render(state, projection, view);
+			MainMenu::render(state, projection, view);
 
-		// } break;
+		} break;
 
-		// case CHOOSE: {
-			// printf("CHOOSE\n");
+		case CHOOSE: {
+			
 
 
 
-		// } break;
+		} break;
 
-		// case GAME: {
-			// printf("GAME\n")
+		case GAME: {
+			
 
 			//update camera based on state
 			//this is just for now, we're going to have a fixed camera in the future.
@@ -148,8 +140,8 @@ static void updateAndRender(State *state){
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 
-		// } break;
-	// }
+		} break;
+	}
 
 }
 

@@ -134,22 +134,19 @@ int main(){
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
 			
-			if( game.state->platform.deltaTime >= maxPeriod ) {
+			Input input = get_current_input(game.window);
+			game.state->platform.input = input;
 
-				Input input = get_current_input(game.window);
-				game.state->platform.input = input;
-
-				//set width + height 
-				game.state->platform.windowResized = windowResized;
-				windowResized = false; //reset so we can flag for next resize
-				game.state->platform.screenWidth = screenWidth;
-				game.state->platform.screenHeight = screenHeight;
+			//set width + height 
+			game.state->platform.windowResized = windowResized;
+			windowResized = false; //reset so we can flag for next resize
+			game.state->platform.screenWidth = screenWidth;
+			game.state->platform.screenHeight = screenHeight;
 				
-				game.api.updateAndRender(game.state);
+			game.api.updateAndRender(game.state);
 
-				close = game.api.shouldClose(game.state);
-		    }
-		    
+			close = game.api.shouldClose(game.state);
+
 		}
 
 		glfwSwapBuffers(game.window);

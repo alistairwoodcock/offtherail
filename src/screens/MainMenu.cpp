@@ -19,6 +19,7 @@ namespace MainMenu{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, image->width, image->height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
+		stbi_set_flip_vertically_on_load(false);
 		stbi_image_free(data);
 
 		glGenVertexArrays(1, &image->VAO);
@@ -78,8 +79,6 @@ namespace MainMenu{
 		game->logo->scale_vel = 0.1;
 		setupImage("images/logo.png", game->logo, logo_vertices, sizeof(logo_vertices));
 
-		printf("logo->glTexture: %u\n", game->logo->glTexture);
-		
 		game->startText = new MenuImage();
 		game->startText->z = -1;
 		game->startText->y = -0.1;
@@ -87,8 +86,6 @@ namespace MainMenu{
 		game->startText->scale_vel = 0;
 		setupImage("images/start.png", game->startText, logo_vertices, sizeof(logo_vertices));
 		
-		printf("startText->glTexture: %u\n", game->startText->glTexture);
-
 		game->exitText = new MenuImage();
 		game->exitText->z = -1;
 		game->exitText->y = -0.3;
@@ -96,8 +93,6 @@ namespace MainMenu{
 		game->exitText->scale_vel = 0;
 		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
 
-		printf("exitText->glTexture: %u\n", game->exitText->glTexture);
-		
 		game->textShader = loadShader("text", "src/shaders/text.vs","src/shaders/text.fs");
 		useShader(game->textShader.ID);
 		shaderSetInt(game->textShader.ID, "textTexture", 0);
@@ -152,7 +147,6 @@ namespace MainMenu{
 				game->quit_game = true;
 			} 
 			if(game->start_active){
-				printf("WE GET HERE\n");
 				game->current_screen = GAME;
 			}
 		}
@@ -161,13 +155,6 @@ namespace MainMenu{
 		{
 			game->quit_game = true;
 		}
-
-		printf("game->current_screen: %i\n", game->current_screen);
-		printf("game->exit_active: %i\n", game->exit_active);
-		printf("game->start_active: %i\n", game->start_active);
-		
-		printf("input->w_pressed: %i\n", input->w_pressed);
-		printf("input->space_pressed: %i\n", input->space_pressed);
 	}
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
