@@ -11,7 +11,7 @@
 #include "entities/Train.h"
 #include "entities/Particles.h"
 
-#include "screens/MainMenu.h"
+#include "screens/MenuImage.h"
 
 
 enum Screens {
@@ -25,6 +25,7 @@ struct Input {
 	bool d_pressed;
 	bool w_pressed;
 	bool s_pressed;
+	bool p_pressed;
 	bool space_pressed;
 	bool enter_pressed;
 	bool escape_pressed;
@@ -47,6 +48,7 @@ struct PlatformState {
 struct GameState {
 	bool game_started;
 	bool quit_game;
+	bool paused;
 	
 	Screens current_screen;
 	
@@ -67,9 +69,15 @@ struct GameState {
 	MenuImage *logo;
 	MenuImage *startText;
 	MenuImage *exitText;
-
 	bool start_active;
 	bool exit_active;
+
+	/* OVERLAY SCREEN STATE */
+	MenuImage *overlay;
+	MenuImage *resumeText;
+	bool overlay_active;
+	bool resume_active;
+
 
 	Camera camera;
 	

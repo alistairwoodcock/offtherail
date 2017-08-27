@@ -25,6 +25,7 @@ namespace Particles {
 	}
 
 	void update(State *state, float time, float deltaTime){
+		GameState *game  = &state->game_state;
 		int particle_count = state->game_state.particle_count;
 		Particle *particles = state->game_state.particles;
 
@@ -44,9 +45,10 @@ namespace Particles {
 
 			if(p->y < -2)
 			{
-				p->y = -1;
-				p->x = 0;
-				p->z = 3;
+				
+				p->y = game->train->y + 5;
+				p->x = game->train->x;
+				p->z = game->train->z;
 				p->x_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
 				p->y_vel = ((std::rand()%100))/50.0;
 				p->z_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
@@ -78,11 +80,11 @@ namespace Particles {
 
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-			model = glm::scale(model, glm::vec3(0.02f));
+			model = glm::scale(model, glm::vec3(0.2f));
 			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
 			
 			shaderSetMat4(ID, "model", model);
-			shaderSetVec3(ID, "color", glm::vec3(1,1.0,0.0));
+			shaderSetVec3(ID, "color", glm::vec3(1,0.0,0.0));
 			shaderSetFloat(ID, "alpha", p->alpha);
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);

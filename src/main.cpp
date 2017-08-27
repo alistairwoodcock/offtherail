@@ -114,6 +114,8 @@ int main(){
 	game.state->platform.screenWidth = screenWidth;
 	game.state->platform.screenHeight = screenHeight;
 
+	printf("SCREEN width: %i\n", screenWidth);
+
     glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) {
 		printf("Failed to initialize GLEW\n");
@@ -165,6 +167,7 @@ Input get_current_input(GLFWwindow* window){
 	in.s_pressed = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS);
 	in.a_pressed = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS);
 	in.d_pressed = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
+	in.p_pressed = (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 	in.space_pressed = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 	in.enter_pressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
 

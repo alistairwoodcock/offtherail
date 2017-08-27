@@ -19,6 +19,7 @@
 #include "entities/Particles.cpp"
 #include "entities/Train.cpp"
 #include "screens/MainMenu.cpp"
+#include "screens/OverlayMenu.cpp"
 
 static void init(State *state)
 {
@@ -79,6 +80,7 @@ static void init(State *state)
 
     /* -- Menu Setup --*/
     MainMenu::setup(state);
+    OverlayMenu::setup(state);
 
 
     /* -- Train Setup -- */
@@ -126,16 +128,20 @@ static void updateAndRender(State *state){
 
 		case GAME: {
 			
-
-			//update camera based on state
-			//this is just for now, we're going to have a fixed camera in the future.
-			if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-			if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-			if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-			if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+			OverlayMenu::update(state, platform->currTime, platform->deltaTime);
+			OverlayMenu::render(state, projection, view);
 			
-			Trains::update(state, platform->currTime, platform->deltaTime);
-			Particles::update(state, platform->currTime, platform->deltaTime);
+			if(!game->paused){
+				//update camera based on state
+				//this is just for now, we're going to have a fixed camera in the future.
+				if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
+				if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
+				if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
+				if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+				
+				Trains::update(state, platform->currTime, platform->deltaTime);
+				Particles::update(state, platform->currTime, platform->deltaTime);
+			}			
 			
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
