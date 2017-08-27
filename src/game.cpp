@@ -76,6 +76,9 @@ static void init(State *state)
     /* -- End Particle Setup -- */
 
 
+    /* -- Menu Setup --*/
+    // MainMenu::setup(state);
+
 
     /* -- Train Setup -- */
     state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
@@ -85,7 +88,7 @@ static void init(State *state)
 }
 
 static void updateAndRender(State *state){
-	// printf("A\n");
+	
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -106,77 +109,53 @@ static void updateAndRender(State *state){
 	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, 100.0f);
 	glm::mat4 view = camera->GetViewMatrix();
 	
+	// game->current_screen = GAME;
 
-	// switch(state->current_screen)
+	// switch(game->current_screen)
 	// {
-	// 	case MAIN_MENU: {
+		// case MAIN_MENU: {
+
+			// printf("MAIN_MENU\n");
 			
-	// 		// MainMenu::update(state, time, deltaTime);
+			// MainMenu::update(state, platform->currTime, platform->deltaTime);
+			
+			// MainMenu::render(state, projection, view);
 
-	// 		// MainMenu::render(projection, view);
+		// } break;
 
-	// 	} break;
-
-	// 	case CHOOSE: {
-
+		// case CHOOSE: {
+			// printf("CHOOSE\n");
 
 
-	// 	} break;
 
-	// 	case GAME: {
+		// } break;
 
-	// 		//update camera based on state
-	// 		//this is just for now, we're going to have a fixed camera in the future.
+		// case GAME: {
+			// printf("GAME\n")
+
+			//update camera based on state
+			//this is just for now, we're going to have a fixed camera in the future.
 			if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
 			if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
 			if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
 			if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 			
-			Trains::update(state, platform->currTime, platform->deltaTime);
-			
-			// printf("C\n");
+			// Trains::update(state, platform->currTime, platform->deltaTime);
 			Particles::update(state, platform->currTime, platform->deltaTime);
-		
-
 			
-			Trains::render(state, projection, view);
+			// Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
-			
 
-
-	// 	} break;
+		// } break;
 	// }
-			// printf("D\n");
+
 }
 
-// static void switchScreen(State *state, Screens newScreen){
-// 	GameState *game = &state->game_state;
-
-// 	game->current_screen = newScreen;
-
-// 	switch(newScreen)
-// 	{
-// 		case MAIN_MENU: {
-
-// 			// MainMenu::setup(state);
-
-// 		} break;
-
-// 		case CHOOSE: {
-
-
-// 		} break;
-
-// 		case GAME: {
-
-// 			// Train::setup(state);
-// 			// Particles::setup(state);
-
-// 		} break;
-// 	}
-// }
 
 static bool shouldClose(State *state){
+	if(state->game_state.quit_game){
+		printf("SHOULD CLOSE\n");
+	}
 	return state->game_state.quit_game;
 }
 
@@ -191,12 +170,6 @@ static void reload(State *state){
 }
 static void unload(State *state){
 	printf("UNLOAD\n");
-	// if(state->platform.initialized){
-	// 	glDeleteVertexArrays(1, &state->game_state.Particle_VAO);
- //    	glDeleteBuffers(1, &state->game_state.Particle_VBO);
-
-	// 	state->platform.freeShaders();		
-	// }
 }
 
 const GameAPI GAME_API = {
@@ -207,119 +180,3 @@ const GameAPI GAME_API = {
     .updateAndRender = updateAndRender,
     .shouldClose = shouldClose
 };
-
-
-/*
-
-namespace Game {
-
-	//Game state object
-	// State state = {0};
-	
-	Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
-	
-	unsigned int screenWidth;
-	unsigned int screenHeight;
-	
-	float time = 0; //total game time
-
-	//initialise the very start of the game code
-	void setup(){
-
-		state.game_started = false;
-		
-		switchScreen(MAIN_MENU);
-	}
-
-	//does all initialisation for screens
-	//lets discuss if this is the best way to go
-	void switchScreen(Screens newScreen){
-		state.current_screen = newScreen;
-
-		switch(newScreen)
-		{
-			case MAIN_MENU: {
-
-				MainMenu::setup(state);
-
-			} break;
-
-			case CHOOSE: {
-
-
-			} break;
-
-			case GAME: {
-
-				Train::setup(state);
-				Particles::setup(state);
-
-			} break;
-		}
-	}
-
-	//gets called from the main loop
-	//we render every frame and update logic here
-	void update(float deltaTime){
-		time += deltaTime;
-
-		// printf("Time: %f\n", time);
-
-		// view/projection transformations to pass to render functions
-		glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)screenWidth / (float)screenHeight, 0.1f, 100.0f);
-		glm::mat4 view = camera.GetViewMatrix();
-
-		switch(state.current_screen)
-		{
-			case MAIN_MENU: {
-				
-				MainMenu::update(state, time, deltaTime);
-
-				MainMenu::render(projection, view);
-
-			} break;
-
-			case CHOOSE: {
-
-
-
-			} break;
-
-			case GAME: {
-
-				//update camera based on state
-				//this is just for now, we're going to have a fixed camera in the future.
-				if(state.up_pressed) camera.ProcessKeyboard(FORWARD, deltaTime);
-				if(state.down_pressed) camera.ProcessKeyboard(BACKWARD, deltaTime);
-				if(state.left_pressed) camera.ProcessKeyboard(LEFT, deltaTime);
-				if(state.right_pressed) camera.ProcessKeyboard(RIGHT, deltaTime);
-				
-				Train::update(state, time, deltaTime);
-				Particles::update(state, time, deltaTime);
-			
-
-				Train::render(projection, view);
-				Particles::render(projection, view);
-
-			} break;
-		}
-		
-	}
-
-	//Stuff below mostly gets called from our main function
-	//for handing window input rendering setup and all that
-
-	void updateDimensions(unsigned int width, unsigned int height){
-		screenWidth = width;
-		screenHeight = height;
-	}
-
-	glm::vec3 getBackgroundColor(){
-		return glm::vec3(1,1,1);
-	}
-
-	bool shouldClose(){
-		return state.quit_game;
-	}
-}
-*/

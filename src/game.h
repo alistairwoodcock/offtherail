@@ -6,10 +6,13 @@
 #include "libs/shader.h"
 #include "libs/model.h"
 
-
+#include "entities/Entity.h"
 #include "entities/Camera.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
+
+// #include "screens/MainMenu.h"
+
 
 enum Screens {
 	MAIN_MENU,
@@ -65,8 +68,13 @@ struct GameState {
 	Train *train;
 
 	/* MENU SCREEN STATE */
-	// bool start_active;
-	// bool exit_active;
+	Shader textShader;
+	// MenuImage *logo;
+	// MenuImage *startText;
+	// MenuImage *exitText;
+
+	bool start_active;
+	bool exit_active;
 
 	Camera camera;
 	
