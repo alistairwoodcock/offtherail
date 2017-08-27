@@ -33,6 +33,7 @@ static void init(State *state)
     state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     
     //GL Setup
+    printf("screenWidth: %i\n", state->platform.screenWidth);
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
 	glEnable(GL_BLEND); 
@@ -97,6 +98,7 @@ static void updateAndRender(State *state){
 	PlatformState *platform = &state->platform;
 	
 	if(platform->windowResized){
+		printf("screenWidth: %i\n", platform->screenWidth);
 		glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
 	}
 
@@ -140,10 +142,10 @@ static void updateAndRender(State *state){
 			if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
 			if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 			
-			// Trains::update(state, platform->currTime, platform->deltaTime);
+			Trains::update(state, platform->currTime, platform->deltaTime);
 			Particles::update(state, platform->currTime, platform->deltaTime);
 			
-			// Trains::render(state, projection, view);
+			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 
 		// } break;

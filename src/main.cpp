@@ -76,8 +76,11 @@ void unload_game_lib(Game *game)
 }
 
 
-float screenWidth = 500;
-float screenHeight = 500;
+const double maxFPS = 60.0;
+const double maxPeriod = 1.0 / maxFPS;
+
+int screenWidth = 500;
+int screenHeight = 500;
 
 bool windowResized = false;
 
@@ -107,6 +110,10 @@ int main(){
 	glfwSetFramebufferSizeCallback(game.window, window_resize);
     glfwMakeContextCurrent(game.window);
 
+	glfwGetFramebufferSize( game.window, &screenWidth, &screenHeight );
+	game.state->platform.screenWidth = screenWidth;
+	game.state->platform.screenHeight = screenHeight;
+
     glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) {
 		printf("Failed to initialize GLEW\n");
@@ -122,25 +129,27 @@ int main(){
 		load_game_lib(&game);
 		if(game.handle){
 
-			Input input = get_current_input(game.window);
-			game.state->platform.input = input;
-
-			//set width + height 
-			game.state->platform.windowResized = windowResized;
-			windowResized = false; //reset so we can flag for next resize
-			game.state->platform.screenWidth = screenWidth;
-			game.state->platform.screenHeight = screenHeight;
-
 			//time update
 			game.state->platform.prevTime = game.state->platform.currTime;
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
 			
-			game.api.updateAndRender(game.state);
+			if( game.state->platform.deltaTime >= maxPeriod ) {
 
-			close = game.api.shouldClose(game.state);
+				Input input = get_current_input(game.window);
+				game.state->platform.input = input;
 
-			usleep(1000);
+				//set width + height 
+				game.state->platform.windowResized = windowResized;
+				windowResized = false; //reset so we can flag for next resize
+				game.state->platform.screenWidth = screenWidth;
+				game.state->platform.screenHeight = screenHeight;
+				
+				game.api.updateAndRender(game.state);
+
+				close = game.api.shouldClose(game.state);
+		    }
+		    
 		}
 
 		glfwSwapBuffers(game.window);
