@@ -19,32 +19,27 @@ namespace OverlayMenu{
 	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
 		};
 
-		// game->overlay = new MenuImage();
-		// game->overlay->z = -1;
-		// game->overlay->y = -0.1;
-		// game->overlay->scale = glm::vec3(1);
-		// game->overlay->scale_vel = 0;
-		// setupImage("images/overlay.png", game->overlay, logo_vertices, sizeof(logo_vertices));
+		game->overlay = new Entity();
+		game->overlay->x = 0;
+		game->overlay->y = 0;
+		game->overlay->z = 5;
+
+		game->overlayShader = loadShader("flat", "src/shaders/flat.vs", "src/shaders/flat.fs");
+		
 		
 		game->resumeText = new MenuImage();
-		game->resumeText->z = -1;
-		game->resumeText->y = -0.3;
-		game->resumeText->scale = glm::vec3(0.15);
+		game->resumeText->x = 0;
+		game->resumeText->y = -0.2;
+		game->resumeText->z = 0;
+		game->resumeText->scale = glm::vec3(0.4);
 		game->resumeText->scale_vel = 0;
-		setupImage("images/exit.png", game->resumeText, logo_vertices, sizeof(logo_vertices));
+		setupImage("images/resume.png", game->resumeText, logo_vertices, sizeof(logo_vertices));
 	}	
 
 	void update(State *state, float time, float deltaTime){
 		GameState *game = &state->game_state;
 		PlatformState *platform = &state->platform;
 		Input input = platform->input;
-
-		printf("game->overlay_active: %i\n", game->overlay_active);
-		printf("game->resume_active: %i\n", game->resume_active);
-		printf("game->exit_active: %i\n", game->exit_active);
-		printf("game->paused: %i\n", game->paused);
-
-		printf("escape_pressed: %i\n", input.escape_pressed);
 
 		if(!game->overlay_active && (input.p_pressed || input.escape_pressed)){
 			game->overlay_active = true;
@@ -56,44 +51,31 @@ namespace OverlayMenu{
 			return;
 		}
 
-
 		MenuImage *logo = game->logo;
 		MenuImage *resumeText = game->resumeText;
 		MenuImage *exitText = game->exitText;
-
+		
 		logo->scale += glm::vec3(1.0)*logo->scale_vel*deltaTime*0.5f;
 		resumeText->scale += glm::vec3(1.0)*resumeText->scale_vel*deltaTime;
 		exitText->scale += glm::vec3(1.0)*exitText->scale_vel*deltaTime;
 		
-		logo->x = game->camera.Position.x + 0.5;
-		logo->y = game->camera.Position.y;
-		logo->z = game->camera.Position.z-2.0;
-
-		resumeText->x = game->camera.Position.x;
-		resumeText->y = game->camera.Position.y + 0.25;
-		resumeText->z = game->camera.Position.z-2.0;
-
-		exitText->x = game->camera.Position.x;
-		exitText->y = game->camera.Position.y - 0.25;
-		exitText->z = game->camera.Position.z-2.0;
-
-		if(logo->scale.x > 0.98) logo->scale_vel = -0.1;
-		if(logo->scale.x <= 0.95) logo->scale_vel = 0.1;
+		if(logo->scale.x > 1.2) logo->scale_vel = -0.1;
+		if(logo->scale.x <= 1.17) logo->scale_vel = 0.1;
 		
 		if(game->resume_active){
-			if(resumeText->scale.x < 0.3) resumeText->scale_vel = 0.5;
-			if(resumeText->scale.x >= 0.3) resumeText->scale_vel = 0;
+			if(resumeText->scale.x < 0.4) resumeText->scale_vel = 0.5;
+			if(resumeText->scale.x >= 0.4) resumeText->scale_vel = 0;
 		} else {
-			if(resumeText->scale.x > 0.2) resumeText->scale_vel = -0.5;
-			if(resumeText->scale.x <= 0.2) resumeText->scale_vel = 0;
+			if(resumeText->scale.x > 0.3) resumeText->scale_vel = -0.5;
+			if(resumeText->scale.x <= 0.3) resumeText->scale_vel = 0;
 		}
 
 		if(game->exit_active){
-			if(exitText->scale.x < 0.3) exitText->scale_vel = 0.5;
-			if(exitText->scale.x >= 0.3) exitText->scale_vel = 0;
+			if(exitText->scale.x < 0.4) exitText->scale_vel = 0.5;
+			if(exitText->scale.x >= 0.4) exitText->scale_vel = 0;
 		} else {
-			if(exitText->scale.x > 0.2) exitText->scale_vel = -0.5;
-			if(exitText->scale.x <= 0.2) exitText->scale_vel = 0;
+			if(exitText->scale.x > 0.3) exitText->scale_vel = -0.5;
+			if(exitText->scale.x <= 0.3) exitText->scale_vel = 0;
 		}
 
 
@@ -116,6 +98,7 @@ namespace OverlayMenu{
 				game->exit_active = false;
 				game->resume_active = false;
 				game->start_active = true;
+				game->input_timeout = 0.5;
 			} 
 			if(game->resume_active){
 				game->current_screen = GAME;
@@ -127,11 +110,28 @@ namespace OverlayMenu{
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
 		GameState *game = &state->game_state;
+		Entity *overlay = game->overlay;
 		if(game->overlay_active){
 
 			renderImage(state, game->logo, projection, view);
 			renderImage(state, game->resumeText, projection, view);
 			renderImage(state, game->exitText, projection, view);
+
+			Shader shader = game->overlayShader;
+			unsigned int ID = shader.ID;
+
+			glm::mat4 model;
+			model = glm::translate(model, glm::vec3(overlay->x,overlay->y,overlay->z));
+			model = glm::scale(model, glm::vec3(10.0f));
+			
+			glBindVertexArray(state->game_state.Particle_VAO);
+			useShader(ID);
+			shaderSetVec3(ID, "color", glm::vec3(1.0,1,1.0));
+			shaderSetFloat(ID, "alpha", 0.7);
+			shaderSetMat4(ID, "position", model);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
+	
 		}
 	}
 

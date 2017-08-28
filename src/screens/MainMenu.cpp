@@ -20,23 +20,25 @@ namespace MainMenu{
 
 		game->logo = new MenuImage();
 		game->logo->x = 0;
-		game->logo->y = 0.3;
-		game->logo->z = -1;
-		game->logo->scale = glm::vec3(0.95);
+		game->logo->y = 0.4;
+		game->logo->z = 0;
+		game->logo->scale = glm::vec3(1.1);
 		game->logo->scale_vel = 0.1;
 		setupImage("images/logo.png", game->logo, logo_vertices, sizeof(logo_vertices));
 
 		game->startText = new MenuImage();
-		game->startText->z = -1;
-		game->startText->y = -0.1;
-		game->startText->scale = glm::vec3(0.3);
+		game->startText->x = 0;
+		game->startText->y = -0.2;
+		game->startText->z = 0;
+		game->startText->scale = glm::vec3(0.5);
 		game->startText->scale_vel = 0;
 		setupImage("images/start.png", game->startText, logo_vertices, sizeof(logo_vertices));
 		
 		game->exitText = new MenuImage();
-		game->exitText->z = -1;
-		game->exitText->y = -0.3;
-		game->exitText->scale = glm::vec3(0.15);
+		game->exitText->x = 0;
+		game->exitText->y = -0.5;
+		game->exitText->z = 0;
+		game->exitText->scale = glm::vec3(0.3);
 		game->exitText->scale_vel = 0;
 		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
 
@@ -56,25 +58,25 @@ namespace MainMenu{
 		logo->scale += glm::vec3(1.0)*logo->scale_vel*deltaTime*0.5f;
 		startText->scale += glm::vec3(1.0)*startText->scale_vel*deltaTime;
 		exitText->scale += glm::vec3(1.0)*exitText->scale_vel*deltaTime;
-		
 
-		if(logo->scale.x > 0.98) logo->scale_vel = -0.1;
-		if(logo->scale.x <= 0.95) logo->scale_vel = 0.1;
+		
+		if(logo->scale.x > 1.2) logo->scale_vel = -0.1;
+		if(logo->scale.x <= 1.17) logo->scale_vel = 0.1;
 		
 		if(game->start_active){
-			if(startText->scale.x < 0.3) startText->scale_vel = 0.5;
-			if(startText->scale.x >= 0.3) startText->scale_vel = 0;
+			if(startText->scale.x < 0.4) startText->scale_vel = 0.5;
+			if(startText->scale.x >= 0.4) startText->scale_vel = 0;
 		} else {
-			if(startText->scale.x > 0.2) startText->scale_vel = -0.5;
-			if(startText->scale.x <= 0.2) startText->scale_vel = 0;
+			if(startText->scale.x > 0.3) startText->scale_vel = -0.5;
+			if(startText->scale.x <= 0.3) startText->scale_vel = 0;
 		}
 
 		if(game->exit_active){
-			if(exitText->scale.x < 0.3) exitText->scale_vel = 0.5;
-			if(exitText->scale.x >= 0.3) exitText->scale_vel = 0;
+			if(exitText->scale.x < 0.4) exitText->scale_vel = 0.5;
+			if(exitText->scale.x >= 0.4) exitText->scale_vel = 0;
 		} else {
-			if(exitText->scale.x > 0.2) exitText->scale_vel = -0.5;
-			if(exitText->scale.x <= 0.2) exitText->scale_vel = 0;
+			if(exitText->scale.x > 0.3) exitText->scale_vel = -0.5;
+			if(exitText->scale.x <= 0.3) exitText->scale_vel = 0;
 		}
 
 		Input *input = &platform->input;

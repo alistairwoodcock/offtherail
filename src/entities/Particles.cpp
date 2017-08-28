@@ -80,7 +80,7 @@ namespace Particles {
 
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-			model = glm::scale(model, glm::vec3(0.2f));
+			model = glm::scale(model, glm::vec3(0.02f));
 			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
 			
 			shaderSetMat4(ID, "model", model);

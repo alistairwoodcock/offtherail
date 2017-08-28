@@ -64,6 +64,9 @@ struct GameState {
 	Model *trainModel;
 	Train *train;
 
+	/* INPUT STATE */
+	float input_timeout;
+
 	/* MENU SCREEN STATE */
 	Shader textShader;
 	MenuImage *logo;
@@ -73,7 +76,8 @@ struct GameState {
 	bool exit_active;
 
 	/* OVERLAY SCREEN STATE */
-	MenuImage *overlay;
+	Shader overlayShader;
+	Entity *overlay;
 	MenuImage *resumeText;
 	bool overlay_active;
 	bool resume_active;

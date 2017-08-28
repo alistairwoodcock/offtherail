@@ -46,9 +46,9 @@ void renderImage(State *state, MenuImage *image, glm::mat4 &projection, glm::mat
 	unsigned int ID = state->game_state.textShader.ID;
 
 	useShader(ID);
-	shaderSetMat4(ID, "projection", projection);
-	shaderSetMat4(ID, "view", view);
-	shaderSetMat4(ID, "model", model);
+	// shaderSetMat4(ID, "projection", projection);
+	// shaderSetMat4(ID, "view", view);
+	shaderSetMat4(ID, "position", model);
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 

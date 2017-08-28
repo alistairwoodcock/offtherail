@@ -12,7 +12,7 @@ namespace Trains {
 	void update(State *state, float time, float deltaTime){
 		
 		state->game_state.train->y = -0;
-		state->game_state.train->y_rot += 50 * deltaTime;
+		state->game_state.train->y_rot += 15 * deltaTime;
 		state->game_state.train->z_rot = 0 ;
 
 	}

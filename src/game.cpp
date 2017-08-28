@@ -33,6 +33,8 @@ static void init(State *state)
     
     state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     
+    state->game_state.input_timeout = 0;
+
     //GL Setup
     printf("screenWidth: %i\n", state->platform.screenWidth);
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
@@ -105,6 +107,15 @@ static void updateAndRender(State *state){
 		glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
 	}
 
+
+	//we set all input to empty when 
+	//the input timeout is running
+	if(game->input_timeout > 0){
+		game->input_timeout -= platform->deltaTime;
+		Input empty = {0};
+		platform->input = empty;
+	}
+
 	// view/projection transformations to pass to render functions
 	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, 100.0f);
 	glm::mat4 view = camera->GetViewMatrix();
@@ -129,7 +140,6 @@ static void updateAndRender(State *state){
 		case GAME: {
 			
 			OverlayMenu::update(state, platform->currTime, platform->deltaTime);
-			OverlayMenu::render(state, projection, view);
 			
 			if(!game->paused){
 				//update camera based on state
@@ -145,6 +155,7 @@ static void updateAndRender(State *state){
 			
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
+			OverlayMenu::render(state, projection, view);
 
 		} break;
 	}
