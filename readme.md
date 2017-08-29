@@ -8,14 +8,14 @@ This project uses ASSIMP, OpenGL, and GLFW.
 The code is structured as follows:
 
 ### main.cpp
-	Uses glfw as the platform layer, takes input from the platform and holds the application state
-	It expects a dynamic library called game.[dylib|so|dll], opens this library and makes update calls
-	to it, passing in the current state of the game. 
-	main.cpp has headers describing the state data of the game.
+Uses glfw as the platform layer, takes input from the platform and holds the application state
+It expects a dynamic library called game.[dylib|so|dll], opens this library and makes update calls
+to it, passing in the current state of the game. 
+main.cpp has headers describing the state data of the game.
 
 ### game.cpp 
-	Game is a dynamic library compiled separately to our main loop (in main.cpp). 
-	It takes the current state of the game, updates it, and outputs render data to the graphics card using OpenGL
+Game is a dynamic library compiled separately to our main loop (in main.cpp). 
+It takes the current state of the game, updates it, and outputs render data to the graphics card using OpenGL
 
 
 ## Building
