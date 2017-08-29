@@ -130,7 +130,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
         glDeleteShader(geometry);
 
     shader.ID = ID;
-    shader.name = "";
+    //shader.name = "";
 
     int shaderNameLen = strlen(shaderName);
 

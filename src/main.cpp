@@ -39,7 +39,7 @@ void load_game_lib(Game *game){
             game->api.unload(game->state);
             dlclose(game->handle);
         }
-        void *handle = dlopen(GAME_LIBRARY, RTLD_NOW);
+        void *handle = dlopen(GAME_LIBRARY, RTLD_LAZY);
         if (handle) {
             game->handle = handle;
             game->id = attr.st_ino;

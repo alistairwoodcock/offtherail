@@ -86,14 +86,13 @@ static void init(State *state)
 
 
     /* -- Train Setup -- */
-    state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
+    /*state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
 	state->game_state.trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    state->game_state.train = new Train();
-
+    state->game_state.train = new Train();*/
 }
 
 static void updateAndRender(State *state){
-	
+
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -149,11 +148,11 @@ static void updateAndRender(State *state){
 				if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
 				if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
 				
-				Trains::update(state, platform->currTime, platform->deltaTime);
+				//Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
 			}			
 			
-			Trains::render(state, projection, view);
+			//Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);
 
