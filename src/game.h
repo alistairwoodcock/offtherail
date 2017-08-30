@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 
 #include "libs/shader.h"
-#include "libs/model.h"
+// #include "libs/model.h"
 
 #include "entities/Entity.h"
 #include "entities/Camera.h"
@@ -60,9 +60,9 @@ struct GameState {
 	unsigned int Particle_VAO;
 
 	/* TRAIN STATE */ 
-	Shader trainShader;
-	Model *trainModel;
-	Train *train;
+	// Shader trainShader;
+	// Model *trainModel;
+	// Train *train;
 
 	/* INPUT STATE */
 	float input_timeout;

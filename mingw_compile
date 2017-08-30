@@ -1,0 +1,5 @@
+mkdir build > /dev/null 2>&1
+
+g++ -lglfw3 -lglew32 -lopengl32  -lassimp -shared -o build/game.dylib src/game.cpp
+
+g++ -lglfw3 -lglew32 -lopengl32 -o build/main src/main.cpp

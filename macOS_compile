@@ -1,3 +1,5 @@
+mkdir build > /dev/null 2>&1
+
 g++ -framework OpenGL -framework GLUT -lglfw -lglew -lassimp -dynamiclib -o build/game.dylib src/game.cpp
 
 g++ -framework OpenGL -lglfw -lglew -lassimp src/main.cpp -o build/main

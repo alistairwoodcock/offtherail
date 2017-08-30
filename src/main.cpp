@@ -1,9 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
-
 #include "libs/stb_image.h"
 
+#define GLEW_STATIC
 #include <GL/glew.h>
+
+#define GLFW_DLL
 #include <GLFW/glfw3.h>
 
 //dynamic lib loading on unix
