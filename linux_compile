@@ -1,2 +1,2 @@
-g++ -lGL -lglut -lglfw -lGLEW -lassimp -fPIC -shared -o build/game.dylib src/game.cpp
-g++ src/main.cpp -lGL -lglut -lglfw -lGLEW -rdynamic -ldl -o build/main
+g++ src/game.cpp -lGL -lglut -lglfw -lGLEW -lassimp -fPIC -shared -o build/game.dylib
+g++ src/main.cpp -lGL -lglut -lglfw -lGLEW -fPIC -rdynamic -ldl -o build/main
