@@ -35,7 +35,7 @@ This swaps out the previous game library implementation.
 need to re-launch for changes to game state.
 
 
-#Setup
+# Setup
 
 ## MinGW
 
