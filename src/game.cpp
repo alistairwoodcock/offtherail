@@ -168,10 +168,22 @@ static void updateAndRender(State *state){
 
 void changeScreen(State *state, Screens screen) {
     state->game_state.current_screen = screen;
-    if (screen == MAIN_MENU)
-        Music::play("sounds/dejavu.wav");
-    else if (screen == GAME)
-        Music::play("sounds/running90s.wav");
+
+    switch(screen)
+    {
+    	case MAIN_MENU: {
+        	Music::play("sounds/dejavu.wav");
+    	} break;
+
+    	case CHOOSE: {
+
+    	} break;
+
+    	case GAME: {
+        	Music::play("sounds/running90s.wav");
+    	} break;
+    }
+    
 }
 
 void paused(State *state, bool paused) {
