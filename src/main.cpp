@@ -42,7 +42,7 @@ bool first_load = true;
 void load_game_lib(Game *game){
 	struct stat attr;
 	#ifdef _WIN32
-	if(load_counter++ > 128){
+	if(load_counter++ > 66){
 		load_counter = 0;
 	#else
 	if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
@@ -170,7 +170,6 @@ int main(){
 			float sleep_time_ms = 33 - game.state->platform.deltaTime * 1000;
 
 			if(sleep_time_ms > 0){
-				printf("sleepTime: %f\ns", game.state->platform.deltaTime * 1000);
 				#ifdef _WIN32
 				Sleep(sleep_time_ms);
 				#else
