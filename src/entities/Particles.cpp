@@ -46,9 +46,9 @@ namespace Particles {
 			if(p->y < -2)
 			{
 				
-				p->y = game->train->y + 5;
-				p->x = game->train->x;
-				p->z = game->train->z;
+				p->y = 0;
+				p->x = 0;
+				p->z = 0;
 				p->x_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
 				p->y_vel = ((std::rand()%100))/50.0;
 				p->z_vel = ((std::rand()%100) - (std::rand()%100))/300.0;

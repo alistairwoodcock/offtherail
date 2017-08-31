@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "libs/stb_image.h"
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 
 #define GLFW_DLL
@@ -15,8 +14,6 @@
 #include <dlfcn.h>
 
 #include "game.h"
-
-const char *GAME_LIBRARY = "build/game.dylib";
 
 struct Game {
     void *handle;
@@ -32,54 +29,88 @@ void window_resize(GLFWwindow* window, int width, int height);
 void load_game_lib(Game *game);
 void unload_game_lib(Game *game);
 
+const char *GAME_LIBRARY = "build/game.dylib";
+const char *GAME_LIBRARY_TMP = "build/game_tmp.dylib";
+
+#ifdef _WIN32 
+#include <windows.h>
+int load_counter = 0;
+#endif
+
 bool first_load = true;
 
 void load_game_lib(Game *game){
 	struct stat attr;
-    if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
-        if (game->handle) {
+	
+	#ifdef _WIN32
+	if(load_counter++ > 66){
+		load_counter = 0;
+	#else
+	if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
+	#endif
+
+		if (game->handle) {
             game->api.unload(game->state);
+            #ifdef _WIN32
+            FreeLibrary((HINSTANCE)game->handle);
+            #else
             dlclose(game->handle);
+            #endif
         }
-        void *handle = dlopen(GAME_LIBRARY, RTLD_LAZY);
-        if (handle) {
-            game->handle = handle;
-            game->id = attr.st_ino;
-            const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
-            if (api != NULL) {
-                game->api = *api;
-                if (first_load){
-                	first_load = false;
-                    game->api.init(game->state);
-                }
 
-                game->api.reload(game->state);
-            } else {
-                dlclose(game->handle);
-                game->handle = NULL;
-                game->id = 0;
-            }
-        } else {
-            game->handle = NULL;
-            game->id = 0;
-        }
-    }
+        CopyFile(GAME_LIBRARY, GAME_LIBRARY_TMP, false);
+
+		void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
+
+	 	if(handle){
+	 		game->handle = handle;
+			game->id = attr.st_ctime;
+			#ifdef _WIN32
+	 		const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
+	 		#else
+	 		const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
+	 		#endif
+
+	 		if(api != NULL){
+	 			game->api = *api;
+	 			if(first_load){
+	 				first_load = false;
+	 				game->api.init(game->state);
+	 			}
+
+	 			game->api.reload(game->state);
+	 		} else {
+	 			#ifdef _WIN32
+	 			FreeLibrary((HINSTANCE)game->handle);
+	 			#else
+	 			dlclose(game->handle);
+	 			#endif
+	 			game->handle = NULL;
+	 			game->id = 0;
+
+	 		}
+	 	} else {
+	 		game->handle = NULL;
+	 		game->id = 0;
+	 	}
+	}
+
+  
 }
 
-void unload_game_lib(Game *game)
-{
-    if (game->handle) {
-        game->api.finalize(game->state);
-        game->state = NULL;
-        dlclose(game->handle);
-        game->handle = NULL;
-        game->id = 0;
-    }
+void unload_game_lib(Game *game){
+	if(game->handle){
+		game->api.finalize(game->state);
+		game->state = NULL;
+		#ifdef _WIN32
+		FreeLibrary((HINSTANCE)game->handle);
+		#else 
+		dlclose(game->handle);
+		#endif
+		game->handle = NULL;
+		game->id = 0;
+	}
 }
-
-
-const double maxFPS = 60.0;
-const double maxPeriod = 1.0 / maxFPS;
 
 int screenWidth = 500;
 int screenHeight = 500;
@@ -87,7 +118,6 @@ int screenHeight = 500;
 bool windowResized = false;
 
 int main(){
-
 	Game game = {0};
 	State *state = (State *)malloc(sizeof(*state));
 
@@ -137,7 +167,18 @@ int main(){
 			game.state->platform.prevTime = game.state->platform.currTime;
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
-			
+
+			float sleep_time_ms = 33 - game.state->platform.deltaTime * 1000;
+
+			if(sleep_time_ms > 0){
+				#ifdef _WIN32
+				Sleep(sleep_time_ms);
+				#else
+				usleep(sleep_time_ms)
+				#endif
+			}
+
+
 			Input input = get_current_input(game.window);
 			game.state->platform.input = input;
 
@@ -151,6 +192,7 @@ int main(){
 
 			close = game.api.shouldClose(game.state);
 
+
 		}
 
 		glfwSwapBuffers(game.window);
@@ -158,7 +200,10 @@ int main(){
 		close = (close || glfwWindowShouldClose(game.window));
 	}
 
-    game.api.finalize(game.state);
+	unload_game_lib(&game);
+
+	free(state);
+
 	return 0;
 }
 

@@ -10,12 +10,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
-#include "GLPlatform.h"
-
 #include "game.h"
 
-#include "entities/Camera.h"
+#include "libs/shader.cpp"
+#include "libs/model.cpp"
+#include "libs/music.cpp"
 
+#include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Train.cpp"
 #include "screens/MainMenu.cpp"

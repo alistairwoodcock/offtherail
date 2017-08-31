@@ -4,14 +4,8 @@
 #include <string>
 #include <iostream>
 
-#include "libs/shader.h"
-#include "libs/mesh.cpp"
-#include "libs/model.cpp"
+#include "shader.h"
 
-
-// Default screen width and height
-// const int MAX_SHADERS = 32;
-// const int MAX_MODELS = 32;
 
 void checkCompileErrors(GLuint shader, std::string type);
 char* loadFileText(const char* fileName);
