@@ -21,10 +21,15 @@
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
+#include "Music.cpp"
+
 static void init(State *state)
 {
 	printf("INIT");
 	//Setup our entire game and GL state 
+    
+    /* -- Music Setup -- */
+    Music::init(); // Need to init before first changeScreen()
     
     //Game state for runtime
     state->game_state.game_started = false;
@@ -162,11 +167,16 @@ static void updateAndRender(State *state){
 }
 
 void changeScreen(State *state, Screens screen) {
-   state->game_state.current_screen = screen; 
+    state->game_state.current_screen = screen;
+    if (screen == MAIN_MENU)
+        Music::play("sounds/dejavu.wav");
+    else if (screen == GAME)
+        Music::play("sounds/running90s.wav");
 }
 
 void paused(State *state, bool paused) {
     state->game_state.paused = paused;
+    Music::pause(paused);
 }
 
 static bool shouldClose(State *state){
@@ -179,6 +189,7 @@ static bool shouldClose(State *state){
 static void finalize(State *state){
 	printf("FINALIZE\n");
 	free(state);
+    Music::destroy();
 }
 
 static void reload(State *state){
