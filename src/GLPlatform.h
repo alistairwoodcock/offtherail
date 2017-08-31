@@ -5,8 +5,6 @@
 #include <iostream>
 
 #include "libs/shader.h"
-#include "libs/mesh.cpp"
-#include "libs/model.cpp"
 
 
 // Default screen width and height

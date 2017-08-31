@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "libs/stb_image.h"
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 
 #define GLFW_DLL
