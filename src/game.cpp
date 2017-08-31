@@ -13,8 +13,9 @@
 #include "game.h"
 
 #include "libs/shader.cpp"
+#include "libs/texture.cpp"
+#include "libs/mesh.cpp"
 #include "libs/model.cpp"
-// #include "libs/music.cpp"
 
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"

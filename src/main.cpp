@@ -40,62 +40,76 @@ int load_counter = 0;
 bool first_load = true;
 
 void load_game_lib(Game *game){
-	struct stat attr;
-	
-	#ifdef _WIN32
-	if(load_counter++ > 66){
-		load_counter = 0;
-	#else
-	if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
-	#endif
+#ifdef _WIN32
 
-		if (game->handle) {
+    if(load_counter++ > 66){
+        load_counter = 0;
+    
+        if (game->handle) {
             game->api.unload(game->state);
-            #ifdef _WIN32
             FreeLibrary((HINSTANCE)game->handle);
-            #else
-            dlclose(game->handle);
-            #endif
         }
 
         CopyFile(GAME_LIBRARY, GAME_LIBRARY_TMP, false);
+        void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
+        
+        if(handle){
+            game->handle = handle;
+            
+            const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
+        
+            if(api != NULL){
+                game->api = *api;
+                if(first_load){
+                    first_load = false;
+                    game->api.init(game->state);
+                }
 
-		void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
+                game->api.reload(game->state);
+            } else {
+                FreeLibrary((HINSTANCE)game->handle);
+                game->handle = NULL;
+                game->id = 0;
 
-	 	if(handle){
-	 		game->handle = handle;
-			game->id = attr.st_ctime;
-			#ifdef _WIN32
-	 		const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
-	 		#else
-	 		const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
-	 		#endif
+            }
+        } else {
+            game->handle = NULL;
+            game->id = 0;
+        }
+    }
 
-	 		if(api != NULL){
-	 			game->api = *api;
-	 			if(first_load){
-	 				first_load = false;
-	 				game->api.init(game->state);
-	 			}
+	
+#else
+	struct stat attr;
+    if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
+        if (game->handle) {
+            game->api.unload(game->state);
+            dlclose(game->handle);
+        }
+        void *handle = dlopen(GAME_LIBRARY, RTLD_LAZY);
+        if (handle) {
+            game->handle = handle;
+            game->id = attr.st_ino;
+            const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
+            if (api != NULL) {
+                game->api = *api;
+                if (first_load){
+                	first_load = false;
+                    game->api.init(game->state);
+                }
 
-	 			game->api.reload(game->state);
-	 		} else {
-	 			#ifdef _WIN32
-	 			FreeLibrary((HINSTANCE)game->handle);
-	 			#else
-	 			dlclose(game->handle);
-	 			#endif
-	 			game->handle = NULL;
-	 			game->id = 0;
-
-	 		}
-	 	} else {
-	 		game->handle = NULL;
-	 		game->id = 0;
-	 	}
-	}
-
-  
+                game->api.reload(game->state);
+            } else {
+                dlclose(game->handle);
+                game->handle = NULL;
+                game->id = 0;
+            }
+        } else {
+            game->handle = NULL;
+            game->id = 0;
+        }
+    }
+#endif
 }
 
 void unload_game_lib(Game *game){
@@ -174,7 +188,7 @@ int main(){
 				#ifdef _WIN32
 				Sleep(sleep_time_ms);
 				#else
-				usleep(sleep_time_ms)
+				usleep(sleep_time_ms);
 				#endif
 			}
 
@@ -201,8 +215,6 @@ int main(){
 	}
 
 	unload_game_lib(&game);
-
-	free(state);
 
 	return 0;
 }

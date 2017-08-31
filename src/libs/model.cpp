@@ -1,5 +1,6 @@
 #include "model.h"
-#include "../GLPlatform.h"
+#include "texture.h"
+#include "shader.h"
 
 Model::Model(string const &modelName, string const &path, bool gamma = false) : gammaCorrection(gamma)
 {
