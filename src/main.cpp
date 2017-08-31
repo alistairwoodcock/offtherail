@@ -15,8 +15,6 @@
 
 #include "game.h"
 
-const char *GAME_LIBRARY = "build/game.dylib";
-
 struct Game {
     void *handle;
     ino_t id;
@@ -25,14 +23,80 @@ struct Game {
     GLFWwindow *window;
 };
 
+
 //Func definitions
 Input get_current_input(GLFWwindow *window);
 void window_resize(GLFWwindow* window, int width, int height);
 void load_game_lib(Game *game);
 void unload_game_lib(Game *game);
 
-bool first_load = true;
+const char *GAME_LIBRARY = "build/game.dylib";
+const char *GAME_LIBRARY_TMP = "build/game_tmp.dylib";
 
+#ifdef _WIN32 
+
+#include <windows.h>
+#define stat _stat
+
+bool first_load = true;
+int load_counter = 0;
+void load_game_lib(Game *game){
+
+	struct stat attr;
+	if(load_counter++ > 128){
+		load_counter = 0;
+
+		if (game->handle) {
+            game->api.unload(game->state);
+            FreeLibrary((HINSTANCE)game->handle);
+        }
+
+        CopyFile(GAME_LIBRARY, GAME_LIBRARY_TMP, false);
+
+		void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
+
+	 	if(handle){
+	 		game->handle = handle;
+			game->id = attr.st_ctime;
+	 		const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
+
+	 		if(api != NULL){
+	 			game->api = *api;
+	 			if(first_load){
+	 				first_load = false;
+	 				game->api.init(game->state);
+	 			}
+
+	 			game->api.reload(game->state);
+	 		} else {
+	 			FreeLibrary((HINSTANCE)game->handle);
+	 			game->handle = NULL;
+	 			game->id = 0;
+
+	 		}
+	 	} else {
+	 		game->handle = NULL;
+	 		game->id = 0;
+	 	}
+	}
+
+  
+}
+
+void unload_game_lib(Game *game){
+	if(game->handle){
+		game->api.finalize(game->state);
+		game->state = NULL;
+		FreeLibrary((HINSTANCE)game->handle);
+		game->handle = NULL;
+		game->id = 0;
+	}
+}
+
+
+#else 
+
+bool first_load = true;
 void load_game_lib(Game *game){
 	struct stat attr;
     if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
@@ -77,8 +141,8 @@ void unload_game_lib(Game *game)
 }
 
 
-const double maxFPS = 60.0;
-const double maxPeriod = 1.0 / maxFPS;
+#endif
+
 
 int screenWidth = 500;
 int screenHeight = 500;
@@ -86,7 +150,6 @@ int screenHeight = 500;
 bool windowResized = false;
 
 int main(){
-
 	Game game = {0};
 	State *state = (State *)malloc(sizeof(*state));
 
@@ -124,6 +187,8 @@ int main(){
 		return false;
 	}
 
+	float time_count = 0;
+
 	bool close = false;
 	while(!close)
 	{
@@ -136,7 +201,7 @@ int main(){
 			game.state->platform.prevTime = game.state->platform.currTime;
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
-			
+
 			Input input = get_current_input(game.window);
 			game.state->platform.input = input;
 
@@ -150,12 +215,17 @@ int main(){
 
 			close = game.api.shouldClose(game.state);
 
+
 		}
 
 		glfwSwapBuffers(game.window);
 
 		close = (close || glfwWindowShouldClose(game.window));
 	}
+
+	unload_game_lib(&game);
+
+	free(state);
 
 	return 0;
 }

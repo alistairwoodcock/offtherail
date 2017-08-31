@@ -46,7 +46,7 @@ namespace Particles {
 			if(p->y < -2)
 			{
 				
-				p->y = 5;
+				p->y = 0;
 				p->x = 0;
 				p->z = 0;
 				p->x_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
