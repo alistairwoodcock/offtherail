@@ -97,7 +97,7 @@ namespace MainMenu{
 				game->quit_game = true;
 			} 
 			if(game->start_active){
-				game->current_screen = GAME;
+                changeScreen(state, GAME);
 			}
 		}
 

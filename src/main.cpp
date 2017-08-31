@@ -158,6 +158,7 @@ int main(){
 		close = (close || glfwWindowShouldClose(game.window));
 	}
 
+    game.api.finalize(game.state);
 	return 0;
 }
 

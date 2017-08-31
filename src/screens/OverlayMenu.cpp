@@ -44,7 +44,7 @@ namespace OverlayMenu{
 		if(!game->overlay_active && (input.p_pressed || input.escape_pressed)){
 			game->overlay_active = true;
 			game->resume_active = true;
-			game->paused = true;
+            paused(state, true);
 		} 
 
 		if(!game->overlay_active){
@@ -92,8 +92,8 @@ namespace OverlayMenu{
 		if(input.space_pressed || input.enter_pressed){
 			
 			if(game->exit_active){
-				game->current_screen = MAIN_MENU;
-				game->paused = false;
+                changeScreen(state, MAIN_MENU);
+                paused(state, false);
 				game->overlay_active = false;
 				game->exit_active = false;
 				game->resume_active = false;
@@ -101,8 +101,8 @@ namespace OverlayMenu{
 				game->input_timeout = 0.5;
 			} 
 			if(game->resume_active){
-				game->current_screen = GAME;
-				game->paused = false;
+                changeScreen(state, GAME);
+                paused(state, false);
 				game->overlay_active = false;
 			}
 		}

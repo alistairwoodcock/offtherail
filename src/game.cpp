@@ -29,7 +29,7 @@ static void init(State *state)
     //Game state for runtime
     state->game_state.game_started = false;
     state->game_state.quit_game = false;
-    state->game_state.current_screen = MAIN_MENU;
+    changeScreen(state, MAIN_MENU);
     
     state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     
@@ -161,6 +161,13 @@ static void updateAndRender(State *state){
 
 }
 
+void changeScreen(State *state, Screens screen) {
+   state->game_state.current_screen = screen; 
+}
+
+void paused(State *state, bool paused) {
+    state->game_state.paused = paused;
+}
 
 static bool shouldClose(State *state){
 	if(state->game_state.quit_game){
@@ -170,7 +177,7 @@ static bool shouldClose(State *state){
 }
 
 static void finalize(State *state){
-	printf("UNLOAD\n");
+	printf("FINALIZE\n");
 	free(state);
 }
 
