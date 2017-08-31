@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "libs/stb_image.h"
 
+
 #include <GL/glew.h>
 
 #define GLFW_DLL
@@ -188,7 +189,7 @@ int main(){
 				#ifdef _WIN32
 				Sleep(sleep_time_ms);
 				#else
-				usleep(sleep_time_ms);
+				usleep(sleep_time_ms * 1000);
 				#endif
 			}
 
