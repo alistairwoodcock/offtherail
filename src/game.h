@@ -63,6 +63,8 @@ struct GameState {
 	Shader trainShader;
 	Model *trainModel;
 	Train *train;
+	Entity *bogieFront;
+	Entity *bogieBack;
 
 	/* INPUT STATE */
 	float input_timeout;

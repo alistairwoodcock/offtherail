@@ -33,7 +33,6 @@ static void init(State *state)
     state->game_state.quit_game = false;
     changeScreen(state, MAIN_MENU);
     
-    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
     
     state->game_state.input_timeout = 0;
 
@@ -82,15 +81,20 @@ static void init(State *state)
     /* -- End Particle Setup -- */
 
 
+    /* -- Camera Setup -- */
+    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+    state->game_state.camera.Position.x = 0.0f;
+    state->game_state.camera.Position.y = 8.0f;
+    state->game_state.camera.Position.z = 24.0f;
+    
+
     /* -- Menu Setup --*/
     MainMenu::setup(state);
     OverlayMenu::setup(state);
 
 
     /* -- Train Setup -- */
-    state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
-	state->game_state.trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    state->game_state.train = new Train();
+    Trains::setup(state);
 }
 
 static void updateAndRender(State *state){
@@ -145,11 +149,7 @@ static void updateAndRender(State *state){
 			if(!game->paused){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
-				if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-				if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-				if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-				if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
-				
+
 				Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
 			}			
