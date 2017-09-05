@@ -60,6 +60,8 @@ namespace Trains {
 		// bogieFront->x = 1;
 		// bogieBack->x = 1;
 		// bogieFront->z = 1;
+
+
 		printf("bogieFront->x: %f\n", bogieFront->x);
 
 		float b_x_diff = bogieBack->x - bogieFront->x;
@@ -71,6 +73,7 @@ namespace Trains {
 		printf("%f\n", angle);
 
 		train->y_rot = angle;
+		train->x = (bogieBack->x + bogieFront->x)/2;
 
 	}
 
