@@ -134,6 +134,14 @@ Run 'Build Solution' in visual studios. Once it has complete you'll find a dll i
 copy the include/GLFW directory into C:/MinGW/include
 copy the dll src/debug/glfw3.dll into C:/MinGW/lib/ and rename it to glfw3.dll.a
 
+GLFW is a piece of shit to work with so eventually I got it working on Windows by doing the following:
+- Donwload the precompiled binaries (glfw-3.2.1.bin.WIN32.zip) from: http://www.glfw.org/download.html
+- Copy the libglfw3.a and libglfw3dll.a into C:\MinGW\lib (or whereever else MinGW is)
+- Copy the glfw3.dll into the projects build directory.
+
+Then update the mingw_compile script change -lglfw3 to -llglfw3dll.
+Fingers crossed it now builds and runs. Run it from MSYS ./build/main.exe
+
 ### Installing GLM
 
 GLM is a header implementation, so you only need to include these files in your project. 
