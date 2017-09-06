@@ -10,6 +10,7 @@
 #include "entities/Camera.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
+#include "entities/Grass.h"
 
 #include "screens/MenuImage.h"
 
@@ -58,6 +59,12 @@ struct GameState {
 	Shader particleShader;
 	unsigned int Particle_VBO;
 	unsigned int Particle_VAO;
+
+    /* GRASS STATE */
+    int grass_count;
+    Grass* grass;
+    Shader grassShader;
+    Model* grassModel;
 
 	/* TRAIN STATE */ 
 	Shader trainShader;
