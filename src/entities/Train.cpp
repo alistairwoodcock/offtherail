@@ -74,9 +74,6 @@ namespace Trains {
 		if(bogieBack->z > bogieFront->z) angle += M_PI;
 
 		
-
-		printf("bogie_dist: %f\n", bogie_dist);
-		
 		if(bogie_dist <= 10){
 			train->y_rot = angle;
 			train->x = (bogieBack->x + bogieFront->x)/2;
