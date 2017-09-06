@@ -27,16 +27,19 @@ namespace Trains {
 		Entity *bogieFront = game->bogieFront;
 		Entity *bogieBack = game->bogieBack;
 		train->y = -4;
-		// train->x =  sin(time) * deltaTime;
-		train->z = 0;
-		train->z_rot = 0;
-
+		
 		Input input = state->platform.input;
 
 		if(input.a_pressed){
-			bogieFront->x -= 0.05;
+			bogieFront->x -= 5 * deltaTime;
 		} else if(input.d_pressed) {
-			bogieFront->x += 0.05;
+			bogieFront->x += 5 * deltaTime;
+		}
+
+		if(input.s_pressed){
+			bogieFront->z += 5 * deltaTime;
+		} else if(input.w_pressed){
+			bogieFront->z -= 5 * deltaTime;
 		}
 
 		if(bogieBack->x > 3){
@@ -46,31 +49,21 @@ namespace Trains {
 		if(bogieBack->x < 1){
 			bogieBack->x_vel = 2;
 		}
-
-		bogieBack->x += bogieBack->x_vel * deltaTime;
 		
-
-		// bogieBack->x -= bogieBack->x;
-		// if(bogieBack->x > 2){
-		// 	// bogieFront->x = 2;
-		// }
-		// bogieFront->x += 10 * deltaTime * sin(time);
-		// bogieBack->x += 10 * deltaTime; * sin(time);
-
-		// bogieFront->x = 1;
-		// bogieBack->x = 1;
-		// bogieFront->z = 1;
-
-
-		printf("bogieFront->x: %f\n", bogieFront->x);
-
 		float b_x_diff = bogieBack->x - bogieFront->x;
-		printf("x_diff: %f\n", b_x_diff);
-		float b_z_diff = abs(bogieBack->z - bogieFront->z);
-		printf("z_diff: %f\n", b_z_diff);
-		float angle = atan(b_x_diff/b_z_diff);
+		float b_z_diff = 0;
+		float angle = 0;
 
-		printf("%f\n", angle);
+		b_z_diff = bogieBack->z - bogieFront->z;
+		if(b_z_diff == 0){
+			b_z_diff = 0.00001;
+		}
+
+		angle = atan(b_x_diff/b_z_diff);
+
+		if(bogieBack->z > bogieFront->z){
+			angle += M_PI;
+		}
 
 		train->y_rot = angle;
 		train->x = (bogieBack->x + bogieFront->x)/2;
