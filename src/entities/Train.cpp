@@ -31,15 +31,19 @@ namespace Trains {
 		Input input = state->platform.input;
 
 		if(input.a_pressed){
-			bogieFront->x -= 5 * deltaTime;
+			bogieFront->x_vel = -5;
 		} else if(input.d_pressed) {
-			bogieFront->x += 5 * deltaTime;
+			bogieFront->x_vel = 5;
+		} else {
+			bogieFront->x_vel = 0;
 		}
 
 		if(input.s_pressed){
-			bogieFront->z += 5 * deltaTime;
+			bogieFront->z_vel = 5;
 		} else if(input.w_pressed){
-			bogieFront->z -= 5 * deltaTime;
+			bogieFront->z_vel = -5;
+		} else {
+			bogieFront->z_vel = 0;
 		}
 
 		if(bogieBack->x > 3){
@@ -49,25 +53,40 @@ namespace Trains {
 		if(bogieBack->x < 1){
 			bogieBack->x_vel = 2;
 		}
-		
+
+		//Update bogie position
+		bogieFront->x += bogieFront->x_vel * deltaTime;
+		bogieFront->z += bogieFront->z_vel * deltaTime;
+
+		bogieBack->x += bogieBack->x_vel * deltaTime;
+		bogieBack->y += bogieBack->y_vel * deltaTime;
+
+
 		float b_x_diff = bogieBack->x - bogieFront->x;
-		float b_z_diff = 0;
+		float b_z_diff = bogieBack->z - bogieFront->z;
+		if(b_z_diff == 0) b_z_diff = 0.00001;
+
+		float bogie_dist = sqrt(b_z_diff*b_z_diff + b_x_diff*b_x_diff);
+
 		float angle = 0;
-
-		b_z_diff = bogieBack->z - bogieFront->z;
-		if(b_z_diff == 0){
-			b_z_diff = 0.00001;
-		}
-
 		angle = atan(b_x_diff/b_z_diff);
 
-		if(bogieBack->z > bogieFront->z){
-			angle += M_PI;
+		if(bogieBack->z > bogieFront->z) angle += M_PI;
+
+		
+
+		printf("bogie_dist: %f\n", bogie_dist);
+		
+		if(bogie_dist <= 10){
+			train->y_rot = angle;
+			train->x = (bogieBack->x + bogieFront->x)/2;
+			train->z_rot = 0;
+		} else {
+			train->z_rot = M_PI / 2;
+			if(bogieFront->x > bogieBack->x){
+				train->z_rot *= -1;	
+			}
 		}
-
-		train->y_rot = angle;
-		train->x = (bogieBack->x + bogieFront->x)/2;
-
 	}
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
