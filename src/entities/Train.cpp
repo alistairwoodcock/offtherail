@@ -46,24 +46,39 @@ namespace Trains {
 			bogieFront->z_vel = 0;
 		}
 
-		if(bogieBack->x > 3){
-			bogieBack->x_vel = -2;
-		}
+		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
+		float bogie_mid_z = (bogieBack->z + bogieFront->z)/2;
 
-		if(bogieBack->x < 1){
-			bogieBack->x_vel = 2;
-		}
+		float b_x_diff = bogieBack->x - bogieFront->x;
+		float b_z_diff = bogieBack->z - bogieFront->z;
+
+		if(bogieBack->x > bogie_mid_x + 1.5) bogieBack->x_vel = -2;
+		if(bogieBack->x < bogie_mid_x - 1.5) bogieBack->x_vel = 2;
+		
+		if(bogieBack->z > bogie_mid_z + 1.5) bogieBack->z_vel = -2;
+		if(bogieBack->z < bogie_mid_z - 1.5) bogieBack->z_vel = 2;
+
+		glm::vec3 v1(bogieBack->x, bogieBack->y, bogieBack->z);
+		glm::vec3 v2(bogieFront->x, bogieFront->y, bogieFront->z);
+		glm::vec3 dist_vec = glm::normalize(glm::vec3(v1 - v2));
+		dist_vec *= 6; //arbitrarily chosen distance between bogies
+		dist_vec += v2;
+
+		bogieBack->x = dist_vec.x;
+		bogieBack->y = dist_vec.y;
+		bogieBack->z = dist_vec.z;
+
 
 		//Update bogie position
 		bogieFront->x += bogieFront->x_vel * deltaTime;
 		bogieFront->z += bogieFront->z_vel * deltaTime;
 
-		bogieBack->x += bogieBack->x_vel * deltaTime;
-		bogieBack->y += bogieBack->y_vel * deltaTime;
+		// bogieBack->x += bogieBack->x_vel * deltaTime;
+		// bogieBack->z += bogieBack->z_vel * deltaTime;
 
+		b_x_diff = bogieBack->x - bogieFront->x;
+		b_z_diff = bogieBack->z - bogieFront->z;
 
-		float b_x_diff = bogieBack->x - bogieFront->x;
-		float b_z_diff = bogieBack->z - bogieFront->z;
 		if(b_z_diff == 0) b_z_diff = 0.00001;
 
 		float bogie_dist = sqrt(b_z_diff*b_z_diff + b_x_diff*b_x_diff);
@@ -77,6 +92,7 @@ namespace Trains {
 		if(bogie_dist <= 10){
 			train->y_rot = angle;
 			train->x = (bogieBack->x + bogieFront->x)/2;
+			train->z = (bogieBack->z + bogieFront->z)/2;
 			train->z_rot = 0;
 		} else {
 			train->z_rot = M_PI / 2;
@@ -100,7 +116,7 @@ namespace Trains {
 
 		// render the loaded model
 		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
+		model = glm::translate(model, glm::vec3(train->x, train->y, train->z - 4.5));
 		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
