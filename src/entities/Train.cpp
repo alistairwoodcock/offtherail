@@ -27,54 +27,79 @@ namespace Trains {
 		Entity *bogieFront = game->bogieFront;
 		Entity *bogieBack = game->bogieBack;
 		train->y = -4;
-		// train->x =  sin(time) * deltaTime;
-		train->z = 0;
-		train->z_rot = 0;
-
+		
 		Input input = state->platform.input;
 
 		if(input.a_pressed){
-			bogieFront->x -= 0.05;
+			bogieFront->x_vel = -5;
 		} else if(input.d_pressed) {
-			bogieFront->x += 0.05;
+			bogieFront->x_vel = 5;
+		} else {
+			bogieFront->x_vel = 0;
 		}
 
-		if(bogieBack->x > 3){
-			bogieBack->x_vel = -2;
+		if(input.s_pressed){
+			bogieFront->z_vel = 5;
+		} else if(input.w_pressed){
+			bogieFront->z_vel = -5;
+		} else {
+			bogieFront->z_vel = 0;
 		}
 
-		if(bogieBack->x < 1){
-			bogieBack->x_vel = 2;
-		}
-
-		bogieBack->x += bogieBack->x_vel * deltaTime;
-		
-
-		// bogieBack->x -= bogieBack->x;
-		// if(bogieBack->x > 2){
-		// 	// bogieFront->x = 2;
-		// }
-		// bogieFront->x += 10 * deltaTime * sin(time);
-		// bogieBack->x += 10 * deltaTime; * sin(time);
-
-		// bogieFront->x = 1;
-		// bogieBack->x = 1;
-		// bogieFront->z = 1;
-
-
-		printf("bogieFront->x: %f\n", bogieFront->x);
+		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
+		float bogie_mid_z = (bogieBack->z + bogieFront->z)/2;
 
 		float b_x_diff = bogieBack->x - bogieFront->x;
-		printf("x_diff: %f\n", b_x_diff);
-		float b_z_diff = abs(bogieBack->z - bogieFront->z);
-		printf("z_diff: %f\n", b_z_diff);
-		float angle = atan(b_x_diff/b_z_diff);
+		float b_z_diff = bogieBack->z - bogieFront->z;
 
-		printf("%f\n", angle);
+		if(bogieBack->x > bogie_mid_x + 1.5) bogieBack->x_vel = -2;
+		if(bogieBack->x < bogie_mid_x - 1.5) bogieBack->x_vel = 2;
+		
+		if(bogieBack->z > bogie_mid_z + 1.5) bogieBack->z_vel = -2;
+		if(bogieBack->z < bogie_mid_z - 1.5) bogieBack->z_vel = 2;
 
-		train->y_rot = angle;
-		train->x = (bogieBack->x + bogieFront->x)/2;
+		glm::vec3 v1(bogieBack->x, bogieBack->y, bogieBack->z);
+		glm::vec3 v2(bogieFront->x, bogieFront->y, bogieFront->z);
+		glm::vec3 dist_vec = glm::normalize(glm::vec3(v1 - v2));
+		dist_vec *= 7; //arbitrarily chosen distance between bogies
+		dist_vec += v2;
 
+		bogieBack->x = dist_vec.x;
+		bogieBack->y = dist_vec.y;
+		bogieBack->z = dist_vec.z;
+
+
+		//Update bogie position
+		bogieFront->x += bogieFront->x_vel * deltaTime;
+		bogieFront->z += bogieFront->z_vel * deltaTime;
+
+		// bogieBack->x += bogieBack->x_vel * deltaTime;
+		// bogieBack->z += bogieBack->z_vel * deltaTime;
+
+		b_x_diff = bogieBack->x - bogieFront->x;
+		b_z_diff = bogieBack->z - bogieFront->z;
+
+		if(b_z_diff == 0) b_z_diff = 0.00001;
+
+		float bogie_dist = sqrt(b_z_diff*b_z_diff + b_x_diff*b_x_diff);
+
+		float angle = 0;
+		angle = atan(b_x_diff/b_z_diff);
+
+		if(bogieBack->z > bogieFront->z) angle += M_PI;
+
+		
+		if(bogie_dist <= 10){
+			train->y_rot = angle;
+			train->x = (bogieBack->x + bogieFront->x)/2;
+			train->z = (bogieBack->z + bogieFront->z)/2;
+			train->z_rot = 0;
+		} else {
+			train->z_rot = M_PI / 2;
+			if(bogieFront->x > bogieBack->x){
+				train->z_rot *= -1;	
+			}
+		}
 	}
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
@@ -112,8 +137,8 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		shaderSetVec3(ID, "color", glm::vec3(0,0.0,1.0));
 		shaderSetFloat(ID, "alpha", 0.5);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 		Entity *bogieBack = state->game_state.bogieBack;
@@ -124,7 +149,7 @@ namespace Trains {
 		shaderSetVec3(ID, "color", glm::vec3(0,0.1,0.0));
 		shaderSetFloat(ID, "alpha", 0.5);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		glBindVertexArray(0);
 
