@@ -61,7 +61,7 @@ namespace Trains {
 		glm::vec3 v1(bogieBack->x, bogieBack->y, bogieBack->z);
 		glm::vec3 v2(bogieFront->x, bogieFront->y, bogieFront->z);
 		glm::vec3 dist_vec = glm::normalize(glm::vec3(v1 - v2));
-		dist_vec *= 6; //arbitrarily chosen distance between bogies
+		dist_vec *= 7; //arbitrarily chosen distance between bogies
 		dist_vec += v2;
 
 		bogieBack->x = dist_vec.x;
@@ -116,7 +116,7 @@ namespace Trains {
 
 		// render the loaded model
 		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(train->x, train->y, train->z - 4.5));
+		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
 		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
@@ -138,7 +138,7 @@ namespace Trains {
 		shaderSetVec3(ID, "color", glm::vec3(0,0.0,1.0));
 		shaderSetFloat(ID, "alpha", 0.5);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
 		Entity *bogieBack = state->game_state.bogieBack;
@@ -149,7 +149,7 @@ namespace Trains {
 		shaderSetVec3(ID, "color", glm::vec3(0,0.1,0.0));
 		shaderSetFloat(ID, "alpha", 0.5);
 
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 		
 		glBindVertexArray(0);
 

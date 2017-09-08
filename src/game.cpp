@@ -35,6 +35,7 @@ static void init(State *state)
     
     state->game_state.camera_locked = true;
     state->game_state.input_timeout = 0;
+    state->game_state.ground = -2;
 
     //GL Setup
     printf("screenWidth: %i\n", state->platform.screenWidth);
@@ -165,10 +166,15 @@ static void updateAndRender(State *state){
 			if(!game->camera_locked){
 				/* camera position update */
 
-				if(platform->input.up_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-				if(platform->input.down_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-				if(platform->input.left_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-				if(platform->input.right_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+				if(platform->input.up_pressed) camera->UpdatePosition(FORWARD, platform->deltaTime);
+				if(platform->input.down_pressed) camera->UpdatePosition(BACKWARD, platform->deltaTime);
+				if(platform->input.left_pressed) camera->UpdatePosition(LEFT, platform->deltaTime);
+				if(platform->input.right_pressed) camera->UpdatePosition(RIGHT, platform->deltaTime);
+				
+				if(platform->input.right_bracket_pressed) camera->UpdatePosition(UP, platform->deltaTime);
+				if(platform->input.left_bracket_pressed) camera->UpdatePosition(DOWN, platform->deltaTime);
+				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
+				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
 			}
 			
