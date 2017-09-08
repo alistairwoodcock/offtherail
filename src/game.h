@@ -10,6 +10,7 @@
 #include "entities/Camera.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
+#include "entities/SkyDome.h"
 
 #include "screens/MenuImage.h"
 
@@ -64,6 +65,10 @@ struct GameState {
 	unsigned int Particle_VBO;
 	unsigned int Particle_VAO;
 
+	/* SKYDOME STATE*/
+	//THIS LINE BREAKS THE MAIN MENU ??
+	SkyDome *skydome;
+
 	/* TRAIN STATE */ 
 	Shader trainShader;
 	Model *trainModel;
@@ -93,6 +98,8 @@ struct GameState {
 	Camera camera;
 	bool camera_locked;
 	glm::vec3 camera_default_pos;
+
+	
 	
 	
 };

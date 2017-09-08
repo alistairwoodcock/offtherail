@@ -20,6 +20,7 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Train.cpp"
+#include "entities/SkyDome.cpp"
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
@@ -94,6 +95,8 @@ static void init(State *state)
     MainMenu::setup(state);
     OverlayMenu::setup(state);
 
+	/* -- Set Up Sky --*/
+	SkyDomes::setup(state);
 
     /* -- Train Setup -- */
     Trains::setup(state);
