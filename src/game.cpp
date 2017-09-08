@@ -33,8 +33,7 @@ static void init(State *state)
     state->game_state.quit_game = false;
     changeScreen(state, MAIN_MENU);
     
-    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
-    
+    state->game_state.camera_locked = true;
     state->game_state.input_timeout = 0;
 
     //GL Setup
@@ -82,15 +81,22 @@ static void init(State *state)
     /* -- End Particle Setup -- */
 
 
+    /* -- Camera Setup -- */
+    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
+    state->game_state.camera_default_pos = glm::vec3(0.0f, 8.0f, 24.0f);
+
+    state->game_state.camera.Position.x = state->game_state.camera_default_pos.x;
+    state->game_state.camera.Position.y = state->game_state.camera_default_pos.y;
+    state->game_state.camera.Position.z = state->game_state.camera_default_pos.z;
+    
+
     /* -- Menu Setup --*/
     MainMenu::setup(state);
     OverlayMenu::setup(state);
 
 
     /* -- Train Setup -- */
-    state->game_state.trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
-	state->game_state.trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    state->game_state.train = new Train();
+    Trains::setup(state);
 }
 
 static void updateAndRender(State *state){
@@ -112,6 +118,7 @@ static void updateAndRender(State *state){
 	//we set all input to empty when 
 	//the input timeout is running
 	if(game->input_timeout > 0){
+		printf("input_timeout: %f\n", game->input_timeout);
 		game->input_timeout -= platform->deltaTime;
 		Input empty = {0};
 		platform->input = empty;
@@ -141,15 +148,34 @@ static void updateAndRender(State *state){
 		case GAME: {
 			
 			OverlayMenu::update(state, platform->currTime, platform->deltaTime);
+
+			if(platform->input.u_pressed){
+				if(game->camera_locked){
+					game->camera_locked = false;
+					game->input_timeout = 0.1;
+				} else {
+					game->camera_locked = true;	
+					game->camera.Position.x = game->camera_default_pos.x;
+					game->camera.Position.y = game->camera_default_pos.y;
+					game->camera.Position.z = game->camera_default_pos.z;
+					game->input_timeout = 0.1;
+				}
+			}
+
+			if(!game->camera_locked){
+				/* camera position update */
+
+				if(platform->input.up_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
+				if(platform->input.down_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
+				if(platform->input.left_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
+				if(platform->input.right_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+
+			}
 			
 			if(!game->paused){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
-				if(platform->input.w_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-				if(platform->input.s_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-				if(platform->input.a_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-				if(platform->input.d_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
-				
+
 				Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
 			}			

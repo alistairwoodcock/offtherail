@@ -26,6 +26,11 @@ struct Input {
 	bool w_pressed;
 	bool s_pressed;
 	bool p_pressed;
+	bool u_pressed;
+	bool up_pressed;
+	bool down_pressed;
+	bool left_pressed;
+	bool right_pressed;
 	bool space_pressed;
 	bool enter_pressed;
 	bool escape_pressed;
@@ -63,6 +68,8 @@ struct GameState {
 	Shader trainShader;
 	Model *trainModel;
 	Train *train;
+	Entity *bogieFront;
+	Entity *bogieBack;
 
 	/* INPUT STATE */
 	float input_timeout;
@@ -82,8 +89,10 @@ struct GameState {
 	bool overlay_active;
 	bool resume_active;
 
-
+	/* CAMERA STATE */
 	Camera camera;
+	bool camera_locked;
+	glm::vec3 camera_default_pos;
 	
 	
 };
