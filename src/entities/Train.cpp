@@ -137,7 +137,7 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		shaderSetVec3(ID, "color", glm::vec3(0,0.0,1.0));
 		shaderSetFloat(ID, "alpha", 0.5);
-
+		
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 

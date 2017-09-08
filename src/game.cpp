@@ -26,6 +26,7 @@
 static void init(State *state)
 {
 	printf("INIT");
+	
 	//Setup our entire game and GL state 
     
     //Game state for runtime
