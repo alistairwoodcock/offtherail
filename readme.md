@@ -160,13 +160,15 @@ open MSYS and cd into the assimp folder
 create a directory called build and cd into that.
 build assimp using the following commands:
 
-	cmake -G "MinGW Makefiles" ../
+	cmake -G "MSYS Makefiles" ../
 
 	make
 
-There will now be a number of files and folders. 
-Find the include/ folder and copy the assimp folder into your MingGW includes folder (C:/MinGW/include/)
-and 
+There will now be a number of files and folders.
+Copy the libassimp.dll into Mingw/lib.
+Copy libassimp.dll into the build directory.
+ 
+Find the include/ folder and copy the assimp folder into your MingGW includes folder (C:/MinGW/include/) 
 
 
 #### Building using Visual Studio
