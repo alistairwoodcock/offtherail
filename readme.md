@@ -139,7 +139,7 @@ GLFW is a piece of shit to work with so eventually I got it working on Windows b
 - Copy the libglfw3.a and libglfw3dll.a into C:\MinGW\lib (or whereever else MinGW is)
 - Copy the glfw3.dll into the projects build directory.
 
-Then update the mingw_compile script change -lglfw3 to -llglfw3dll.
+Then update the mingw_compile script change -lglfw3 to -lglfw3dll.
 Fingers crossed it now builds and runs. Run it from MSYS ./build/main.exe
 
 ### Installing GLM
