@@ -2,16 +2,16 @@
 
 namespace Grasses {
 
-    void resetPos(Grass *p) {
+    void resetPos(State *state, Grass *p) {
 		p->alpha = 1.0;
 		
         p->x = (std::rand()%250)/10.0 + 5;
         if (std::rand()%2 == 0) p->x *= -1;
-		p->y = -2.0;
+		p->y = state->game_state.ground;
 		p->z = -50 - std::rand()%50;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
-		p->z_vel = 100.0;
+		p->z_vel = 10.0;
     }
 
 	void setup(State *state) {
@@ -19,8 +19,7 @@ namespace Grasses {
         printf("SETUP GRASS\n");
 		GameState *game = &state->game_state;
 
-		//game->grassModel = new Model("grass", "models/teapot/teapot.obj");
-		game->grassModel = new Model("grass", "models/train/locomotive/Locomotive C36.obj");
+		game->grassModel = new Model("grass", "models/teapot/teapot.obj");
 		game->grassShader = loadShader("grass", "src/shaders/grass.vs", "src/shaders/grass.fs");
         
         int grass_count = game->grass_count;
@@ -29,7 +28,7 @@ namespace Grasses {
 		for(int i = 0; i < grass_count; i++)
 		{
 			Grass *p = new Grass();
-            resetPos(p);
+            resetPos(state, p);
             p->z -= std::rand()%100; // Initial offset
 			game->grass[i] = *p;
 		}
@@ -54,7 +53,7 @@ namespace Grasses {
 			p->alpha -= 0.025 * deltaTime;
 
 			if (p->z > 18 || p->alpha < 0.05) {
-                resetPos(p);
+                resetPos(state, p);
 			}
 		}
 	}
@@ -80,7 +79,7 @@ namespace Grasses {
             // render the loaded model
 		    glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-		    model = glm::scale(model, glm::vec3(0.005f, 0.005f, 0.00f));
+		    model = glm::scale(model, glm::vec3(1.5f));
 
 		    //model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
 		    shaderSetMat4(ID, "model", model);
