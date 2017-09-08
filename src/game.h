@@ -99,7 +99,6 @@ struct GameState {
 	/* CAMERA STATE */
 	Camera camera;
 	bool camera_locked;
-	glm::vec3 camera_default_pos;
 	
 	
 };
