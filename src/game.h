@@ -34,6 +34,10 @@ struct Input {
 	bool space_pressed;
 	bool enter_pressed;
 	bool escape_pressed;
+	bool left_bracket_pressed;
+	bool right_bracket_pressed;
+	bool semicolon_pressed;
+	bool apostrophe_pressed;
 };
 
 struct PlatformState {
@@ -56,6 +60,9 @@ struct GameState {
 	bool paused;
 	
 	Screens current_screen;
+
+	/* LEVEL STATE */
+	float ground; //y position for the ground
 	
 	/* PARTICLE STATE */
 	int particle_count;
