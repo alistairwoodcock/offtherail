@@ -10,7 +10,7 @@
 #include "entities/Camera.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
-#include "entities/SkyDome.h"
+#include "entities/SkyBox.h"
 
 #include "screens/MenuImage.h"
 
@@ -67,7 +67,7 @@ struct GameState {
 
 	/* SKYDOME STATE*/
 	//THIS LINE BREAKS THE MAIN MENU ??
-	SkyDome *skydome;
+	SkyBox *skybox;
 
 	/* TRAIN STATE */ 
 	Shader trainShader;
