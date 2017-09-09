@@ -72,12 +72,21 @@ namespace SkyBoxes {
 
 		vector<std::string> faces
 		{
+			
 			"images/skybox/right.jpg",
 			"images/skybox/left.jpg",
 			"images/skybox/top.jpg",
 			"images/skybox/bottom.jpg",
 			"images/skybox/back.jpg",
 			"images/skybox/front.jpg"
+			/*
+			"images/skybox/elly/right.png",
+			"images/skybox/elly/left.png",
+			"images/skybox/elly/top.png",
+			"images/skybox/elly/bottom.png",
+			"images/skybox/elly/back.png",
+			"images/skybox/elly/front.png"
+			*/
 		};
 
 		game->skybox->cubemapTexture = loadCubemap(faces);
