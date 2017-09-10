@@ -20,6 +20,7 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Train.cpp"
+#include "entities/SkyBox.cpp"
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
@@ -90,6 +91,8 @@ static void init(State *state)
     MainMenu::setup(state);
     OverlayMenu::setup(state);
 
+	/* -- Set Up Sky --*/
+	SkyBoxes::setup(state);
 
     /* -- Train Setup -- */
     Trains::setup(state);
@@ -179,6 +182,8 @@ static void updateAndRender(State *state){
 				Particles::update(state, platform->currTime, platform->deltaTime);
 			}			
 			
+			//Draw CubeMap
+			SkyBoxes::render(state, projection, view);
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);

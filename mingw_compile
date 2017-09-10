@@ -2,6 +2,9 @@ mkdir build > /dev/null 2>&1
 
 rm build/game.dylib
 
+
 g++ -o build/game.dylib src/game.cpp -lglfw3dll -lglew32 -lopengl32 -lassimp -shared 
 
 g++ -o build/main src/main.cpp -lglfw3dll -lglew32 -lopengl32 
+
+#-Wl,--verbose

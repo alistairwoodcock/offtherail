@@ -10,6 +10,7 @@
 #include "entities/Camera.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
+#include "entities/SkyBox.h"
 
 #include "screens/MenuImage.h"
 
@@ -71,6 +72,10 @@ struct GameState {
 	unsigned int Particle_VBO;
 	unsigned int Particle_VAO;
 
+	/* SKYDOME STATE*/
+	//THIS LINE BREAKS THE MAIN MENU ??
+	SkyBox *skybox;
+
 	/* TRAIN STATE */ 
 	Shader trainShader;
 	Model *trainModel;
@@ -98,8 +103,7 @@ struct GameState {
 
 	/* CAMERA STATE */
 	Camera camera;
-	bool camera_locked;
-	
+	bool camera_locked;	
 	
 };
 
