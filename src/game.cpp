@@ -85,7 +85,7 @@ static void init(State *state)
 
 
     /* -- Camera Setup -- */
-    state->game_state.camera = Camera(glm::vec3(0.0f, 8.0f, 24.0f));
+    state->game_state.camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
     /* -- Menu Setup --*/
     MainMenu::setup(state);
@@ -172,6 +172,9 @@ static void updateAndRender(State *state){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
+				// printf("camera(%f, %f, %f)\n", camera->Position.x, camera->Position.y, camera->Position.z);
+				// printf("camera YAW(%f)\n", camera->Yaw);
+				// printf("camera PITCH(%f)\n", camera->Pitch);
 			}
 			
 			if(!game->paused){
