@@ -27,6 +27,7 @@
 static void init(State *state)
 {
 	printf("INIT");
+	
 	//Setup our entire game and GL state 
     
     //Game state for runtime
@@ -36,6 +37,7 @@ static void init(State *state)
     
     state->game_state.camera_locked = true;
     state->game_state.input_timeout = 0;
+    state->game_state.ground = -2;
 
     //GL Setup
     printf("screenWidth: %i\n", state->platform.screenWidth);
@@ -83,14 +85,8 @@ static void init(State *state)
 
 
     /* -- Camera Setup -- */
-    state->game_state.camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f));
-    state->game_state.camera_default_pos = glm::vec3(0.0f, 8.0f, 24.0f);
-
-    state->game_state.camera.Position.x = state->game_state.camera_default_pos.x;
-    state->game_state.camera.Position.y = state->game_state.camera_default_pos.y;
-    state->game_state.camera.Position.z = state->game_state.camera_default_pos.z;
+    state->game_state.camera = Camera(glm::vec3(0.0f, 8.0f, 24.0f));
     
-
     /* -- Menu Setup --*/
     MainMenu::setup(state);
     OverlayMenu::setup(state);
@@ -158,20 +154,23 @@ static void updateAndRender(State *state){
 					game->input_timeout = 0.1;
 				} else {
 					game->camera_locked = true;	
-					game->camera.Position.x = game->camera_default_pos.x;
-					game->camera.Position.y = game->camera_default_pos.y;
-					game->camera.Position.z = game->camera_default_pos.z;
 					game->input_timeout = 0.1;
+					camera->Reset();
 				}
 			}
 
 			if(!game->camera_locked){
 				/* camera position update */
 
-				if(platform->input.up_pressed) camera->ProcessKeyboard(FORWARD, platform->deltaTime);
-				if(platform->input.down_pressed) camera->ProcessKeyboard(BACKWARD, platform->deltaTime);
-				if(platform->input.left_pressed) camera->ProcessKeyboard(LEFT, platform->deltaTime);
-				if(platform->input.right_pressed) camera->ProcessKeyboard(RIGHT, platform->deltaTime);
+				if(platform->input.up_pressed) camera->UpdatePosition(FORWARD, platform->deltaTime);
+				if(platform->input.down_pressed) camera->UpdatePosition(BACKWARD, platform->deltaTime);
+				if(platform->input.left_pressed) camera->UpdatePosition(LEFT, platform->deltaTime);
+				if(platform->input.right_pressed) camera->UpdatePosition(RIGHT, platform->deltaTime);
+				
+				if(platform->input.right_bracket_pressed) camera->UpdatePosition(UP, platform->deltaTime);
+				if(platform->input.left_bracket_pressed) camera->UpdatePosition(DOWN, platform->deltaTime);
+				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
+				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
 			}
 			

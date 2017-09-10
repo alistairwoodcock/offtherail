@@ -236,6 +236,10 @@ Input get_current_input(GLFWwindow* window){
 	in.right_pressed = (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS);
 	in.space_pressed = (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS);
 	in.enter_pressed = (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS);
+	in.left_bracket_pressed = (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS);
+	in.right_bracket_pressed = (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS);
+	in.semicolon_pressed = (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS);
+	in.apostrophe_pressed = (glfwGetKey(window, GLFW_KEY_APOSTROPHE) == GLFW_PRESS);
 
 	return in;
 }
