@@ -11,7 +11,7 @@ namespace Grasses {
 		p->z = -50 - std::rand()%50;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
-		p->z_vel = 10.0;
+		p->z_vel = state->game_state.speed;
         p->x_rot = -1.0;
     }
 
