@@ -64,6 +64,7 @@ struct GameState {
 
 	/* LEVEL STATE */
 	float ground; //y position for the ground
+    float speed; //Speed of train, scenery, etc.
 	
 	/* PARTICLE STATE */
 	int particle_count;
@@ -106,7 +107,6 @@ struct GameState {
 	/* CAMERA STATE */
 	Camera camera;
 	bool camera_locked;
-	glm::vec3 camera_default_pos;
 	
 	
 };
