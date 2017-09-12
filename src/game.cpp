@@ -36,7 +36,9 @@ static void init(State *state)
     
     state->game_state.camera_locked = true;
     state->game_state.input_timeout = 0;
+
     state->game_state.ground = -2;
+    state->game_state.speed = 10;
 
     //GL Setup
     printf("screenWidth: %i\n", state->platform.screenWidth);
