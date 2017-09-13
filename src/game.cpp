@@ -19,6 +19,7 @@
 
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
+#include "entities/Grass.cpp"
 #include "entities/Train.cpp"
 #include "entities/SkyBox.cpp"
 #include "screens/MainMenu.cpp"
@@ -84,7 +85,11 @@ static void init(State *state)
     Particles::setup(state);
 
     /* -- End Particle Setup -- */
-
+    
+    /* -- Grasss Setup -- */
+    state->game_state.grass_count = 10;
+    Grasses::setup(state);
+    /* -- End Grass Setup -- */
 
     /* -- Camera Setup -- */
     state->game_state.camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
@@ -183,12 +188,15 @@ static void updateAndRender(State *state){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
 
+				Grasses::update(state, platform->currTime, platform->deltaTime);
 				Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
 			}			
 			
+
 			//Draw CubeMap
 			SkyBoxes::render(state, projection, view);
+			Grasses::render(state, projection, view);
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);

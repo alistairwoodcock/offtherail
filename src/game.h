@@ -11,6 +11,7 @@
 #include "entities/Train.h"
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
+#include "entities/Grass.h"
 
 #include "screens/MenuImage.h"
 
@@ -76,6 +77,12 @@ struct GameState {
 	/* SKYDOME STATE*/
 	//THIS LINE BREAKS THE MAIN MENU ??
 	SkyBox *skybox;
+
+    /* GRASS STATE */
+    int grass_count;
+    Grass* grass;
+    Shader grassShader;
+    Model* grassModel;
 
 	/* TRAIN STATE */ 
 	Shader trainShader;
