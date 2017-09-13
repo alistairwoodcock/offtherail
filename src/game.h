@@ -64,6 +64,7 @@ struct GameState {
 
 	/* LEVEL STATE */
 	float ground; //y position for the ground
+    float speed; //Speed of train, scenery, etc.
 	
 	/* PARTICLE STATE */
 	int particle_count;
