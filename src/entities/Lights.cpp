@@ -4,9 +4,9 @@ namespace Lights {
 		GameState *game = &state->game_state;
 
 		game->sun = new Entity();
-		game->sun->x = 20;
+		game->sun->x = 15;
 		game->sun->y = 13;
-		game->sun->z = 0;
+		game->sun->z = -40;
 		game->sun->z_rot = 0;
 
 
@@ -16,9 +16,8 @@ namespace Lights {
 	void update(State *state, float time, float deltaTime){
 		GameState *game = &state->game_state;
 
-		game->sun->z_rot += 1 * deltaTime;
-		game->sun->x = 15;
-		game->sun->z = -40;
+		game->sun->z_rot += 10 * deltaTime;
+		
 	}
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
