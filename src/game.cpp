@@ -22,6 +22,7 @@
 #include "entities/Grass.cpp"
 #include "entities/Train.cpp"
 #include "entities/SkyBox.cpp"
+#include "entities/Lights.cpp"
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
@@ -55,42 +56,14 @@ static void init(State *state)
     //load shaders
     
     /* -- Particles Setup -- */
-    float particle_vertices[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	};
-
-	GLuint VAO;
-    GLuint VBO;
-
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
-    glEnableVertexAttribArray(0);
-
-    state->game_state.Particle_VAO = VAO;
-    state->game_state.Particle_VBO = VBO;
-
-    state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
-    state->game_state.particle_count = 10000;
-
     Particles::setup(state);
-
-    /* -- End Particle Setup -- */
     
-    /* -- Grasss Setup -- */
-    state->game_state.grass_count = 10;
-    Grasses::setup(state);
-    /* -- End Grass Setup -- */
+    /* -- Lights Setup -- */
+    Lights::setup(state);
 
+    /* -- Grasss Setup -- */
+    Grasses::setup(state);
+    
     /* -- Camera Setup -- */
     state->game_state.camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
@@ -191,11 +164,13 @@ static void updateAndRender(State *state){
 				Grasses::update(state, platform->currTime, platform->deltaTime);
 				Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
+				Lights::update(state, platform->currTime, platform->deltaTime);
 			}			
 			
 
 			//Draw CubeMap
 			SkyBoxes::render(state, projection, view);
+			Lights::render(state, projection, view);
 			Grasses::render(state, projection, view);
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);

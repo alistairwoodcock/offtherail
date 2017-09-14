@@ -78,6 +78,10 @@ struct GameState {
 	//THIS LINE BREAKS THE MAIN MENU ??
 	SkyBox *skybox;
 
+	/*LIGHTS STATE*/
+	Shader lightShader;
+	Entity *sun;
+
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
