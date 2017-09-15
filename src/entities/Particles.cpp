@@ -4,7 +4,34 @@ namespace Particles {
 
 	void setup(State *state){
 		printf("SETUP PARTICLES\n");
-		int particle_count = state->game_state.particle_count;
+		float particle_vertices[] = {
+	        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+	         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+	         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+	        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		};
+
+		GLuint VAO;
+	    GLuint VBO;
+
+	    glGenVertexArrays(1, &VAO);
+	    glGenBuffers(1, &VBO);
+
+	    glBindVertexArray(VAO);
+	    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
+	    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
+	    glEnableVertexAttribArray(0);
+
+	    state->game_state.Particle_VAO = VAO;
+	    state->game_state.Particle_VBO = VBO;
+
+	    state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
+	    state->game_state.particle_count = 10000;
+
+	    int particle_count = state->game_state.particle_count;
 		
 		state->game_state.particles = (Particle*)malloc(particle_count*sizeof(Particle));
 
@@ -45,10 +72,10 @@ namespace Particles {
 
 			if(p->y < -2)
 			{
-				
-				p->y = game->train->y + 5;
-				p->x = game->train->x;
-				p->z = game->train->z;
+				Entity *train = game->train;
+				p->y = -2;
+				p->x = train->x;
+				p->z = 0;
 				p->x_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
 				p->y_vel = ((std::rand()%100))/50.0;
 				p->z_vel = ((std::rand()%100) - (std::rand()%100))/300.0;

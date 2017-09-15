@@ -59,7 +59,7 @@ namespace MainMenu{
 		startText->scale += glm::vec3(1.0)*startText->scale_vel*deltaTime;
 		exitText->scale += glm::vec3(1.0)*exitText->scale_vel*deltaTime;
 
-		
+
 		if(logo->scale.x > 1.2) logo->scale_vel = -0.1;
 		if(logo->scale.x <= 1.17) logo->scale_vel = 0.1;
 		
