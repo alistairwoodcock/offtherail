@@ -30,7 +30,7 @@
 
 static void init(State *state)
 {
-	printf("INIT");
+	printf("INIT\n");
 	
 	//Setup our entire game and GL state 
     

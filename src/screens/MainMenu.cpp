@@ -84,16 +84,19 @@ namespace MainMenu{
 		if(game->start_active && input->s_pressed){
 			game->start_active = false;
 			game->exit_active = true;
+            Music::soundEffect("sounds/oh.wav");
 		}
 
 		if(game->exit_active && input->w_pressed){
 			game->start_active = true;
 			game->exit_active = false;
+            Music::soundEffect("sounds/oh.wav");
 		}
 
 		if(input->space_pressed || input->enter_pressed){
 			
 			if(game->exit_active){
+                Music::soundEffect("sounds/exit.wav", true);
 				game->quit_game = true;
 			} 
 			if(game->start_active){

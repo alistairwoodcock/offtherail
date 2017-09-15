@@ -14,9 +14,22 @@
 
 namespace Music {
 
-    struct Sound {
+    class Sound {
+    public:
         ALuint Buffer; // Buffer to hold the sound data.
         ALuint Source; // Source is the point of emission.
+
+        float getDuration() {
+            ALint size, channels, bits, frequency;
+
+            alGetBufferi(Buffer, AL_SIZE, &size);
+            alGetBufferi(Buffer, AL_CHANNELS, &channels);
+            alGetBufferi(Buffer, AL_BITS, &bits);
+            alGetBufferi(Buffer, AL_FREQUENCY, &frequency);
+
+            float lengthInSamples = size * 8 / (channels * bits);
+            return lengthInSamples / (float) frequency;
+        }
     };
 
     Sound music;
@@ -34,11 +47,12 @@ namespace Music {
 	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
-	ALboolean LoadMusic(const char* file) {
-		
+	ALboolean LoadMusic(Sound &sound, const char* file) {
+		Sound s = {0};
+
         printf("Loading %s\n", file);
 		current = file;
-		music.Buffer = alutCreateBufferFromFile(file);
+		s.Buffer = alutCreateBufferFromFile(file);
 
         // Check for alut error
 		ALenum error = alutGetError();
@@ -49,22 +63,24 @@ namespace Music {
         printf("Successfully loaded %s into the buffer\n", file);
 
 		// Bind the buffer with the source.
-		alGenSources(1, &music.Source);
+		alGenSources(1, &s.Source);
 
 		if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
 
-		alSourcei (music.Source, AL_BUFFER,   music.Buffer);
-		alSourcef (music.Source, AL_PITCH,    1.0      );
-		alSourcef (music.Source, AL_GAIN,     1.0      );
-		alSourcefv(music.Source, AL_POSITION, SourcePos);
-		alSourcefv(music.Source, AL_VELOCITY, SourceVel);
-		alSourcei (music.Source, AL_LOOPING,  AL_TRUE  );
+		alSourcei (s.Source, AL_BUFFER,   s.Buffer );
+		alSourcef (s.Source, AL_PITCH,    1.0      );
+		alSourcef (s.Source, AL_GAIN,     1.0      );
+		alSourcefv(s.Source, AL_POSITION, SourcePos);
+		alSourcefv(s.Source, AL_VELOCITY, SourceVel);
+		alSourcei (s.Source, AL_LOOPING,  AL_TRUE  );
 	
 		// Do another error check and return.
-		if(alGetError() == AL_NO_ERROR)
-			return AL_TRUE;
-		return AL_FALSE;
+		if(alGetError() != AL_NO_ERROR)
+			return AL_FALSE;
+        
+        sound = s;
+        return AL_TRUE;
 	}
 
 	void SetListenerValues() {
@@ -92,7 +108,7 @@ namespace Music {
 		if (current != file) {
 			if (music.Source)
 				alSourceStop(music.Source);
-			LoadMusic(file);
+			LoadMusic(music, file);
 			alSourcePlay(music.Source);
 		}
 	}
@@ -101,4 +117,13 @@ namespace Music {
 		paused ? alSourcePause(music.Source) : alSourcePlay(music.Source);
 	}
 
+    void soundEffect(const char* file, bool sleep=false) {
+        Sound effect = {0};
+        LoadMusic(effect, file);
+        alSourcei(effect.Source, AL_LOOPING, AL_FALSE);
+        alSourcePlay(effect.Source);
+
+        if (sleep)
+            alutSleep(effect.getDuration());
+    }
 }
