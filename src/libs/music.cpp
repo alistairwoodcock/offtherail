@@ -14,11 +14,12 @@
 
 namespace Music {
 
-	// Buffers to hold sound data.
-	ALuint Buffer;
-	// Sources are points of emitting sound.
-	ALuint Source;
+    struct Sound {
+        ALuint Buffer; // Buffer to hold the sound data.
+        ALuint Source; // Source is the point of emission.
+    };
 
+    Sound music;
 	const char* current;
 
 	/*
@@ -33,32 +34,32 @@ namespace Music {
 	ALfloat ListenerVel[] = { 0.0, 0.0, 0.0 };
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
-	ALboolean LoadALData(const char* file) {
+	ALboolean LoadMusic(const char* file) {
+		
+        printf("Loading %s\n", file);
 		current = file;
-		printf("%s\n", file);
+		music.Buffer = alutCreateBufferFromFile(file);
 
-		Buffer = alutCreateBufferFromFile(file);
-
-		printf("yeww\n");
-
+        // Check for alut error
 		ALenum error = alutGetError();
 		if (error != ALUT_ERROR_NO_ERROR) {
 			printf("%s\n", alutGetErrorString(error));
 			return AL_FALSE;
 		}
+        printf("Successfully loaded %s into the buffer\n", file);
 
 		// Bind the buffer with the source.
-		alGenSources(1, &Source);
+		alGenSources(1, &music.Source);
 
 		if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
 
-		alSourcei (Source, AL_BUFFER,   Buffer   );
-		alSourcef (Source, AL_PITCH,    1.0      );
-		alSourcef (Source, AL_GAIN,     1.0      );
-		alSourcefv(Source, AL_POSITION, SourcePos);
-		alSourcefv(Source, AL_VELOCITY, SourceVel);
-		alSourcei (Source, AL_LOOPING,  AL_TRUE     );
+		alSourcei (music.Source, AL_BUFFER,   music.Buffer);
+		alSourcef (music.Source, AL_PITCH,    1.0      );
+		alSourcef (music.Source, AL_GAIN,     1.0      );
+		alSourcefv(music.Source, AL_POSITION, SourcePos);
+		alSourcefv(music.Source, AL_VELOCITY, SourceVel);
+		alSourcei (music.Source, AL_LOOPING,  AL_TRUE  );
 	
 		// Do another error check and return.
 		if(alGetError() == AL_NO_ERROR)
@@ -74,7 +75,7 @@ namespace Music {
 
 	void destroy() {
 		//alDeleteBuffers(1, &Buffer);
-		alDeleteSources(1, &Source);
+		alDeleteSources(1, &music.Source);
 		if (alutExit() == AL_FALSE) {
 			printf("Error unloading ALUT: %s\n", alutGetErrorString(alutGetError()));
 		}
@@ -84,22 +85,20 @@ namespace Music {
 		alutInit(NULL, 0);
 		alGetError();
 		SetListenerValues();
+        music = {0};
 	}
 
 	void play(const char* file) {
 		if (current != file) {
-			if (Source)
-				alSourceStop(Source);
-			LoadALData(file);
-			alSourcePlay(Source);
+			if (music.Source)
+				alSourceStop(music.Source);
+			LoadMusic(file);
+			alSourcePlay(music.Source);
 		}
 	}
 
 	void pause(bool paused) {
-		if (paused)
-			alSourcePause(Source);
-		else
-			alSourcePlay(Source);
+		paused ? alSourcePause(music.Source) : alSourcePlay(music.Source);
 	}
 
 }
