@@ -16,6 +16,7 @@
 #include "libs/texture.cpp"
 #include "libs/mesh.cpp"
 #include "libs/model.cpp"
+#include "libs/music.cpp"
 
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
@@ -26,7 +27,6 @@
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
-#include "Music.cpp"
 
 static void init(State *state)
 {

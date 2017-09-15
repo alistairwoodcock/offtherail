@@ -4,7 +4,7 @@
 #include "OpenAL/alc.h"
 #include "AL/alut.h"
 
-#elif 
+#else 
 
 #include "AL/al.h"
 #include "AL/alc.h"
