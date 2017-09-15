@@ -12,6 +12,8 @@
 
 #endif
 
+#include <map>
+
 namespace Music {
 
     class Sound {
@@ -32,6 +34,8 @@ namespace Music {
         }
     };
 
+    std::map<const char*, Sound> sounds;
+
     Sound music;
 	const char* current;
 
@@ -48,6 +52,12 @@ namespace Music {
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
 	ALboolean LoadMusic(Sound &sound, const char* file) {
+        auto search = sounds.find(file);
+        if (search != sounds.end()) {
+            sound = search->second;
+            return AL_TRUE;
+        }
+
 		Sound s = {0};
 
         printf("Loading %s\n", file);
@@ -79,6 +89,7 @@ namespace Music {
 		if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
         
+        sounds.insert(sounds.begin(), std::pair<const char*,Sound>(file,s));
         sound = s;
         return AL_TRUE;
 	}
@@ -91,7 +102,7 @@ namespace Music {
 
 	void destroy() {
 		//alDeleteBuffers(1, &Buffer);
-		alDeleteSources(1, &music.Source);
+        alDeleteSources(1, &music.Source);
 		if (alutExit() == AL_FALSE) {
 			printf("Error unloading ALUT: %s\n", alutGetErrorString(alutGetError()));
 		}
@@ -101,7 +112,6 @@ namespace Music {
 		alutInit(NULL, 0);
 		alGetError();
 		SetListenerValues();
-        music = {0};
 	}
 
 	void play(const char* file) {
@@ -118,7 +128,7 @@ namespace Music {
 	}
 
     void soundEffect(const char* file, bool sleep=false) {
-        Sound effect = {0};
+        Sound effect;
         LoadMusic(effect, file);
         alSourcei(effect.Source, AL_LOOPING, AL_FALSE);
         alSourcePlay(effect.Source);
