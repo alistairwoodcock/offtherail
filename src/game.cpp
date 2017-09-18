@@ -26,22 +26,25 @@
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
+const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+
 static void init(State *state)
 {
 	printf("INIT");
 	
 	//Setup our entire game and GL state 
-    
+    GameState *game = &state->game_state;
+
     //Game state for runtime
-    state->game_state.game_started = false;
-    state->game_state.quit_game = false;
+    game->game_started = false;
+    game->quit_game = false;
     changeScreen(state, MAIN_MENU);
     
-    state->game_state.camera_locked = true;
-    state->game_state.input_timeout = 0;
+    game->camera_locked = true;
+    game->input_timeout = 0;
 
-    state->game_state.ground = -2;
-    state->game_state.speed = 10;
+    game->ground = -2;
+    game->speed = 10;
 
     //GL Setup
     printf("screenWidth: %i\n", state->platform.screenWidth);
@@ -65,7 +68,7 @@ static void init(State *state)
     Grasses::setup(state);
     
     /* -- Camera Setup -- */
-    state->game_state.camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
+    game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
     /* -- Menu Setup --*/
     MainMenu::setup(state);
@@ -76,7 +79,65 @@ static void init(State *state)
 
     /* -- Train Setup -- */
     Trains::setup(state);
+
+    /* -- Shadow Setup --*/
+    unsigned int depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+
+	unsigned int depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
+
+
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);  
+
+	game->shadowDepthMapFBO = depthMapFBO;
+	game->shadowDepthMap = depthMap;
+	game->shadowDepthShader = loadShader("light", "src/shaders/simpleDepthShader.vs","src/shaders/simpleDepthShader.fs");
+	game->lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+
+	game->debugDepthQuad = loadShader("debugQuad", "src/shaders/debugQuad.vs", "src/shaders/debugQuad.fs");
+
 }
+
+unsigned int quadVAO = 0;
+unsigned int quadVBO;
+void renderQuad()
+{
+    if (quadVAO == 0)
+    {
+        float quadVertices[] = {
+            // positions        // texture Coords
+            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
+             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+        };
+        // setup plane VAO
+        glGenVertexArrays(1, &quadVAO);
+        glGenBuffers(1, &quadVBO);
+        glBindVertexArray(quadVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    }
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+}
+
 
 static void updateAndRender(State *state){
 
@@ -155,6 +216,11 @@ static void updateAndRender(State *state){
 				// printf("camera(%f, %f, %f)\n", camera->Position.x, camera->Position.y, camera->Position.z);
 				// printf("camera YAW(%f)\n", camera->Yaw);
 				// printf("camera PITCH(%f)\n", camera->Pitch);
+			} else {
+				if(platform->input.apostrophe_pressed){
+					game->showDepthMap = !game->showDepthMap;
+					game->input_timeout = 0.1;
+				}
 			}
 			
 			if(!game->paused){
@@ -165,16 +231,54 @@ static void updateAndRender(State *state){
 				Trains::update(state, platform->currTime, platform->deltaTime);
 				Particles::update(state, platform->currTime, platform->deltaTime);
 				Lights::update(state, platform->currTime, platform->deltaTime);
-			}			
+			}	
+
+			// 1. first render to depth map
+			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+			glBindFramebuffer(GL_FRAMEBUFFER, game->shadowDepthMapFBO);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			
+			//configure shader and matrices
+			float near_plane = 1.0f, far_plane = 13.5f;
+			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane); 
+			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+			useShader(game->shadowDepthShader.ID);
+			shaderSetMat4(game->shadowDepthShader.ID, "lightSpaceMatrix", lightSpaceMatrix);
+
+			Particles::renderShadow(state, game->shadowDepthShader);
+			Grasses::renderShadow(state, game->shadowDepthShader);
+			Trains::renderShadow(state, game->shadowDepthShader);
 			
 
-			//Draw CubeMap
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			// 2. then render scene as normal with shadow mapping (using depth map)
+			glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
+			
+			// render scene 
 			SkyBoxes::render(state, projection, view);
 			Lights::render(state, projection, view);
 			Grasses::render(state, projection, view);
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);
+
+			if(game->showDepthMap)
+			{
+				useShader(game->debugDepthQuad.ID);
+				shaderSetFloat(game->debugDepthQuad.ID, "near_plane", near_plane);
+				shaderSetFloat(game->debugDepthQuad.ID, "far_plane", far_plane);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
+				renderQuad();
+			}
+
+
 
 		} break;
 	}

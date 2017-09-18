@@ -156,5 +156,24 @@ namespace Trains {
 
 
 	}
+
+	void renderShadow(State *state, Shader &shader){
+		
+		Model *trainModel = state->game_state.trainModel;
+		Train *train = state->game_state.train;
+
+		unsigned int ID = shader.ID;
+
+		// render the loaded model
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
+		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+
+		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		model = glm::rotate(model, train->z_rot, glm::vec3(0.0, 0.0, 1.0));
+		shaderSetMat4(ID, "model", model);
+		
+		trainModel->Draw(shader);
+	}
 	
 }

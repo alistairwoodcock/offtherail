@@ -116,6 +116,14 @@ struct GameState {
 	/* CAMERA STATE */
 	Camera camera;
 	bool camera_locked;	
+
+	/* SHADOW STATE */
+	glm::vec3 lightPos;
+	Shader shadowDepthShader;
+	unsigned int shadowDepthMapFBO;
+	unsigned int shadowDepthMap;
+	Shader debugDepthQuad;
+	bool showDepthMap;
 	
 };
 

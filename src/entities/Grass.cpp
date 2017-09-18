@@ -133,4 +133,30 @@ namespace Grasses {
 		useShader(0);
 	}
 
+	void renderShadow(State *state, Shader &shader){
+		GameState *game = &state->game_state;
+        Model *grassModel = game->grassModel;
+		Grass *grass = game->grass;
+		int grass_count = game->grass_count;
+
+		unsigned int ID = shader.ID;
+
+		for(int i = 0; i < grass_count; i++)
+		{
+
+			Grass *p = grass+i;
+		    
+            // render the loaded model
+		    glm::mat4 model;
+			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
+		    model = glm::scale(model, glm::vec3(0.8));
+
+		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		    shaderSetMat4(ID, "model", model);
+		    
+		    grassModel->Draw(shader);
+        }
+
+	}
+
 }

@@ -120,4 +120,28 @@ namespace Particles {
 		glBindVertexArray(0);
 	}
 
+	void renderShadow(State *state, Shader &shader){
+		Particle *particles = state->game_state.particles;
+		int particle_count = state->game_state.particle_count;
+
+		glBindVertexArray(state->game_state.Particle_VAO);
+
+		for(int i = 0; i < particle_count; i++)
+		{
+
+			Particle *p = particles+i;
+
+			glm::mat4 model;
+			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
+			model = glm::scale(model, glm::vec3(0.02f));
+			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			
+			shaderSetMat4(shader.ID, "model", model);
+			
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		glBindVertexArray(0);
+	}
+
 }
