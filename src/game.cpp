@@ -103,9 +103,42 @@ static void init(State *state)
 	game->shadowDepthMapFBO = depthMapFBO;
 	game->shadowDepthMap = depthMap;
 	game->shadowDepthShader = loadShader("light", "src/shaders/simpleDepthShader.vs","src/shaders/simpleDepthShader.fs");
-	game->lightPos = glm::vec3(-2.0f, 4.0f, -1.0f);
+
+	game->lightPos = glm::vec3(game->sun->x, game->sun->y, game->sun->z);
 
 	game->debugDepthQuad = loadShader("debugQuad", "src/shaders/debugQuad.vs", "src/shaders/debugQuad.fs");
+
+	/* -- Ground Setup -- */
+	game->groundShader = loadShader("ground", "src/shaders/ground.vs", "src/shaders/ground.fs");
+
+	float planeVertices[] = {
+        // positions            // normals         // texcoords
+         25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+
+         25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
+        -25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+         25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+    };
+    // plane VAO
+    unsigned int planeVAO;
+    unsigned int planeVBO;
+    glGenVertexArrays(1, &planeVAO);
+    glGenBuffers(1, &planeVBO);
+    glBindVertexArray(planeVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glBindVertexArray(0);
+
+    game->Plane_VAO = planeVAO;
+    game->Plane_VBO = planeVBO;
 
 }
 
@@ -239,8 +272,9 @@ static void updateAndRender(State *state){
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
 			//configure shader and matrices
-			float near_plane = 1.0f, far_plane = 13.5f;
-			glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane); 
+			float near_plane = 10.0f, far_plane = 60.5f;
+			
+			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
 			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -267,6 +301,34 @@ static void updateAndRender(State *state){
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);
+
+			//Drawing the ground
+			//TODO(AL): Move into separate namespace
+			// shaderSetMat4(game->groundShader.ID, "model", model);
+			Shader shader = game->groundShader;
+			unsigned int ID = shader.ID;
+
+			glm::mat4 model;
+			model = glm::translate(model, glm::vec3(0, game->ground, 0));
+			
+			useShader(ID);
+			shaderSetMat4(ID, "projection", projection);
+			shaderSetMat4(ID, "view", view);
+			shaderSetMat4(ID, "model", model);
+			shaderSetMat4(ID, "lightSpaceMatrix", lightSpaceMatrix);
+			shaderSetVec3(ID, "color", glm::vec3(0.1,0.8,0.1));
+
+			shaderSetInt(ID, "diffuseTexture", 0);
+    		shaderSetInt(ID, "shadowMap", 1);
+
+		 	glActiveTexture(GL_TEXTURE1);
+        	glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
+
+    		glBindVertexArray(game->Plane_VAO);
+    		glDrawArrays(GL_TRIANGLES, 0, 6);
+    		
+    		glBindVertexArray(0);
+
 
 			if(game->showDepthMap)
 			{

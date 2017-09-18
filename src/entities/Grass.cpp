@@ -7,7 +7,7 @@ namespace Grasses {
 		
         p->x = (std::rand()%200)/10.0 + 6;
         if (std::rand()%2 == 0) p->x *= -1;
-		p->y = state->game_state.ground;
+		p->y = state->game_state.ground - 0.5;
 		p->z = -50 - std::rand()%50;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;

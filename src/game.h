@@ -64,7 +64,6 @@ struct GameState {
 	Screens current_screen;
 
 	/* LEVEL STATE */
-	float ground; //y position for the ground
     float speed; //Speed of train, scenery, etc.
 	
 	/* PARTICLE STATE */
@@ -81,6 +80,12 @@ struct GameState {
 	/*LIGHTS STATE*/
 	Shader lightShader;
 	Entity *sun;
+
+	/* GROUND STATE */
+	float ground; //y position for the ground
+	Shader groundShader;
+	unsigned int Plane_VAO;
+	unsigned int Plane_VBO;
 
     /* GRASS STATE */
     int grass_count;

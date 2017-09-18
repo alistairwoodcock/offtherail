@@ -11,7 +11,7 @@ namespace Trains {
 
 
 		game->train->x = 0;
-		game->train->y = -2.0f;
+		game->train->y = game->ground;
 		game->train->z = 0.0f;
 
 		game->bogieFront = new Entity();
@@ -26,7 +26,6 @@ namespace Trains {
 		Entity *train = game->train;
 		Entity *bogieFront = game->bogieFront;
 		Entity *bogieBack = game->bogieBack;
-		train->y = -4;
 		
 		Input input = state->platform.input;
 
@@ -45,6 +44,8 @@ namespace Trains {
 		} else {
 			bogieFront->z_vel = 0;
 		}
+
+
 
 		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
 		float bogie_mid_z = (bogieBack->z + bogieFront->z)/2;
