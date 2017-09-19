@@ -272,16 +272,16 @@ static void updateAndRender(State *state){
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
 			//configure shader and matrices
-			float near_plane = 10.0f, far_plane = 60.5f;
+			float near_plane = 10.0f, far_plane = 70.5f;
 			
 			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
-			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			glm::mat4 lightView = glm::lookAt(glm::vec3(game->sun->x,game->sun->y,game->sun->z), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			useShader(game->shadowDepthShader.ID);
 			shaderSetMat4(game->shadowDepthShader.ID, "lightSpaceMatrix", lightSpaceMatrix);
 
-			Particles::renderShadow(state, game->shadowDepthShader);
+			// Particles::renderShadow(state, game->shadowDepthShader);
 			Grasses::renderShadow(state, game->shadowDepthShader);
 			Trains::renderShadow(state, game->shadowDepthShader);
 			
@@ -294,14 +294,6 @@ static void updateAndRender(State *state){
 			glActiveTexture(GL_TEXTURE1);
 			glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
 			
-			// render scene 
-			SkyBoxes::render(state, projection, view);
-			Lights::render(state, projection, view);
-			Grasses::render(state, projection, view);
-			Trains::render(state, projection, view);
-			Particles::render(state, projection, view);
-			OverlayMenu::render(state, projection, view);
-
 			//Drawing the ground
 			//TODO(AL): Move into separate namespace
 			// shaderSetMat4(game->groundShader.ID, "model", model);
@@ -316,7 +308,7 @@ static void updateAndRender(State *state){
 			shaderSetMat4(ID, "view", view);
 			shaderSetMat4(ID, "model", model);
 			shaderSetMat4(ID, "lightSpaceMatrix", lightSpaceMatrix);
-			shaderSetVec3(ID, "color", glm::vec3(0.1,0.8,0.1));
+			shaderSetVec3(ID, "color", glm::vec3(0.0,0.25,0.0));
 
 			shaderSetInt(ID, "diffuseTexture", 0);
     		shaderSetInt(ID, "shadowMap", 1);
@@ -329,7 +321,15 @@ static void updateAndRender(State *state){
     		
     		glBindVertexArray(0);
 
+			// render scene 
+			SkyBoxes::render(state, projection, view);
+			Lights::render(state, projection, view);
+			Grasses::render(state, projection, view);
+			Trains::render(state, projection, view);
+			Particles::render(state, projection, view);
+			OverlayMenu::render(state, projection, view);
 
+			
 			if(game->showDepthMap)
 			{
 				useShader(game->debugDepthQuad.ID);
