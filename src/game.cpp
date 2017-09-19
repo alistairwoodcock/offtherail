@@ -26,7 +26,8 @@
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
-const unsigned int SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+//the larger these are, the higher resolution shadow we can have
+const unsigned int SHADOW_WIDTH = 2048*4, SHADOW_HEIGHT = 2048*4;
 
 static void init(State *state)
 {
@@ -113,13 +114,13 @@ static void init(State *state)
 
 	float planeVertices[] = {
         // positions            // normals         // texcoords
-         25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
+         60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
+        -60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
+        -60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,   0.0f, 50.0f,
 
-         25.0f, 0.0f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-        -25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-         25.0f, 0.0f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
+         60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
+        -60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,   0.0f, 50.0f,
+         60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,  50.0f, 50.0f
     };
     // plane VAO
     unsigned int planeVAO;
@@ -198,7 +199,8 @@ static void updateAndRender(State *state){
 	}
 
 	// view/projection transformations to pass to render functions
-	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, 100.0f);
+	float drawDistance = 160.0f;
+	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, drawDistance);
 	glm::mat4 view = camera->GetViewMatrix();
 	
 	switch(game->current_screen)
@@ -308,7 +310,9 @@ static void updateAndRender(State *state){
 			shaderSetMat4(ID, "view", view);
 			shaderSetMat4(ID, "model", model);
 			shaderSetMat4(ID, "lightSpaceMatrix", lightSpaceMatrix);
-			shaderSetVec3(ID, "color", glm::vec3(0.0,0.25,0.0));
+			shaderSetVec3(ID, "color", glm::vec3(0.48,0.625,0.2656));
+
+
 
 			shaderSetInt(ID, "diffuseTexture", 0);
     		shaderSetInt(ID, "shadowMap", 1);
