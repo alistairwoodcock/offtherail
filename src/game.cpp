@@ -277,7 +277,7 @@ static void updateAndRender(State *state){
 			float near_plane = 10.0f, far_plane = 70.5f;
 			
 			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
-			glm::mat4 lightView = glm::lookAt(glm::vec3(game->sun->x,game->sun->y,game->sun->z), glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			useShader(game->shadowDepthShader.ID);
