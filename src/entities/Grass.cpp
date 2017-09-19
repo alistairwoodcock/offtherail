@@ -7,7 +7,7 @@ namespace Grasses {
 		
         p->x = (std::rand()%200)/10.0 + 6;
         if (std::rand()%2 == 0) p->x *= -1;
-		p->y = state->game_state.ground - 0.5;
+		p->y = state->game_state.ground;
 		p->z = -50 - std::rand()%50;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
@@ -110,7 +110,7 @@ namespace Grasses {
 		shaderSetVec3(ID, "material.ambient",  1.0f, 1.0f, 1.0f);
 		shaderSetVec3(ID, "material.diffuse",  0.5f, 0.5f, 0.31f);
 		shaderSetVec3(ID, "material.specular", 0.25f, 0.25f, 0.25f);
-		shaderSetFloat(ID, "material.shininess", 64.0f); 
+		shaderSetFloat(ID, "material.shininess", 128.0f);
 
 		for(int i = 0; i < grass_count; i++)
 		{

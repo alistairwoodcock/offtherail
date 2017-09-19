@@ -105,7 +105,7 @@ static void init(State *state)
 	game->shadowDepthMap = depthMap;
 	game->shadowDepthShader = loadShader("light", "src/shaders/simpleDepthShader.vs","src/shaders/simpleDepthShader.fs");
 
-	game->lightPos = glm::vec3(game->sun->x, game->sun->y, game->sun->z);
+	game->lightPos = glm::vec3(15, 30, -40);
 
 	game->debugDepthQuad = loadShader("debugQuad", "src/shaders/debugQuad.vs", "src/shaders/debugQuad.fs");
 
@@ -277,13 +277,14 @@ static void updateAndRender(State *state){
 			float near_plane = 10.0f, far_plane = 70.5f;
 			
 			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
-			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f), glm::vec3(0.0, 1.0, 0.0));
+			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+
 
 			useShader(game->shadowDepthShader.ID);
 			shaderSetMat4(game->shadowDepthShader.ID, "lightSpaceMatrix", lightSpaceMatrix);
 
-			// Particles::renderShadow(state, game->shadowDepthShader);
 			Grasses::renderShadow(state, game->shadowDepthShader);
 			Trains::renderShadow(state, game->shadowDepthShader);
 			
@@ -342,6 +343,16 @@ static void updateAndRender(State *state){
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
 				renderQuad();
+
+
+				if(platform->input.up_pressed) game->lightPos.y -= 10 * platform->deltaTime;
+				if(platform->input.down_pressed) game->lightPos.y += 10 * platform->deltaTime;
+				if(platform->input.left_pressed) game->lightPos.z += 10 * platform->deltaTime;
+				if(platform->input.right_pressed) game->lightPos.z -= 10 * platform->deltaTime;
+				
+
+				printf("lightPos(%f,%f,%f)\n", game->lightPos.x,game->lightPos.y,game->lightPos.z);
+				
 			}
 
 
