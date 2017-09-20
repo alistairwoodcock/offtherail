@@ -28,7 +28,6 @@ namespace Particles {
 	    state->game_state.Particle_VAO = VAO;
 	    state->game_state.Particle_VBO = VBO;
 
-	    state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
 	    state->game_state.particle_count = 1000;
 
 	    int particle_count = state->game_state.particle_count;
@@ -93,7 +92,7 @@ namespace Particles {
 
 		glBindVertexArray(state->game_state.Particle_VAO);
 
-		Shader shader = state->game_state.particleShader;
+		Shader shader = Shaders::get(state, "particle");
 		unsigned int ID = shader.ID;
 
 		useShader(ID);

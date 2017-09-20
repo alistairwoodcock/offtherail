@@ -4,8 +4,6 @@ namespace Ground {
     void setup(State *state) {
     	GameState *game = &state->game_state;
 
-        game->groundShader = loadShader("ground", "src/shaders/ground.vs", "src/shaders/ground.fs");
-
         float planeVertices[] = {
         // positions            // normals         // texcoords
         	60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
@@ -45,7 +43,7 @@ namespace Ground {
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view, glm::mat4 &lightSpaceMatrix){
 		GameState *game = &state->game_state;
 		
-		Shader shader = game->groundShader;
+		Shader shader = Shaders::get(state, "ground");
 		unsigned int ID = shader.ID;
 
 		glm::mat4 model;

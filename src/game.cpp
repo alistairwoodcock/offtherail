@@ -52,13 +52,14 @@ static void init(State *state)
     //GL Setup
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
-	glEnable(GL_BLEND); 
+	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    //platform for input + rendering
-	    
+    
 
-    //load shaders
+    /* -- Shaders Setup -- */
+	Shaders::setup(state);
+
     
     /* -- Particles Setup -- */
     Particles::setup(state);
@@ -104,11 +105,8 @@ static void init(State *state)
 
 	game->shadowDepthMapFBO = depthMapFBO;
 	game->shadowDepthMap = depthMap;
-	game->shadowDepthShader = loadShader("light", "src/shaders/simpleDepthShader.vs","src/shaders/simpleDepthShader.fs");
-
+	
 	game->lightPos = glm::vec3(15, 30, -40);
-
-	game->debugDepthQuad = loadShader("debugQuad", "src/shaders/debugQuad.vs", "src/shaders/debugQuad.fs");
 
 	/* -- Ground Setup -- */
 	Ground::setup(state);
@@ -174,6 +172,9 @@ static void updateAndRender(State *state){
 	float drawDistance = 160.0f;
 	glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)platform->screenWidth / (float)platform->screenHeight, 0.1f, drawDistance);
 	glm::mat4 view = camera->GetViewMatrix();
+
+	// update shaders
+	Shaders::update(state);
 	
 	switch(game->current_screen)
 	{
@@ -252,12 +253,14 @@ static void updateAndRender(State *state){
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			//Render to depth buffer to produce shadows
-			useShader(game->shadowDepthShader.ID);
-			shaderSetMat4(game->shadowDepthShader.ID, "lightSpaceMatrix", lightSpaceMatrix);
+			Shader shadow = Shaders::get(state, "simpleDepthShader");
+
+			useShader(shadow.ID);
+			shaderSetMat4(shadow.ID, "lightSpaceMatrix", lightSpaceMatrix);
 
 			//Render anything you want to have shadows here
-			Grasses::renderShadow(state, game->shadowDepthShader);
-			Trains::renderShadow(state, game->shadowDepthShader);
+			Grasses::renderShadow(state, shadow);
+			Trains::renderShadow(state, shadow);
 			
 			//Render scene as normal with shadow mapping (using depth map)
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -277,9 +280,11 @@ static void updateAndRender(State *state){
 			
 			if(game->showDepthMap)
 			{
-				useShader(game->debugDepthQuad.ID);
-				shaderSetFloat(game->debugDepthQuad.ID, "near_plane", near_plane);
-				shaderSetFloat(game->debugDepthQuad.ID, "far_plane", far_plane);
+				Shader debug = Shaders::get(state, "debugQuad");
+
+				useShader(debug.ID);
+				shaderSetFloat(debug.ID, "near_plane", near_plane);
+				shaderSetFloat(debug.ID, "far_plane", far_plane);
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
 				renderQuad();

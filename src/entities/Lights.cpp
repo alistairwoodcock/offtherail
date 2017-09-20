@@ -9,8 +9,6 @@ namespace Lights {
 		game->sun->z = -40;
 		game->sun->z_rot = 0;
 
-
-		game->lightShader = loadShader("light", "src/shaders/particle.vs","src/shaders/particle.fs");
 	}
 
 	void update(State *state, float time, float deltaTime){
@@ -25,14 +23,12 @@ namespace Lights {
 		
 		GameState *game = &state->game_state;
 
-		Shader shader = state->game_state.lightShader;
+		Shader shader = Shaders::get(state, "particle");
 		unsigned int ID = shader.ID;
 
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
-
-		
 
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(game->sun->x,game->sun->y,game->sun->z));

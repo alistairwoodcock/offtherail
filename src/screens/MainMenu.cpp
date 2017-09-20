@@ -42,9 +42,9 @@ namespace MainMenu{
 		game->exitText->scale_vel = 0;
 		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
 
-		game->textShader = loadShader("text", "src/shaders/text.vs","src/shaders/text.fs");
-		useShader(game->textShader.ID);
-		shaderSetInt(game->textShader.ID, "textTexture", 0);
+		Shader textShader = Shaders::get(state, "text");
+		useShader(textShader.ID);
+		shaderSetInt(textShader.ID, "textTexture", 0);
 	}	
 
 	void update(State *state, float time, float deltaTime){

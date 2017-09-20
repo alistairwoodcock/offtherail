@@ -6,8 +6,7 @@ namespace Trains {
 		GameState *game = &state->game_state;
 
 		game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
-		game->trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    	game->train = new Train();
+		game->train = new Train();
 
 
 		game->train->x = 0;
@@ -108,7 +107,7 @@ namespace Trains {
 		Model *trainModel = state->game_state.trainModel;
 		Train *train = state->game_state.train;
 
-		Shader trainShader = state->game_state.trainShader;
+		Shader trainShader = Shaders::get(state, "train");
 		unsigned int ID = trainShader.ID;
 
 		useShader(ID);
@@ -125,7 +124,7 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		trainModel->Draw(trainShader);
 
-		Shader particleShader = state->game_state.particleShader;
+		Shader particleShader = Shaders::get(state, "particle");
 		ID = particleShader.ID;
 
 		useShader(ID);

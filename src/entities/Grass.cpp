@@ -32,8 +32,8 @@ namespace Grasses {
 		state->game_state.grass_count = 10;
         
 		game->grassModel = randomModel();
-		game->grassShader = loadShader("grass", "src/shaders/grass.vs", "src/shaders/grass.fs");
-		unsigned int ID = game->grassShader.ID;
+		Shader grassShader = Shaders::get(state, "grass");
+		unsigned int ID = grassShader.ID;
 		useShader(ID);
 		shaderSetVec3(ID, "objectColor", 0.4f, 0.4f, 0.4f);
 		shaderSetVec3(ID, "lightColor", 1.0f, 1.0f, 1.0f);
@@ -97,7 +97,7 @@ namespace Grasses {
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
-		Shader grassShader = game->grassShader;
+		Shader grassShader = Shaders::get(state, "grass");
 		unsigned int ID = grassShader.ID;
 
 		useShader(ID);
