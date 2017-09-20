@@ -10,6 +10,8 @@ struct Shader {
     char* name;
     char* vsFileName;
     char* fsFileName;
+    bool callback_set;
+    void(*callback)(void* state);
 };
 
 

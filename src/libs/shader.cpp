@@ -69,6 +69,15 @@ namespace ShaderMaps{
         Shader empty = {};
         return empty;
     }
+
+    void setCallback(ShaderMap &sm, const char* key, void(*callback)(void *state)){
+        for(int i = 0; i < sm.count; i++){
+            if(indexHasKey(sm, i, key)){
+                sm.elements[i].val.callback_set = true;
+                sm.elements[i].val.callback = callback;
+            }
+        }
+    }
 }
 
 namespace Shaders{
@@ -159,16 +168,52 @@ namespace Shaders{
             
         }        
         
+
+        game->shaderUpdateTimeout = 2;
     }
 
     void update(State *state){
         GameState* game = &state->game_state;
+        PlatformState* platform = &state->platform;
+
+        game->shaderUpdateTimeout -= platform->deltaTime;
+
+        if(game->shaderUpdateTimeout > 0) return;
+
+
+        for(int i = 0; i < game->shaderMap.count; i++){
+            ShaderMapElement sme = game->shaderMap.elements[i];
+
+            Shader shader = sme.val;
+
+            freeShader(shader);
+
+            Shader loadedShader = loadShader(shader.name, shader.vsFileName, shader.fsFileName);
+
+            shader.ID = loadedShader.ID;
+
+            if(shader.callback_set){
+                shader.callback((void*)state);
+            }
+
+            game->shaderMap.elements[i].val = shader;
+        }
+
+        game->shaderUpdateTimeout = 2.0;
     }
 
     Shader get(State* state, const char* shaderName){
         GameState* game = &state->game_state;
 
         return ShaderMaps::get(game->shaderMap, shaderName);
+    }
+
+    void reloadCallback(State* state, const char* name, void(*callback)(void *state)){
+        GameState* game = &state->game_state;
+        
+        ShaderMaps::setCallback(game->shaderMap, name, callback);
+
+        callback(state);
     }
 
 }
@@ -265,7 +310,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
 
 void freeShader(Shader s){
     glDeleteProgram(s.ID);
-    free(s.name);
+    // free(s.name);
 }
 
 char* loadFileText(const char* fileName){

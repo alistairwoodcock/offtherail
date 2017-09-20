@@ -68,6 +68,7 @@ struct GameState {
 
 	/* SHADER STATE */
 	ShaderMap shaderMap;
+	float shaderUpdateTimeout;
 
 	/* LEVEL STATE */
     float speed; //Speed of train, scenery, etc.
