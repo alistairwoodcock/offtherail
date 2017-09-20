@@ -23,6 +23,8 @@
 #include "entities/Train.cpp"
 #include "entities/SkyBox.cpp"
 #include "entities/Lights.cpp"
+#include "entities/Ground.cpp"
+
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
@@ -48,7 +50,6 @@ static void init(State *state)
     game->speed = 10;
 
     //GL Setup
-    printf("screenWidth: %i\n", state->platform.screenWidth);
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
 	glEnable(GL_BLEND); 
@@ -110,36 +111,7 @@ static void init(State *state)
 	game->debugDepthQuad = loadShader("debugQuad", "src/shaders/debugQuad.vs", "src/shaders/debugQuad.fs");
 
 	/* -- Ground Setup -- */
-	game->groundShader = loadShader("ground", "src/shaders/ground.vs", "src/shaders/ground.fs");
-
-	float planeVertices[] = {
-        // positions            // normals         // texcoords
-         60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
-        -60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-        -60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,   0.0f, 50.0f,
-
-         60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
-        -60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,   0.0f, 50.0f,
-         60.0f, 0.0f, -110.0f,  0.0f, 1.0f, 0.0f,  50.0f, 50.0f
-    };
-    // plane VAO
-    unsigned int planeVAO;
-    unsigned int planeVBO;
-    glGenVertexArrays(1, &planeVAO);
-    glGenBuffers(1, &planeVBO);
-    glBindVertexArray(planeVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glBindVertexArray(0);
-
-    game->Plane_VAO = planeVAO;
-    game->Plane_VBO = planeVBO;
+	Ground::setup(state);
 
 }
 
@@ -268,65 +240,33 @@ static void updateAndRender(State *state){
 				Lights::update(state, platform->currTime, platform->deltaTime);
 			}	
 
-			// 1. first render to depth map
+			//First render to depth map (for shadows)
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			glBindFramebuffer(GL_FRAMEBUFFER, game->shadowDepthMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
-			//configure shader and matrices
+			//Shadow matrices
 			float near_plane = 10.0f, far_plane = 70.5f;
-			
 			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
 			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
-
-
+			//Render to depth buffer to produce shadows
 			useShader(game->shadowDepthShader.ID);
 			shaderSetMat4(game->shadowDepthShader.ID, "lightSpaceMatrix", lightSpaceMatrix);
 
+			//Render anything you want to have shadows here
 			Grasses::renderShadow(state, game->shadowDepthShader);
 			Trains::renderShadow(state, game->shadowDepthShader);
 			
-
+			//Render scene as normal with shadow mapping (using depth map)
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-			// 2. then render scene as normal with shadow mapping (using depth map)
 			glViewport(0, 0, platform->screenWidth, platform->screenWidth); 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
-			
-			//Drawing the ground
-			//TODO(AL): Move into separate namespace
-			// shaderSetMat4(game->groundShader.ID, "model", model);
-			Shader shader = game->groundShader;
-			unsigned int ID = shader.ID;
-
-			glm::mat4 model;
-			model = glm::translate(model, glm::vec3(0, game->ground, 0));
-			
-			useShader(ID);
-			shaderSetMat4(ID, "projection", projection);
-			shaderSetMat4(ID, "view", view);
-			shaderSetMat4(ID, "model", model);
-			shaderSetMat4(ID, "lightSpaceMatrix", lightSpaceMatrix);
-			shaderSetVec3(ID, "color", glm::vec3(0.48,0.625,0.2656));
-
-
-
-			shaderSetInt(ID, "diffuseTexture", 0);
-    		shaderSetInt(ID, "shadowMap", 1);
-
-		 	glActiveTexture(GL_TEXTURE1);
-        	glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
-
-    		glBindVertexArray(game->Plane_VAO);
-    		glDrawArrays(GL_TRIANGLES, 0, 6);
-    		
-    		glBindVertexArray(0);
-
 			// render scene 
+			Ground::render(state, projection, view, lightSpaceMatrix); //ground first for shadows
+
 			SkyBoxes::render(state, projection, view);
 			Lights::render(state, projection, view);
 			Grasses::render(state, projection, view);
@@ -343,16 +283,6 @@ static void updateAndRender(State *state){
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, game->shadowDepthMap);
 				renderQuad();
-
-
-				if(platform->input.up_pressed) game->lightPos.y -= 10 * platform->deltaTime;
-				if(platform->input.down_pressed) game->lightPos.y += 10 * platform->deltaTime;
-				if(platform->input.left_pressed) game->lightPos.z += 10 * platform->deltaTime;
-				if(platform->input.right_pressed) game->lightPos.z -= 10 * platform->deltaTime;
-				
-
-				printf("lightPos(%f,%f,%f)\n", game->lightPos.x,game->lightPos.y,game->lightPos.z);
-				
 			}
 
 

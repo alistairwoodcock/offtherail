@@ -110,8 +110,9 @@ namespace OverlayMenu{
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
 		GameState *game = &state->game_state;
-		Entity *overlay = game->overlay;
+		
 		if(game->overlay_active){
+			Entity *overlay = game->overlay;
 
 			renderImage(state, game->logo, projection, view);
 			renderImage(state, game->resumeText, projection, view);

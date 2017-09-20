@@ -150,8 +150,8 @@ namespace Grasses {
 		    glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
 		    model = glm::scale(model, glm::vec3(0.8));
-
 		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
+
 		    shaderSetMat4(ID, "model", model);
 		    
 		    grassModel->Draw(shader);
