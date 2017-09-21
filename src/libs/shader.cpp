@@ -3,6 +3,221 @@
 
 #include "shader.h"
 
+namespace ShaderMaps{
+    
+    ShaderMap getMap(){
+        ShaderMap sm = {};
+        sm.count =  0;
+        sm.maxCount = 256;
+        sm.elements = (ShaderMapElement*)malloc(sm.maxCount * sizeof(ShaderMapElement));
+        return sm;
+    }
+
+    bool indexHasKey(ShaderMap &sm, int i, const char* key){
+        return strcmp(sm.elements[i].key, key) == 0;
+    }
+
+    void set(ShaderMap &sm, const char* key, Shader val){
+
+        bool already_exists = false;
+        int found_index = -1;
+
+        for(int i = 0; i < sm.count; i++){
+            if(indexHasKey(sm, i, key)){
+                found_index = i;
+                already_exists = true;
+            }
+        }
+
+        if(!already_exists){
+            found_index = sm.count;
+            sm.count++;
+        }
+
+        if(sm.count < sm.maxCount)
+        {
+
+            if(!already_exists){
+                ShaderMapElement newElement = {};
+                newElement.key = (char*)malloc(strlen(key) * sizeof(char));
+                strcpy(newElement.key, key);
+                sm.elements[found_index] = newElement;
+            }
+
+            sm.elements[found_index].val = val;
+        }
+    }
+
+
+    bool contains(ShaderMap &sm, const char* key){
+
+        for(int i = 0; i < sm.count; i++){
+            if(indexHasKey(sm, i, key)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    Shader get(ShaderMap &sm, const char* key){
+        for(int i = 0; i < sm.count; i++){
+            if(indexHasKey(sm, i, key)){
+                return sm.elements[i].val;
+            }
+        }
+
+        Shader empty = {};
+        return empty;
+    }
+
+    void setCallback(ShaderMap &sm, const char* key, void(*callback)(void *state)){
+        for(int i = 0; i < sm.count; i++){
+            if(indexHasKey(sm, i, key)){
+                sm.elements[i].val.callback_set = true;
+                sm.elements[i].val.callback = callback;
+            }
+        }
+    }
+}
+
+namespace Shaders{
+
+    void setup(State *state){
+        GameState* game = &state->game_state;
+        
+        game->shaderMap = ShaderMaps::getMap();
+
+        // count up all the shaders in the src/shaders/ folder
+        std::string dir = "./src/shaders/";
+            
+        DIR* dirp = opendir(dir.c_str());
+        struct dirent *dp;
+        
+        std::string vs;
+        bool vs_found = false;
+        std::string fs;
+        std::string shaderName;
+
+        std::string vs_type = ".vs";
+        std::string fs_type = ".fs";
+
+        while ((dp = readdir(dirp)) != NULL)
+        {
+            int l = strlen(dp->d_name);
+            std::string fname = dp->d_name;
+
+            if(l > 3){
+                
+                shaderName = fname.substr(0, l-3);
+
+                if(vs_type.compare(fname.substr(l-3, l)) == 0){
+                    vs = "";
+                    vs += dir;
+                    vs += fname;
+
+                    if(!ShaderMaps::contains(game->shaderMap, shaderName.c_str())){
+                        Shader newShader = {};
+                        ShaderMaps::set(game->shaderMap, shaderName.c_str(), newShader);
+                    }
+
+
+                    Shader mapShader = ShaderMaps::get(game->shaderMap, shaderName.c_str());
+                    mapShader.vsFileName = (char*)malloc(sizeof(char)*strlen(vs.c_str()));
+                    strcpy(mapShader.vsFileName, vs.c_str());
+                    
+                    ShaderMaps::set(game->shaderMap, shaderName.c_str(), mapShader);
+                }
+            
+                if(fs_type.compare(fname.substr(l-3, l)) == 0)
+                {
+                    fs = "";
+                    fs += dir;
+                    fs += fname;
+
+                    if(!ShaderMaps::contains(game->shaderMap, shaderName.c_str())){
+                        Shader newShader = {};
+                        ShaderMaps::set(game->shaderMap, shaderName.c_str(), newShader);
+                    }
+                    
+                    Shader mapShader = ShaderMaps::get(game->shaderMap, shaderName.c_str());
+                    mapShader.fsFileName = (char*)malloc(sizeof(char)*strlen(fs.c_str()));
+                    strcpy(mapShader.fsFileName, fs.c_str());
+
+                    ShaderMaps::set(game->shaderMap, shaderName.c_str(), mapShader);
+                }
+            
+            }
+        }
+        (void)closedir(dirp);
+
+        for(int i = 0; i < game->shaderMap.count; i++){
+            Shader shader = game->shaderMap.elements[i].val;
+            shader.name = game->shaderMap.elements[i].key;
+
+            if(shader.vsFileName != NULL && shader.fsFileName != NULL && shader.name != NULL)
+            {
+                Shader loadedShader = loadShader(shader.name, shader.vsFileName, shader.fsFileName);
+                shader.ID = loadedShader.ID;
+
+                ShaderMaps::set(game->shaderMap, shader.name, shader);
+            }
+            else
+            {
+                printf("shaderMap element[%s] had invalid data\n", game->shaderMap.elements[i].key);
+            }
+            
+        }        
+        
+
+        game->shaderUpdateTimeout = 2;
+    }
+
+    void update(State *state){
+        GameState* game = &state->game_state;
+        PlatformState* platform = &state->platform;
+
+        game->shaderUpdateTimeout -= platform->deltaTime;
+
+        if(game->shaderUpdateTimeout > 0) return;
+
+
+        for(int i = 0; i < game->shaderMap.count; i++){
+            ShaderMapElement sme = game->shaderMap.elements[i];
+
+            Shader shader = sme.val;
+
+            freeShader(shader);
+
+            Shader loadedShader = loadShader(shader.name, shader.vsFileName, shader.fsFileName);
+
+            shader.ID = loadedShader.ID;
+
+            if(shader.callback_set){
+                shader.callback((void*)state);
+            }
+
+            game->shaderMap.elements[i].val = shader;
+        }
+
+        game->shaderUpdateTimeout = 2.0;
+    }
+
+    Shader get(State* state, const char* shaderName){
+        GameState* game = &state->game_state;
+
+        return ShaderMaps::get(game->shaderMap, shaderName);
+    }
+
+    void reloadCallback(State* state, const char* name, void(*callback)(void *state)){
+        GameState* game = &state->game_state;
+        
+        ShaderMaps::setCallback(game->shaderMap, name, callback);
+
+        callback(state);
+    }
+
+}
+
 Shader loadShader(const char* shaderName, const char* vertexPath, const char* fragmentPath, const char* geometryPath){
     
     // 1. retrieve the vertex/fragment source code from filePath
@@ -93,9 +308,9 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
     return shader;
 }
 
-void freeShaders(Shader s){
+void freeShader(Shader s){
     glDeleteProgram(s.ID);
-    free(s.name);
+    // free(s.name);
 }
 
 char* loadFileText(const char* fileName){

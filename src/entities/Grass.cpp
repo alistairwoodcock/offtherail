@@ -24,16 +24,14 @@ namespace Grasses {
         }
     }
 
-	void setup(State *state) {
-        printf("SETUP GRASS\n");
+	//we have to take (void *state) because of the dependency 
+	//structure of our includes. Requires casting when receiving
+    void grassShaderSetup(void *state){
+    	GameState *game = &((State*)state)->game_state;
+    	Shader grassShader = Shaders::get((State*)state, "grass");
+		
+		unsigned int ID = grassShader.ID;
 
-		GameState *game = &state->game_state;
-
-		state->game_state.grass_count = 10;
-        
-		game->grassModel = randomModel();
-		game->grassShader = loadShader("grass", "src/shaders/grass.vs", "src/shaders/grass.fs");
-		unsigned int ID = game->grassShader.ID;
 		useShader(ID);
 		shaderSetVec3(ID, "objectColor", 0.4f, 0.4f, 0.4f);
 		shaderSetVec3(ID, "lightColor", 1.0f, 1.0f, 1.0f);
@@ -56,8 +54,24 @@ namespace Grasses {
 
 		shaderSetVec3(ID, "light.position", game->sun->x, game->sun->y, game->sun->z); 
 		shaderSetVec3(ID, "light.specular", 1.0f, 1.0f, 1.0f); 
+    }
 
-        int grass_count = game->grass_count;
+	void setup(State *state) {
+        printf("SETUP GRASS\n");
+
+		GameState *game = &state->game_state;
+
+		state->game_state.grass_count = 10;
+        
+		game->grassModel = randomModel();
+		
+		//setting a reload callback because we have shader vals set on startup
+		//these will need to be reinitialised
+		grassShaderSetup((void*)state);
+		Shaders::reloadCallback(state, "grass", *grassShaderSetup);
+
+
+		int grass_count = game->grass_count;
         game->grass = (Grass*)malloc(grass_count*sizeof(Grass));
 
 		for(int i = 0; i < grass_count; i++)
@@ -97,7 +111,7 @@ namespace Grasses {
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
-		Shader grassShader = game->grassShader;
+		Shader grassShader = Shaders::get(state, "grass");
 		unsigned int ID = grassShader.ID;
 
 		useShader(ID);
@@ -110,7 +124,7 @@ namespace Grasses {
 		shaderSetVec3(ID, "material.ambient",  1.0f, 1.0f, 1.0f);
 		shaderSetVec3(ID, "material.diffuse",  0.5f, 0.5f, 0.31f);
 		shaderSetVec3(ID, "material.specular", 0.25f, 0.25f, 0.25f);
-		shaderSetFloat(ID, "material.shininess", 64.0f); 
+		shaderSetFloat(ID, "material.shininess", 128.0f);
 
 		for(int i = 0; i < grass_count; i++)
 		{
@@ -131,6 +145,32 @@ namespace Grasses {
 		
 		glBindVertexArray(0);
 		useShader(0);
+	}
+
+	void renderShadow(State *state, Shader &shader){
+		GameState *game = &state->game_state;
+        Model *grassModel = game->grassModel;
+		Grass *grass = game->grass;
+		int grass_count = game->grass_count;
+
+		unsigned int ID = shader.ID;
+
+		for(int i = 0; i < grass_count; i++)
+		{
+
+			Grass *p = grass+i;
+		    
+            // render the loaded model
+		    glm::mat4 model;
+			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
+		    model = glm::scale(model, glm::vec3(0.8));
+		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
+
+		    shaderSetMat4(ID, "model", model);
+		    
+		    grassModel->Draw(shader);
+        }
+
 	}
 
 }

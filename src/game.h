@@ -1,6 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include <map>
+#include <string>
+
 #include <GLFW/glfw3.h>
 
 #include "libs/shader.h"
@@ -63,14 +66,16 @@ struct GameState {
 	
 	Screens current_screen;
 
+	/* SHADER STATE */
+	ShaderMap shaderMap;
+	float shaderUpdateTimeout;
+
 	/* LEVEL STATE */
-	float ground; //y position for the ground
     float speed; //Speed of train, scenery, etc.
 	
 	/* PARTICLE STATE */
 	int particle_count;
 	Particle* particles;
-	Shader particleShader;
 	unsigned int Particle_VBO;
 	unsigned int Particle_VAO;
 
@@ -79,17 +84,19 @@ struct GameState {
 	SkyBox *skybox;
 
 	/*LIGHTS STATE*/
-	Shader lightShader;
 	Entity *sun;
+
+	/* GROUND STATE */
+	float ground; //y position for the ground
+	unsigned int Plane_VAO;
+	unsigned int Plane_VBO;
 
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
-    Shader grassShader;
     Model* grassModel;
 
 	/* TRAIN STATE */ 
-	Shader trainShader;
 	Model *trainModel;
 	Train *train;
 	Entity *bogieFront;
@@ -99,7 +106,6 @@ struct GameState {
 	float input_timeout;
 
 	/* MENU SCREEN STATE */
-	Shader textShader;
 	MenuImage *logo;
 	MenuImage *startText;
 	MenuImage *exitText;
@@ -107,7 +113,6 @@ struct GameState {
 	bool exit_active;
 
 	/* OVERLAY SCREEN STATE */
-	Shader overlayShader;
 	Entity *overlay;
 	MenuImage *resumeText;
 	bool overlay_active;
@@ -116,6 +121,12 @@ struct GameState {
 	/* CAMERA STATE */
 	Camera camera;
 	bool camera_locked;	
+
+	/* SHADOW STATE */
+	glm::vec3 lightPos;
+	unsigned int shadowDepthMapFBO;
+	unsigned int shadowDepthMap;
+	bool showDepthMap;
 	
 };
 

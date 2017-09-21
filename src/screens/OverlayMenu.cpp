@@ -24,9 +24,6 @@ namespace OverlayMenu{
 		game->overlay->y = 0;
 		game->overlay->z = 5;
 
-		game->overlayShader = loadShader("flat", "src/shaders/flat.vs", "src/shaders/flat.fs");
-		
-		
 		game->resumeText = new MenuImage();
 		game->resumeText->x = 0;
 		game->resumeText->y = -0.2;
@@ -110,14 +107,15 @@ namespace OverlayMenu{
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
 		GameState *game = &state->game_state;
-		Entity *overlay = game->overlay;
+		
 		if(game->overlay_active){
+			Entity *overlay = game->overlay;
 
 			renderImage(state, game->logo, projection, view);
 			renderImage(state, game->resumeText, projection, view);
 			renderImage(state, game->exitText, projection, view);
 
-			Shader shader = game->overlayShader;
+			Shader shader = Shaders::get(state, "flat");
 			unsigned int ID = shader.ID;
 
 			glm::mat4 model;

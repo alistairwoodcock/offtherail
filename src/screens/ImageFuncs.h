@@ -43,7 +43,7 @@ void renderImage(State *state, MenuImage *image, glm::mat4 &projection, glm::mat
 	model = glm::translate(model, glm::vec3(image->x, image->y, image->z));
 	model = glm::scale(model, image->scale);
 	
-	unsigned int ID = state->game_state.textShader.ID;
+	unsigned int ID = Shaders::get(state, "text").ID;
 
 	useShader(ID);
 	// shaderSetMat4(ID, "projection", projection);

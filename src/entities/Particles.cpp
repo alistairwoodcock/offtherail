@@ -28,8 +28,7 @@ namespace Particles {
 	    state->game_state.Particle_VAO = VAO;
 	    state->game_state.Particle_VBO = VBO;
 
-	    state->game_state.particleShader = loadShader("particle", "src/shaders/particle.vs","src/shaders/particle.fs");
-	    state->game_state.particle_count = 10000;
+	    state->game_state.particle_count = 1000;
 
 	    int particle_count = state->game_state.particle_count;
 		
@@ -93,7 +92,7 @@ namespace Particles {
 
 		glBindVertexArray(state->game_state.Particle_VAO);
 
-		Shader shader = state->game_state.particleShader;
+		Shader shader = Shaders::get(state, "particle");
 		unsigned int ID = shader.ID;
 
 		useShader(ID);
@@ -114,6 +113,30 @@ namespace Particles {
 			shaderSetVec3(ID, "color", glm::vec3(1,0.0,0.0));
 			shaderSetFloat(ID, "alpha", p->alpha);
 
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		glBindVertexArray(0);
+	}
+
+	void renderShadow(State *state, Shader &shader){
+		Particle *particles = state->game_state.particles;
+		int particle_count = state->game_state.particle_count;
+
+		glBindVertexArray(state->game_state.Particle_VAO);
+
+		for(int i = 0; i < particle_count; i++)
+		{
+
+			Particle *p = particles+i;
+
+			glm::mat4 model;
+			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
+			model = glm::scale(model, glm::vec3(0.02f));
+			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			
+			shaderSetMat4(shader.ID, "model", model);
+			
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 

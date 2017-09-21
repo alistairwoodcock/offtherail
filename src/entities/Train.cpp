@@ -6,12 +6,11 @@ namespace Trains {
 		GameState *game = &state->game_state;
 
 		game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
-		game->trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
-    	game->train = new Train();
+		game->train = new Train();
 
 
 		game->train->x = 0;
-		game->train->y = -2.0f;
+		game->train->y = game->ground;
 		game->train->z = 0.0f;
 
 		game->bogieFront = new Entity();
@@ -26,7 +25,6 @@ namespace Trains {
 		Entity *train = game->train;
 		Entity *bogieFront = game->bogieFront;
 		Entity *bogieBack = game->bogieBack;
-		train->y = -4;
 		
 		Input input = state->platform.input;
 
@@ -45,6 +43,8 @@ namespace Trains {
 		} else {
 			bogieFront->z_vel = 0;
 		}
+
+
 
 		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
 		float bogie_mid_z = (bogieBack->z + bogieFront->z)/2;
@@ -107,7 +107,7 @@ namespace Trains {
 		Model *trainModel = state->game_state.trainModel;
 		Train *train = state->game_state.train;
 
-		Shader trainShader = state->game_state.trainShader;
+		Shader trainShader = Shaders::get(state, "train");
 		unsigned int ID = trainShader.ID;
 
 		useShader(ID);
@@ -124,7 +124,7 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		trainModel->Draw(trainShader);
 
-		Shader particleShader = state->game_state.particleShader;
+		Shader particleShader = Shaders::get(state, "particle");
 		ID = particleShader.ID;
 
 		useShader(ID);
@@ -155,6 +155,25 @@ namespace Trains {
 
 
 
+	}
+
+	void renderShadow(State *state, Shader &shader){
+		
+		Model *trainModel = state->game_state.trainModel;
+		Train *train = state->game_state.train;
+
+		unsigned int ID = shader.ID;
+
+		// render the loaded model
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
+		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+
+		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		model = glm::rotate(model, train->z_rot, glm::vec3(0.0, 0.0, 1.0));
+		shaderSetMat4(ID, "model", model);
+		
+		trainModel->Draw(shader);
 	}
 	
 }
