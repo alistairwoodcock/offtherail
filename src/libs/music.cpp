@@ -110,6 +110,7 @@ namespace Music {
 
 	void init() {
 		alutInit(NULL, 0);
+		alutInitWithoutContext(NULL, 0);
 		alGetError();
 		SetListenerValues();
 	}
