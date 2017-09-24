@@ -15,6 +15,7 @@
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
+#include "entities/Track.h"
 
 #include "screens/MenuImage.h"
 
@@ -90,6 +91,12 @@ struct GameState {
 	float ground; //y position for the ground
 	unsigned int Plane_VAO;
 	unsigned int Plane_VBO;
+
+	/* TRACK STATE*/
+	//By having both these lines the game will not run propoerly, cannot
+	//remove the depth map with '
+	Model* trackModel;
+	Track *track;
 
     /* GRASS STATE */
     int grass_count;
