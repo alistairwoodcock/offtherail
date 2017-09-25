@@ -9,10 +9,18 @@ namespace Trains {
 		game->trainShader = loadShader("train", "src/shaders/train.vs", "src/shaders/train.fs");
     	game->train = new Train();
 
+        glm::vec3 s = game->trainModel->size;
+        printf("Train size is %f,%f,%f\n", s.x,s.y,s.z);
 
 		game->train->x = 0;
 		game->train->y = game->ground;
 		game->train->z = 0.0f;
+
+        game->train->size = glm::vec3(0.03f);
+
+        glm::vec3 mSize = game->trainModel->size;
+        glm::vec3 tSize = game->train->size;
+        game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
 
 		game->bogieFront = new Entity();
 		game->bogieFront->z = -1;
@@ -104,9 +112,10 @@ namespace Trains {
 	}
 
 	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
+		GameState *game = &state->game_state;
 		
-		Model *trainModel = state->game_state.trainModel;
-		Train *train = state->game_state.train;
+		Model *trainModel = game->trainModel;
+		Train *train = game->train;
 
 		Shader trainShader = state->game_state.trainShader;
 		unsigned int ID = trainShader.ID;
@@ -118,7 +127,7 @@ namespace Trains {
 		// render the loaded model
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
-		model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
+		model = glm::scale(model, game->train->scale);
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
 		model = glm::rotate(model, train->z_rot, glm::vec3(0.0, 0.0, 1.0));

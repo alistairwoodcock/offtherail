@@ -31,6 +31,8 @@ public:
 	string name;
 	bool gammaCorrection;
 
+    glm::vec3 size; // Size of the model, {max.x - min.x, y... z...}
+
 	/*  Functions   */
 	// constructor, expects a filepath to a 3D model.
 	Model(string const &modelName, string const &path, bool gamma);
