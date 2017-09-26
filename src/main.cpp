@@ -148,7 +148,7 @@ int main(){
 	if(game.window == NULL) {
 		printf("Failed to create GLFW window\n");
 		glfwTerminate();
-		return false;
+		return 1;
 	}
 
 	game.state = state;
@@ -167,7 +167,7 @@ int main(){
 	if(glewInit() != GLEW_OK) {
 		printf("Failed to initialize GLEW\n");
 		glfwTerminate();
-		return false;
+		return 1;
 	}
 
 	bool close = false;

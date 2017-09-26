@@ -7,16 +7,16 @@
 
 struct Shader {
     unsigned int ID;
-    char* name;
-    char* vsFileName;
-    char* fsFileName;
+    std::string name;
+    std::string vsFileName;
+    std::string fsFileName;
     bool callback_set;
     void(*callback)(void* state);
 };
 
 
 struct ShaderMapElement{
-	char* key;
+	std::string key;
 	Shader val;
 };
 
