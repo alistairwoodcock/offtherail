@@ -22,8 +22,8 @@ struct ShaderMapElement{
 
 struct ShaderMap {
 	int count;
-	int maxCount;
-	ShaderMapElement* elements;
+	static const int maxCount = 256;
+	ShaderMapElement elements[maxCount];
 };
 
 void checkCompileErrors(GLuint shader, std::string type);
