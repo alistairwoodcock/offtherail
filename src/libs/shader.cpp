@@ -5,24 +5,16 @@
 
 namespace ShaderMaps{
     
-    ShaderMap getMap(){
-        ShaderMap sm = {};
-        sm.count =  0;
-        sm.maxCount = 256;
-        sm.elements = (ShaderMapElement*)malloc(sm.maxCount * sizeof(ShaderMapElement));
-        return sm;
+    bool indexHasKey(ShaderMap *sm, int i, const char* key){
+        return sm->elements[i].key.compare(key) == 0;
     }
 
-    bool indexHasKey(ShaderMap &sm, int i, const char* key){
-        return strcmp(sm.elements[i].key, key) == 0;
-    }
-
-    void set(ShaderMap &sm, const char* key, Shader val){
+    void set(ShaderMap *sm, const char* key, Shader val){
 
         bool already_exists = false;
         int found_index = -1;
 
-        for(int i = 0; i < sm.count; i++){
+        for(int i = 0; i < sm->count; i++){
             if(indexHasKey(sm, i, key)){
                 found_index = i;
                 already_exists = true;
@@ -30,28 +22,28 @@ namespace ShaderMaps{
         }
 
         if(!already_exists){
-            found_index = sm.count;
-            sm.count++;
+            found_index = sm->count;
+            sm->count++;
         }
 
-        if(sm.count < sm.maxCount)
+        if(sm->count < sm->maxCount)
         {
 
             if(!already_exists){
                 ShaderMapElement newElement = {};
-                newElement.key = (char*)malloc(strlen(key) * sizeof(char));
-                strcpy(newElement.key, key);
-                sm.elements[found_index] = newElement;
+                newElement.key = std::string(key);
+                sm->elements[found_index] = newElement;
             }
 
-            sm.elements[found_index].val = val;
+            sm->elements[found_index].val = val;
         }
     }
 
 
-    bool contains(ShaderMap &sm, const char* key){
+    bool contains(ShaderMap *sm, const char* key){
 
-        for(int i = 0; i < sm.count; i++){
+        
+        for(int i = 0; i < sm->count; i++){
             if(indexHasKey(sm, i, key)){
                 return true;
             }
@@ -59,22 +51,22 @@ namespace ShaderMaps{
         return false;
     }
 
-    Shader get(ShaderMap &sm, const char* key){
-        for(int i = 0; i < sm.count; i++){
+    Shader get(ShaderMap *sm, const char* key){
+        for(int i = 0; i < sm->count; i++){
             if(indexHasKey(sm, i, key)){
-                return sm.elements[i].val;
+                return sm->elements[i].val;
             }
         }
 
-        Shader empty = {};
+        Shader empty = {0};
         return empty;
     }
 
-    void setCallback(ShaderMap &sm, const char* key, void(*callback)(void *state)){
-        for(int i = 0; i < sm.count; i++){
+    void setCallback(ShaderMap *sm, const char* key, void(*callback)(void *state)){
+        for(int i = 0; i < sm->count; i++){
             if(indexHasKey(sm, i, key)){
-                sm.elements[i].val.callback_set = true;
-                sm.elements[i].val.callback = callback;
+                sm->elements[i].val.callback_set = true;
+                sm->elements[i].val.callback = callback;
             }
         }
     }
@@ -83,9 +75,12 @@ namespace ShaderMaps{
 namespace Shaders{
 
     void setup(State *state){
+        printf("setup Shader");
         GameState* game = &state->game_state;
         
-        game->shaderMap = ShaderMaps::getMap();
+        // game->shaderMap = ShaderMap();
+        game->shaderMap = new ShaderMap;
+        game->shaderMap->count = 0;
 
         // count up all the shaders in the src/shaders/ folder
         std::string dir = "./src/shaders/";
@@ -93,11 +88,6 @@ namespace Shaders{
         DIR* dirp = opendir(dir.c_str());
         struct dirent *dp;
         
-        std::string vs;
-        bool vs_found = false;
-        std::string fs;
-        std::string shaderName;
-
         std::string vs_type = ".vs";
         std::string fs_type = ".fs";
 
@@ -108,10 +98,10 @@ namespace Shaders{
 
             if(l > 3){
                 
-                shaderName = fname.substr(0, l-3);
+                std::string shaderName = fname.substr(0, l-3);
 
                 if(vs_type.compare(fname.substr(l-3, l)) == 0){
-                    vs = "";
+                    std::string vs = "";
                     vs += dir;
                     vs += fname;
 
@@ -122,26 +112,28 @@ namespace Shaders{
 
 
                     Shader mapShader = ShaderMaps::get(game->shaderMap, shaderName.c_str());
-                    mapShader.vsFileName = (char*)malloc(sizeof(char)*strlen(vs.c_str()));
-                    strcpy(mapShader.vsFileName, vs.c_str());
+                    mapShader.vsFileName = vs;
                     
                     ShaderMaps::set(game->shaderMap, shaderName.c_str(), mapShader);
                 }
             
                 if(fs_type.compare(fname.substr(l-3, l)) == 0)
                 {
-                    fs = "";
+                    std::string fs = "";
                     fs += dir;
                     fs += fname;
+
 
                     if(!ShaderMaps::contains(game->shaderMap, shaderName.c_str())){
                         Shader newShader = {};
                         ShaderMaps::set(game->shaderMap, shaderName.c_str(), newShader);
                     }
+
                     
                     Shader mapShader = ShaderMaps::get(game->shaderMap, shaderName.c_str());
-                    mapShader.fsFileName = (char*)malloc(sizeof(char)*strlen(fs.c_str()));
-                    strcpy(mapShader.fsFileName, fs.c_str());
+                    mapShader.fsFileName = fs;
+
+
 
                     ShaderMaps::set(game->shaderMap, shaderName.c_str(), mapShader);
                 }
@@ -150,20 +142,25 @@ namespace Shaders{
         }
         (void)closedir(dirp);
 
-        for(int i = 0; i < game->shaderMap.count; i++){
-            Shader shader = game->shaderMap.elements[i].val;
-            shader.name = game->shaderMap.elements[i].key;
+        for(int i = 0; i < game->shaderMap->count; i++){
+            Shader shader = game->shaderMap->elements[i].val;
+            shader.name = game->shaderMap->elements[i].key;
 
-            if(shader.vsFileName != NULL && shader.fsFileName != NULL && shader.name != NULL)
+            printf("-- Setup of Shader %s --\n", shader.name.c_str());
+
+            printf("vsFileName: %s\n", shader.vsFileName.c_str());
+            printf("fsFileName: %s\n", shader.fsFileName.c_str());
+
+            if(shader.vsFileName.length() > 0 && shader.fsFileName.length() > 0 && shader.name.length() > 0)
             {
-                Shader loadedShader = loadShader(shader.name, shader.vsFileName, shader.fsFileName);
+                Shader loadedShader = loadShader(shader.name.c_str(), shader.vsFileName.c_str(), shader.fsFileName.c_str());
                 shader.ID = loadedShader.ID;
 
-                ShaderMaps::set(game->shaderMap, shader.name, shader);
+                ShaderMaps::set(game->shaderMap, shader.name.c_str(), shader);
             }
             else
             {
-                printf("shaderMap element[%s] had invalid data\n", game->shaderMap.elements[i].key);
+                printf("shaderMap element[%s] had invalid data\n", game->shaderMap->elements[i].key.c_str());
             }
             
         }        
@@ -181,14 +178,14 @@ namespace Shaders{
         if(game->shaderUpdateTimeout > 0) return;
 
 
-        for(int i = 0; i < game->shaderMap.count; i++){
-            ShaderMapElement sme = game->shaderMap.elements[i];
+        for(int i = 0; i < game->shaderMap->count; i++){
+            ShaderMapElement sme = game->shaderMap->elements[i];
 
             Shader shader = sme.val;
 
             freeShader(shader);
 
-            Shader loadedShader = loadShader(shader.name, shader.vsFileName, shader.fsFileName);
+            Shader loadedShader = loadShader(shader.name.c_str(), shader.vsFileName.c_str(), shader.fsFileName.c_str());
 
             shader.ID = loadedShader.ID;
 
@@ -196,7 +193,7 @@ namespace Shaders{
                 shader.callback((void*)state);
             }
 
-            game->shaderMap.elements[i].val = shader;
+            game->shaderMap->elements[i].val = shader;
         }
 
         game->shaderUpdateTimeout = 2.0;

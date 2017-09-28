@@ -7,23 +7,23 @@
 
 struct Shader {
     unsigned int ID;
-    char* name;
-    char* vsFileName;
-    char* fsFileName;
+    std::string name;
+    std::string vsFileName;
+    std::string fsFileName;
     bool callback_set;
     void(*callback)(void* state);
 };
 
 
 struct ShaderMapElement{
-	char* key;
+	std::string key;
 	Shader val;
 };
 
 struct ShaderMap {
 	int count;
-	int maxCount;
-	ShaderMapElement* elements;
+	static const int maxCount = 256;
+	ShaderMapElement elements[maxCount];
 };
 
 void checkCompileErrors(GLuint shader, std::string type);

@@ -68,7 +68,7 @@ struct GameState {
 	Screens current_screen;
 
 	/* SHADER STATE */
-	ShaderMap shaderMap;
+	ShaderMap* shaderMap;
 	float shaderUpdateTimeout;
 
 	/* LEVEL STATE */

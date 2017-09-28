@@ -21,9 +21,9 @@
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
 #include "entities/Train.cpp"
-#include "entities/SkyBox.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
+#include "entities/SkyBox.cpp"
 
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
@@ -49,6 +49,8 @@ static void init(State *state)
     game->ground = -2;
     game->speed = 10;
 
+    game->showDepthMap = false;
+
     //GL Setup
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
@@ -68,7 +70,7 @@ static void init(State *state)
     Lights::setup(state);
 
     /* -- Grasss Setup -- */
-    Grasses::setup(state);
+    // Grasses::setup(state);
     
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);

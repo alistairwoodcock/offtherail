@@ -7,14 +7,12 @@
 //#include "../libs/shader.h"
 
 namespace SkyBoxes {
-	unsigned int loadCubemap(vector<std::string> faces);
+	unsigned int loadCubemap(std::vector<std::string> faces);
 	void setup(State *state) {
 		GameState *game = &state->game_state;
 		std::cout << "SetUP Sky" << std::endl;
 
 		game->skybox = new SkyBox();
-
-		game->skybox->skyboxShader = loadShader("skybox", "src/shaders/skybox.vs", "src/shaders/skybox.fs");
 
 		float skyboxVertices[] = {
 			// positions          
@@ -70,7 +68,7 @@ namespace SkyBoxes {
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-		vector<std::string> faces
+		std::vector<std::string> faces
 		{
 			
 			"images/skybox/right.jpg",
@@ -79,14 +77,6 @@ namespace SkyBoxes {
 			"images/skybox/bottom.jpg",
 			"images/skybox/back.jpg",
 			"images/skybox/front.jpg"
-			/*
-			"images/skybox/elly/right.png",
-			"images/skybox/elly/left.png",
-			"images/skybox/elly/top.png",
-			"images/skybox/elly/bottom.png",
-			"images/skybox/elly/back.png",
-			"images/skybox/elly/front.png"
-			*/
 		};
 
 		game->skybox->cubemapTexture = loadCubemap(faces);
@@ -96,7 +86,7 @@ namespace SkyBoxes {
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		SkyBox* skybox = state->game_state.skybox;
-		Shader skyboxShader = skybox->skyboxShader;
+		Shader skyboxShader = Shaders::get(state, "skybox");
 		unsigned int ID = skyboxShader.ID;
 		useShader(ID);
 
@@ -122,7 +112,7 @@ namespace SkyBoxes {
 	// +Z (front) 
 	// -Z (back)
 	// -------------------------------------------------------
-	unsigned int loadCubemap(vector<std::string> faces)
+	unsigned int loadCubemap(std::vector<std::string> faces)
 	{
 		unsigned int textureID;
 		glGenTextures(1, &textureID);

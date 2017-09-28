@@ -42,7 +42,7 @@ namespace Lights {
 			shaderSetMat4(ID, "model", model);
 			
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 
 		glBindVertexArray(0);
