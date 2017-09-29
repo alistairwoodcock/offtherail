@@ -75,7 +75,7 @@ namespace ShaderMaps{
 namespace Shaders{
 
     void setup(State *state){
-        printf("setup Shader");
+        printf("setup Shader\n");
         GameState* game = &state->game_state;
         
         // game->shaderMap = ShaderMap();
@@ -170,7 +170,7 @@ namespace Shaders{
     }
 
     void update(State *state){
-        GameState* game = &state->game_state;
+        /*GameState* game = &state->game_state;
         PlatformState* platform = &state->platform;
 
         game->shaderUpdateTimeout -= platform->deltaTime;
@@ -196,7 +196,7 @@ namespace Shaders{
             game->shaderMap->elements[i].val = shader;
         }
 
-        game->shaderUpdateTimeout = 2.0;
+        game->shaderUpdateTimeout = 2.0;*/
     }
 
     Shader get(State* state, const char* shaderName){
@@ -289,7 +289,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
 
     int shaderNameLen = strlen(shaderName);
 
-    if(shaderNameLen > 0){
+    /*if(shaderNameLen > 0){
         
         shader.name = (char*)malloc(strlen(shaderName)+1);
         for(int i = 0; i < strlen(shaderName); i++){
@@ -297,7 +297,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
             shader.name[i+1] = '\0';
         }
         
-    }
+    }*/
 
     free(vShaderCode);
     free(fShaderCode);
