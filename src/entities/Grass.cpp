@@ -2,16 +2,16 @@
 
 namespace Grasses {
 
-    void resetPos(State *state, Grass *p) {
+    void resetPos(Grass *p) {
 		p->alpha = 0.8;
 		
         p->x = (std::rand()%200)/10.0 + 6;
         if (std::rand()%2 == 0) p->x *= -1;
-		p->y = state->game_state.ground;
+		p->y = game->ground;
 		p->z = -50 - std::rand()%50;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
-		p->z_vel = state->game_state.speed;
+		p->z_vel = game->speed;
         p->y_rot = std::rand()%5;
     }
 
@@ -28,7 +28,8 @@ namespace Grasses {
 	//structure of our includes. Requires casting when receiving
     void grassShaderSetup(void *state){
     	GameState *game = &((State*)state)->game_state;
-    	Shader grassShader = Shaders::get((State*)state, "grass");
+    	
+    	Shader grassShader = Shaders::get("grass");
 		
 		unsigned int ID = grassShader.ID;
 
@@ -56,39 +57,37 @@ namespace Grasses {
 		shaderSetVec3(ID, "light.specular", 1.0f, 1.0f, 1.0f); 
     }
 
-	void setup(State *state) {
+	void setup() {
         printf("SETUP GRASS\n");
 
-		GameState *game = &state->game_state;
-
-		state->game_state.grass_count = 10;
+		game->grass_count = 10;
         
-		game->grassModel = randomModel();
-		
-		//setting a reload callback because we have shader vals set on startup
+        game->grassModel = randomModel();
+        
+        //setting a reload callback because we have shader vals set on startup
 		//these will need to be reinitialised
-		grassShaderSetup((void*)state);
-		Shaders::reloadCallback(state, "grass", *grassShaderSetup);
+		grassShaderSetup((void*)GlobalState);
+		Shaders::reloadCallback("grass", *grassShaderSetup);
 
-
-		int grass_count = game->grass_count;
+        int grass_count = game->grass_count;
         game->grass = (Grass*)malloc(grass_count*sizeof(Grass));
 
-		for(int i = 0; i < grass_count; i++)
+        for(int i = 0; i < grass_count; i++)
 		{
 			Grass *p = new Grass();
-            resetPos(state, p);
+            resetPos(p);
             p->alpha = 1.0;
             p->z += 50 - std::rand()%100; // Initial offset
 			game->grass[i] = *p;
 		}
 
+        printf("SETUP GRASS - 6\n");
 	}
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game  = &state->game_state;
-		int grass_count = state->game_state.grass_count;
-		Grass *grass = state->game_state.grass;
+	void update(float time, float deltaTime){
+		
+		int grass_count = game->grass_count;
+		Grass *grass = game->grass;
 
 		for(int i = 0; i < grass_count; i++)
 		{
@@ -100,18 +99,18 @@ namespace Grasses {
 			p->alpha += 0.025 * deltaTime;
 
 			if (p->z > 18) {
-                resetPos(state, p);
+                resetPos(p);
 			}
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		GameState *game = &state->game_state;
-        Model *grassModel = game->grassModel;
+	void render(glm::mat4 &projection, glm::mat4 &view){
+		
+		Model *grassModel = game->grassModel;
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
-		Shader grassShader = Shaders::get(state, "grass");
+		Shader grassShader = Shaders::get("grass");
 		unsigned int ID = grassShader.ID;
 
 		useShader(ID);
@@ -147,9 +146,8 @@ namespace Grasses {
 		useShader(0);
 	}
 
-	void renderShadow(State *state, Shader &shader){
-		GameState *game = &state->game_state;
-        Model *grassModel = game->grassModel;
+	void renderShadow(Shader &shader){
+		Model *grassModel = game->grassModel;
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 

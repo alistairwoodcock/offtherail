@@ -135,8 +135,14 @@ struct State {
 	PlatformState platform;
 };
 
-void changeScreen(State *state, Screens screen);
-void paused(State *state, bool paused);
+//Our global references to game state
+//these get setup on init + update of game library
+State *GlobalState;
+GameState* game;
+PlatformState* platform;
+
+void changeScreen(Screens screen);
+void paused(bool paused);
 
 struct GameAPI {
 
@@ -148,9 +154,9 @@ struct GameAPI {
 
 	void (*unload)(State *s);
 
-	void (*updateAndRender)(State *s);
+	void (*updateAndRender)();
 
-	bool (*shouldClose)(State *s);
+	bool (*shouldClose)();
 };
 
 extern const struct GameAPI GAME_API;

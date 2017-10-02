@@ -1,10 +1,8 @@
 #include "Train.h"
 
 namespace Trains {
-	
-	void setup(State *state){
-		GameState *game = &state->game_state;
 
+	void setup(){
 		game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
 		game->train = new Train();
 
@@ -27,14 +25,13 @@ namespace Trains {
 		game->bogieBack->z = 9;
 	}
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game = &state->game_state;
-
+	void update(float time, float deltaTime){
+		
 		Entity *train = game->train;
 		Entity *bogieFront = game->bogieFront;
 		Entity *bogieBack = game->bogieBack;
 		
-		Input input = state->platform.input;
+		Input input = platform->input;
 
 		if(input.a_pressed){
 			bogieFront->x_vel = -5;
@@ -51,8 +48,6 @@ namespace Trains {
 		} else {
 			bogieFront->z_vel = 0;
 		}
-
-
 
 		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
 		float bogie_mid_z = (bogieBack->z + bogieFront->z)/2;
@@ -110,13 +105,12 @@ namespace Trains {
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		GameState *game = &state->game_state;
+	void render(glm::mat4 &projection, glm::mat4 &view){
 		
 		Model *trainModel = game->trainModel;
 		Train *train = game->train;
 
-		Shader trainShader = Shaders::get(state, "train");
+		Shader trainShader = Shaders::get("train");
 		unsigned int ID = trainShader.ID;
 
 		useShader(ID);
@@ -133,13 +127,13 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		trainModel->Draw(trainShader);
 
-		Shader particleShader = Shaders::get(state, "particle");
+		Shader particleShader = Shaders::get("particle");
 		ID = particleShader.ID;
 
 		useShader(ID);
-		glBindVertexArray(state->game_state.Particle_VAO);
+		glBindVertexArray(game->Particle_VAO);
 
-		Entity *bogieFront = state->game_state.bogieFront;
+		Entity *bogieFront = game->bogieFront;
 		model = glm::mat4();
 		model = glm::translate(model, glm::vec3(bogieFront->x, bogieFront->y, bogieFront->z));
 		model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
@@ -150,7 +144,7 @@ namespace Trains {
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-		Entity *bogieBack = state->game_state.bogieBack;
+		Entity *bogieBack = game->bogieBack;
 		model = glm::mat4();
 		model = glm::translate(model, glm::vec3(bogieBack->x, bogieBack->y, bogieBack->z));
 		model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
@@ -166,10 +160,10 @@ namespace Trains {
 
 	}
 
-	void renderShadow(State *state, Shader &shader){
+	void renderShadow(Shader &shader){
 		
-		Model *trainModel = state->game_state.trainModel;
-		Train *train = state->game_state.train;
+		Model *trainModel = game->trainModel;
+		Train *train = game->train;
 
 		unsigned int ID = shader.ID;
 

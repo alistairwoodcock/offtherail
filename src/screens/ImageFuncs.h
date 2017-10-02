@@ -33,8 +33,8 @@ void setupImage(const char* imagePath, MenuImage *image, float vertices[], unsig
 	glEnableVertexAttribArray(1);  
 }
 
-void renderImage(State *state, MenuImage *image, glm::mat4 &projection, glm::mat4 &view){
-
+void renderImage(MenuImage *image, glm::mat4 &projection, glm::mat4 &view){
+	
 	glBindVertexArray(image->VAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, image->glTexture);
@@ -43,7 +43,7 @@ void renderImage(State *state, MenuImage *image, glm::mat4 &projection, glm::mat
 	model = glm::translate(model, glm::vec3(image->x, image->y, image->z));
 	model = glm::scale(model, image->scale);
 	
-	unsigned int ID = Shaders::get(state, "text").ID;
+	unsigned int ID = Shaders::get("text").ID;
 
 	useShader(ID);
 	// shaderSetMat4(ID, "projection", projection);

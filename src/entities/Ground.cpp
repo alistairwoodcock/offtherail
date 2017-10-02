@@ -1,10 +1,8 @@
 
 namespace Ground {
 
-    void setup(State *state) {
-    	GameState *game = &state->game_state;
-
-        float planeVertices[] = {
+    void setup() {
+    	float planeVertices[] = {
         // positions            // normals         // texcoords
         	60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,  50.0f,  0.0f,
         	-60.0f, 0.0f,  40.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
@@ -36,14 +34,13 @@ namespace Ground {
 
 	}
 
-	void update(State *state, float time, float deltaTime){
+	void update(float time, float deltaTime){
 
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view, glm::mat4 &lightSpaceMatrix){
-		GameState *game = &state->game_state;
+	void render(glm::mat4 &projection, glm::mat4 &view, glm::mat4 &lightSpaceMatrix){
 		
-		Shader shader = Shaders::get(state, "ground");
+        Shader shader = Shaders::get("ground");
 		unsigned int ID = shader.ID;
 
 		glm::mat4 model;
