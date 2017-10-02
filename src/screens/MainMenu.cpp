@@ -94,7 +94,8 @@ namespace MainMenu{
 				game->quit_game = true;
 			} 
 			if(game->start_active){
-                changeScreen(GAME);
+                changeScreen(CHOOSE);
+                game->input_timeout = 0.5;
 			}
 		}
 

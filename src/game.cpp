@@ -26,6 +26,7 @@
 #include "entities/SkyBox.cpp"
 
 #include "screens/MainMenu.cpp"
+#include "screens/ChooseMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
 //the larger these are, the higher resolution shadow we can have
@@ -79,6 +80,7 @@ static void init(State *state)
     
     /* -- Menu Setup --*/
     MainMenu::setup();
+    ChooseMenu::setup();
     OverlayMenu::setup();
 
 	/* -- Set Up Sky --*/
@@ -182,15 +184,14 @@ static void updateAndRender(){
 		case MAIN_MENU: {
 			
 			MainMenu::update(platform->currTime, platform->deltaTime);
-			
 			MainMenu::render(projection, view);
 
 		} break;
 
 		case CHOOSE: {
 			
-
-
+			ChooseMenu::update(platform->currTime, platform->deltaTime);
+			ChooseMenu::render(projection, view);
 
 		} break;
 

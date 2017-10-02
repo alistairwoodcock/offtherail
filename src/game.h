@@ -112,6 +112,9 @@ struct GameState {
 	bool start_active;
 	bool exit_active;
 
+    /* CHOOSE SCREEN STATE */
+    Train *chooseTrain;
+
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
 	MenuImage *resumeText;

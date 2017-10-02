@@ -4,7 +4,7 @@ namespace Trains {
 	
 	void setup(){
 		
-		game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj");
+		game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj");
 		game->train = new Train();
 
 
