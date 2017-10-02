@@ -205,7 +205,7 @@ int main(){
 				
 			game.api.updateAndRender(game.state);
 
-			close = game.api.shouldClose(game.state);
+			close = game.api.shouldClose();
 
 
 		}

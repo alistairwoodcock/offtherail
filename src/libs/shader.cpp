@@ -74,10 +74,8 @@ namespace ShaderMaps{
 
 namespace Shaders{
 
-    void setup(State *state){
+    void setup(){
         printf("setup Shader\n");
-        GameState* game = &state->game_state;
-        
         // game->shaderMap = ShaderMap();
         game->shaderMap = new ShaderMap;
         game->shaderMap->count = 0;
@@ -169,10 +167,8 @@ namespace Shaders{
         game->shaderUpdateTimeout = 2;
     }
 
-    void update(State *state){
-        /*GameState* game = &state->game_state;
-        PlatformState* platform = &state->platform;
-
+    void update(){
+        /*
         game->shaderUpdateTimeout -= platform->deltaTime;
 
         if(game->shaderUpdateTimeout > 0) return;
@@ -199,18 +195,14 @@ namespace Shaders{
         game->shaderUpdateTimeout = 2.0;*/
     }
 
-    Shader get(State* state, const char* shaderName){
-        GameState* game = &state->game_state;
-
+    Shader get(const char* shaderName){
         return ShaderMaps::get(game->shaderMap, shaderName);
     }
 
-    void reloadCallback(State* state, const char* name, void(*callback)(void *state)){
-        GameState* game = &state->game_state;
-        
+    void reloadCallback(const char* name, void(*callback)(void *state)){
         ShaderMaps::setCallback(game->shaderMap, name, callback);
 
-        callback(state);
+        callback(GlobalState);
     }
 
 }

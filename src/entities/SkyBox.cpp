@@ -8,8 +8,7 @@
 
 namespace SkyBoxes {
 	unsigned int loadCubemap(std::vector<std::string> faces);
-	void setup(State *state) {
-		GameState *game = &state->game_state;
+	void setup() {
 		std::cout << "SetUP Sky" << std::endl;
 
 		game->skybox = new SkyBox();
@@ -82,11 +81,11 @@ namespace SkyBoxes {
 		game->skybox->cubemapTexture = loadCubemap(faces);
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view) {
+	void render(glm::mat4 &projection, glm::mat4 &view) {
 		// draw skybox as last
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-		SkyBox* skybox = state->game_state.skybox;
-		Shader skyboxShader = Shaders::get(state, "skybox");
+		SkyBox* skybox = game->skybox;
+		Shader skyboxShader = Shaders::get("skybox");
 		unsigned int ID = skyboxShader.ID;
 		useShader(ID);
 

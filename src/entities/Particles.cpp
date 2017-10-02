@@ -2,7 +2,7 @@
 
 namespace Particles {
 
-	void setup(State *state){
+	void setup(){
 		printf("SETUP PARTICLES\n");
 		float particle_vertices[] = {
 	        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -25,14 +25,14 @@ namespace Particles {
 	    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
 	    glEnableVertexAttribArray(0);
 
-	    state->game_state.Particle_VAO = VAO;
-	    state->game_state.Particle_VBO = VBO;
+	    game->Particle_VAO = VAO;
+	    game->Particle_VBO = VBO;
 
-	    state->game_state.particle_count = 1000;
+	    game->particle_count = 1000;
 
-	    int particle_count = state->game_state.particle_count;
+	    int particle_count = game->particle_count;
 		
-		state->game_state.particles = (Particle*)malloc(particle_count*sizeof(Particle));
+		game->particles = (Particle*)malloc(particle_count*sizeof(Particle));
 
 
 		for(int i = 0; i < particle_count; i++)
@@ -44,16 +44,15 @@ namespace Particles {
 			p->y_vel = ((std::rand()%100))/50.0;
 			p->z_vel = ((std::rand()%100) - (std::rand()%100))/1000.0;
 			
-			state->game_state.particles[i] = *p;
+			game->particles[i] = *p;
 		}
 
 
 	}
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game  = &state->game_state;
-		int particle_count = state->game_state.particle_count;
-		Particle *particles = state->game_state.particles;
+	void update(float time, float deltaTime){
+		int particle_count = game->particle_count;
+		Particle *particles = game->particles;
 
 		for(int i = 0; i < particle_count; i++)
 		{
@@ -86,13 +85,13 @@ namespace Particles {
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		Particle *particles = state->game_state.particles;
-		int particle_count = state->game_state.particle_count;
+	void render(glm::mat4 &projection, glm::mat4 &view){
+		Particle *particles = game->particles;
+		int particle_count = game->particle_count;
 
-		glBindVertexArray(state->game_state.Particle_VAO);
+		glBindVertexArray(game->Particle_VAO);
 
-		Shader shader = Shaders::get(state, "particle");
+		Shader shader = Shaders::get("particle");
 		unsigned int ID = shader.ID;
 
 		useShader(ID);
@@ -119,11 +118,11 @@ namespace Particles {
 		glBindVertexArray(0);
 	}
 
-	void renderShadow(State *state, Shader &shader){
-		Particle *particles = state->game_state.particles;
-		int particle_count = state->game_state.particle_count;
+	void renderShadow(Shader &shader){
+		Particle *particles = game->particles;
+		int particle_count = game->particle_count;
 
-		glBindVertexArray(state->game_state.Particle_VAO);
+		glBindVertexArray(game->Particle_VAO);
 
 		for(int i = 0; i < particle_count; i++)
 		{

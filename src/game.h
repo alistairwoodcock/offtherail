@@ -135,8 +135,12 @@ struct State {
 	PlatformState platform;
 };
 
-void changeScreen(State *state, Screens screen);
-void paused(State *state, bool paused);
+State *GlobalState;
+GameState* game;
+PlatformState* platform;
+
+void changeScreen(Screens screen);
+void paused(bool paused);
 
 struct GameAPI {
 
@@ -150,7 +154,7 @@ struct GameAPI {
 
 	void (*updateAndRender)(State *s);
 
-	bool (*shouldClose)(State *s);
+	bool (*shouldClose)();
 };
 
 extern const struct GameAPI GAME_API;
