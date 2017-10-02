@@ -135,6 +135,8 @@ struct State {
 	PlatformState platform;
 };
 
+//Our global references to game state
+//these get setup on init + update of game library
 State *GlobalState;
 GameState* game;
 PlatformState* platform;
