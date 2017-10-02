@@ -60,6 +60,10 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	vector<Texture> textures;
+
+    bool minSet = false;
+    glm::vec3 min, max;
+
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -107,8 +111,24 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	
 		vertices.push_back(vertex);
 
+        // Set data for size of the object
+        if (!minSet) {
+            min = glm::vec3(vector);
+            max = glm::vec3(vector);
+            minSet = true;
+        } else {
+            if (vector.x < min.x) min.x = vector.x;
+            if (vector.y < min.y) min.y = vector.y;
+            if (vector.z < min.z) min.z = vector.z;
 
+            if (vector.x > max.x) max.x = vector.x;
+            if (vector.y > max.y) max.y = vector.y;
+            if (vector.z > max.z) max.z = vector.z;
+        }
 	}
+
+    // Update final size
+    size = glm::vec3(max.x - min.x, max.y - min.y, max.z - min.z);
 
 	// now wak through each of the mesh's faces (a face is a mesh its triangle) and retrieve the corresponding vertex indices.
 	for (unsigned int i = 0; i < mesh->mNumFaces; i++)
