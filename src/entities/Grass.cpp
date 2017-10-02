@@ -17,10 +17,10 @@ namespace Grasses {
 
     Model* randomModel() {
         switch(rand()%4) {
-            case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(1.0f));
-            case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(1.0f));
-            case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(1.0f));
-            case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(1.0f));
+            case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
+            case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
+            case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
+            case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(0.2f));
         }
     }
 

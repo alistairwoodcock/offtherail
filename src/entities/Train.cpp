@@ -3,7 +3,8 @@
 namespace Trains {
 
 	void setup(){
-		game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+		
+        game->trainModel = new Model("train", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
 		game->train = new Train();
 
         glm::vec3 s = game->trainModel->size;
