@@ -31,11 +31,11 @@ public:
 	string name;
 	bool gammaCorrection;
 
-    glm::vec3 size; // Size of the model, {max.x - min.x, y... z...}
+    glm::vec3 size;
 
 	/*  Functions   */
 	// constructor, expects a filepath to a 3D model.
-	Model(string const &modelName, string const &path, bool gamma);
+	Model(string const &modelName, string const &path, glm::vec3 modelSize, bool gamma);
 
 	// draws the model, and thus all its meshes
 	void Draw(Shader shader);
