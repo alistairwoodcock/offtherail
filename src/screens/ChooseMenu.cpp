@@ -4,7 +4,13 @@
 #include "glm/glm.hpp"
 
 namespace ChooseMenu {
-	
+
+    void updateScale() {
+        glm::vec3 mSize = game->trainModel->size;
+        glm::vec3 tSize = game->chooseTrain->size;
+        game->chooseTrain->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
+    }
+
 	void setup() {
 		
         game->chooseTrain = new Train();
@@ -12,11 +18,8 @@ namespace ChooseMenu {
         game->chooseTrain->y = game->ground;
         game->chooseTrain->z = 5.0f;
 
-        game->chooseTrain->size = glm::vec3(10.3f);
-        glm::vec3 mSize = game->trainModel->size;
-        glm::vec3 tSize = game->chooseTrain->size;
-        game->chooseTrain->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
-
+        game->chooseTrain->size = glm::vec3(1.0f);
+        updateScale();
 		
 		float logo_vertices[] = {
 	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
@@ -56,22 +59,26 @@ namespace ChooseMenu {
         if(input->a_pressed) {
             game->input_timeout = 0.1;
             if (strcmp(curr, "locomotive") == 0)
-		        game->trainModel = new Model("train2", "models/rocks/rock4.obj");
+		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
             
             else if (strcmp(curr, "train2") == 0)
-		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj");
+		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
         }
 
         if(input->d_pressed) {
             game->input_timeout = 0.1;
             if (strcmp(curr, "locomotive") == 0)
-		        game->trainModel = new Model("train2", "models/rocks/rock4.obj");
+		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
             
             else if (strcmp(curr, "train2") == 0)
-		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj");
+		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
         }
 
-        if(input->space_pressed || input->enter_pressed){
+        if (strcmp(curr, game->trainModel->name.c_str()) != 0) {
+            updateScale();
+        }
+
+        if(input->space_pressed || input->enter_pressed) {
             changeScreen(GAME);
             game->input_timeout = 0.5;
         }

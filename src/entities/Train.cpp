@@ -2,6 +2,12 @@
 
 namespace Trains {
 
+    void updateScale() {
+        glm::vec3 mSize = game->trainModel->size;
+        glm::vec3 tSize = game->train->size;
+        game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
+    }
+
 	void setup(){
 
         game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
@@ -15,10 +21,7 @@ namespace Trains {
 		game->train->z = 0.0f;
 
         game->train->size = glm::vec3(1.0f);
-
-        glm::vec3 mSize = game->trainModel->size;
-        glm::vec3 tSize = game->train->size;
-        game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
+        updateScale();
 
 		game->bogieFront = new Entity();
 		game->bogieFront->z = -1;

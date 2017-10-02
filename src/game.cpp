@@ -300,6 +300,8 @@ static void updateAndRender(){
 }
 
 void changeScreen(Screens screen) {
+   if (screen == GAME) Trains::updateScale();
+
    game->current_screen = screen; 
 }
 
