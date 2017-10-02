@@ -78,6 +78,9 @@ static void init(State *state)
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
+    /* -- Train Setup -- */
+    Trains::setup();
+    
     /* -- Menu Setup --*/
     MainMenu::setup();
     ChooseMenu::setup();
@@ -85,9 +88,6 @@ static void init(State *state)
 
 	/* -- Set Up Sky --*/
 	SkyBoxes::setup();
-
-    /* -- Train Setup -- */
-    Trains::setup();
 
     /* -- Shadow Setup --*/
     unsigned int depthMapFBO;
