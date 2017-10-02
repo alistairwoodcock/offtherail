@@ -70,7 +70,7 @@ static void init(State *state)
     Lights::setup(state);
 
     /* -- Grasss Setup -- */
-    // Grasses::setup(state);
+    Grasses::setup(state);
     
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
