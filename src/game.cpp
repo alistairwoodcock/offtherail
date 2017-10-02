@@ -146,7 +146,7 @@ void renderQuad()
 }
 
 
-static void updateAndRender(State *state){
+static void updateAndRender(){
 
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
@@ -299,18 +299,18 @@ static void updateAndRender(State *state){
 }
 
 void changeScreen(Screens screen) {
-   GlobalState->game_state.current_screen = screen; 
+   game->current_screen = screen; 
 }
 
 void paused(bool paused) {
-    GlobalState->game_state.paused = paused;
+    game->paused = paused;
 }
 
 static bool shouldClose(){
-	if(GlobalState->game_state.quit_game){
+	if(game->quit_game){
 		printf("SHOULD CLOSE\n");
 	}
-	return GlobalState->game_state.quit_game;
+	return game->quit_game;
 }
 
 static void finalize(State *state){

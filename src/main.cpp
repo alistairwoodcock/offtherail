@@ -203,7 +203,7 @@ int main(){
 			game.state->platform.screenWidth = screenWidth;
 			game.state->platform.screenHeight = screenHeight;
 				
-			game.api.updateAndRender(game.state);
+			game.api.updateAndRender();
 
 			close = game.api.shouldClose();
 

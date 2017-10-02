@@ -152,7 +152,7 @@ struct GameAPI {
 
 	void (*unload)(State *s);
 
-	void (*updateAndRender)(State *s);
+	void (*updateAndRender)();
 
 	bool (*shouldClose)();
 };
