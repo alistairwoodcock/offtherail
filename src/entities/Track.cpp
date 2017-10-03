@@ -1,48 +1,65 @@
+#ifndef TRACK_CPP
+#define TRACK_CPP
+
 #include "Track.h"
+#include "../libs/model.h"
 
 namespace Tracks {
-	/*
-	void setup(State *state) {
-		GameState *game = &state->game_state;
+	
+	void setup() {
 		std::cout << "SETTING UP TRACK" << std::endl;
-		game->trackModel = new Model("track", "models/track/railTrackAlongCurveJoined.obj");
-		game->track = new Track();
 
-
-		game->track->x = 0;
-		game->track->y = game->ground;
-		game->track->z = 0.0f;
-
-	}
-
-	void update(State *state, float time, float deltaTime) {
+		game->trackModel = new Model("track", "models/smalltrack/smallstraighttextured.obj");
 		
+		game->trackLen = 62.5;
+		game->trackCount = 8;
+		for(int i = 0; i < game->trackCount; i++){
+			game->tracks[i].x = 0;
+			game->tracks[i].y = game->ground - 4.85;
+			game->tracks[i].z = game->trackLen - i*game->trackLen;
+		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view) {
 
-		Model *trackModel = state->game_state.trackModel;
-		Track *track = state->game_state.track;
+	void update(float time, float deltaTime) {
+		
+		for(int i = 0; i < game->trackCount; i++){
+			Track *track = &game->tracks[i];
 
-		Shader trackShader = Shaders::get(state, "track");
+			track->z += game->speed * deltaTime;
+			
+			if(track->z > 125){
+				track->z = game->trackLen - (game->trackCount-1)*game->trackLen;
+			}
+		}
+
+	}
+
+	void render(glm::mat4 &projection, glm::mat4 &view) {
+
+		Model *trackModel = game->trackModel;
+
+
+		Shader trackShader = Shaders::get("track");
 		unsigned int ID = trackShader.ID;
-
-		std::cout << ID << std::endl;
 
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
-		// render the loaded model
-		glm::mat4 model;
-		//model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
-		//model = glm::scale(model, glm::vec3(0.015f, 0.015f, 0.015f));
-
-		//model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
-		//model = glm::rotate(model, train->z_rot, glm::vec3(0.0, 0.0, 1.0));
-		shaderSetMat4(ID, "model", model);
-		trackModel->Draw(trackShader);
+		for(int i = 0; i < game->trackCount; i++){
+			Track *track = &game->tracks[i];
+			
+			glm::mat4 model;
+			model = glm::scale(model, glm::vec3(0.3f));
+			model = glm::translate(model, glm::vec3(track->x, track->y, track->z));
+			shaderSetMat4(ID, "model", model);
+			trackModel->Draw(trackShader);
+		}
 
 	}
-	*/
+	
 }
+
+#endif
+

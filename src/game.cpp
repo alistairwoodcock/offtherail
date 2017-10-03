@@ -21,6 +21,7 @@
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
 #include "entities/Train.cpp"
+#include "entities/Track.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
@@ -86,6 +87,9 @@ static void init(State *state)
 
     /* -- Train Setup -- */
     Trains::setup();
+
+    /* -- Track Setup -- */
+    Tracks::setup();
 
     /* -- Shadow Setup --*/
     unsigned int depthMapFBO;
@@ -236,10 +240,12 @@ static void updateAndRender(){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
 
+
 				Grasses::update(platform->currTime, platform->deltaTime);
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
+				Tracks::update(platform->currTime, platform->deltaTime);
 			}	
 
 			//First render to depth map (for shadows)
@@ -274,6 +280,7 @@ static void updateAndRender(){
 			SkyBoxes::render(projection, view);
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
+			Tracks::render(projection, view);
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
