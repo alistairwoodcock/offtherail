@@ -5,24 +5,15 @@
 #include "../libs/model.h"
 
 namespace Tracks {
-	/*
+	
 	void setup(State *state) {
 		GameState *game = &state->game_state;
 		std::cout << "SETTING UP TRACK" << std::endl;
-
-		game->trackModel = new Model("track", "models/track/railTrackAlongCurveJoined.obj");
-		game->track = new Track();
-
 
 		Model* trackModel = new Model("track", "models/track/longstraight.obj");
 		game->trackModel = trackModel;
 		game->track = new Track();
 
-
-		//Get the Two track meshes from the model and store in the track object
-		//for (int i = 0; i < trackModel->meshes.size(); i++) {
-		//	std::cout << "Mesh: " << i << trackModel->meshes[i].vertices.size() << std::endl;
-		//}
 		game->track->x = 0;
 		game->track->y = game->ground;
 		game->track->z = 0.0f;
@@ -51,9 +42,6 @@ namespace Tracks {
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
-		
-		//model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
-		//model = glm::rotate(model, train->z_rot, glm::vec3(0.0, 0.0, 1.0));
 		// render the loaded model
 		glm::mat4 model;
 
@@ -71,9 +59,6 @@ namespace Tracks {
 		trackModel->Draw(trackShader);
 
 	}
-
-	*/
-}
 
 	
 }

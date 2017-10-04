@@ -24,6 +24,7 @@
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
+#include "entities/Track.cpp"
 
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"
@@ -84,6 +85,9 @@ static void init(State *state)
 
     /* -- Train Setup -- */
     Trains::setup(state);
+
+	/* -- Track Setup -- */
+	Tracks::setup(state);
 
     /* -- Shadow Setup --*/
     unsigned int depthMapFBO;
@@ -281,7 +285,7 @@ static void updateAndRender(State *state){
 			Trains::render(state, projection, view);
 			Particles::render(state, projection, view);
 			OverlayMenu::render(state, projection, view);
-
+			Tracks::render(state, projection, view);
 			
 			if(game->showDepthMap)
 			{
