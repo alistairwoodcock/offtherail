@@ -8,10 +8,40 @@ namespace Trains {
         game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
     }
 
+    void setupTrainModels(){
+    	game->trainModels[0] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+        game->trainModels[1] = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
+        game->trainModels[2] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+    }
+
+    void setTrainModel(TrainTypes type){
+    	switch(type){
+
+			case ROCK:{
+				game->trainModel = game->trainModels[1];
+			} break;
+			
+			case OUR_BOY_THOMAS: {
+				game->trainModel = game->trainModels[2];
+			} break;
+
+    		case DEFAULT:
+    		default: {
+    			game->trainModel = game->trainModels[0];
+    		} break;
+
+    	}
+		
+		game->currentTrain = type;
+    }
+    
 	void setup(){
 
-        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+
+        setupTrainModels();
+
 		game->train = new Train();
+		setTrainModel(DEFAULT);
 
         glm::vec3 s = game->trainModel->size;
         printf("Train size is %f,%f,%f\n", s.x,s.y,s.z);

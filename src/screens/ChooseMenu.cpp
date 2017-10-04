@@ -32,7 +32,7 @@ namespace ChooseMenu {
 
 		game->logo = new MenuImage();
 		game->logo->x = 0;
-		game->logo->y = 0.4;
+		game->logo->y = 0.65;
 		game->logo->z = 0;
 		game->logo->scale = glm::vec3(1.1);
 		game->logo->scale_vel = 0.1;
@@ -64,6 +64,7 @@ namespace ChooseMenu {
 		
 		MenuImage *logo = game->logo;
 
+
 		logo->scale += glm::vec3(1.0)*logo->scale_vel*deltaTime*0.5f;
 
 		if(logo->scale.x > 1.2) logo->scale_vel = -0.1;
@@ -73,22 +74,26 @@ namespace ChooseMenu {
 
         const char* curr = game->trainModel->name.c_str();
 
+        bool nextTrain = false;
+
         if(input->a_pressed || input->left_pressed) {
             game->input_timeout = 0.1;
-            if (strcmp(curr, "locomotive") == 0)
-		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
-            
-            else if (strcmp(curr, "train2") == 0)
-		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+            nextTrain = true;
         }
 
         if(input->d_pressed || input->right_pressed) {
             game->input_timeout = 0.1;
-            if (strcmp(curr, "locomotive") == 0)
-		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
-            
-            else if (strcmp(curr, "train2") == 0)
-		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+            nextTrain = true;
+        }
+
+        if(nextTrain){
+        	if (strcmp(curr, "locomotive") == 0){
+            	Trains::setTrainModel(ROCK);
+            } else if (strcmp(curr, "train2") == 0) {
+            	Trains::setTrainModel(OUR_BOY_THOMAS);
+            } else if (strcmp(curr, "thomas") == 0) {
+            	Trains::setTrainModel(DEFAULT);
+            }
         }
 
         if (strcmp(curr, game->trainModel->name.c_str()) != 0) {
@@ -108,6 +113,7 @@ namespace ChooseMenu {
         // Update Mr Train
 		Train *train = game->chooseTrain;
         train->y_rot += 0.5 * deltaTime;
+        train->y = game->ground + sin(time) * 0.8;
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){

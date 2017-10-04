@@ -102,6 +102,8 @@ struct GameState {
 	Entity *bogieFront;
 	Entity *bogieBack;
 
+	Model* trainModels[TRAIN_MODEL_NUM];
+
 	/* INPUT STATE */
 	float input_timeout;
 
@@ -114,6 +116,7 @@ struct GameState {
 
     /* CHOOSE SCREEN STATE */
     Train *chooseTrain;
+    TrainTypes currentTrain;
     MenuImage *chooseRight;
     MenuImage *chooseLeft;
 
