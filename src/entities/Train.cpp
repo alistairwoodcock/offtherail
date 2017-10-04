@@ -15,23 +15,10 @@ namespace Trains {
     }
 
     void setTrainModel(TrainTypes type){
-    	switch(type){
-
-			case ROCK:{
-				game->trainModel = game->trainModels[1];
-			} break;
-			
-			case OUR_BOY_THOMAS: {
-				game->trainModel = game->trainModels[2];
-			} break;
-
-    		case DEFAULT:
-    		default: {
-    			game->trainModel = game->trainModels[0];
-    		} break;
-
-    	}
-		
+        if (type < 0 || type > TRAIN_MODEL_NUM) {
+            type = DEFAULT;
+        }
+		game->trainModel = game->trainModels[type];
 		game->currentTrain = type;
     }
     
