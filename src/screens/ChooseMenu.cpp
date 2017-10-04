@@ -38,6 +38,23 @@ namespace ChooseMenu {
 		game->logo->scale_vel = 0.1;
 		setupImage("images/logo.png", game->logo, logo_vertices, sizeof(logo_vertices));
 
+
+		game->chooseRight = new MenuImage();
+		game->chooseRight->x = 0.75;
+		game->chooseRight->y = 0;
+		game->chooseRight->z = 0;
+		game->chooseRight->scale = glm::vec3(0.4);
+		game->chooseRight->scale_vel = 0.1;
+		setupImage("images/arrow_right.png", game->chooseRight, logo_vertices, sizeof(logo_vertices));
+
+		game->chooseLeft = new MenuImage();
+		game->chooseLeft->x = -0.75;
+		game->chooseLeft->y = 0;
+		game->chooseLeft->z = 0;
+		game->chooseLeft->scale = glm::vec3(0.4);
+		game->chooseLeft->scale_vel = 0.1;
+		setupImage("images/arrow_left.png", game->chooseLeft, logo_vertices, sizeof(logo_vertices));
+
 		Shader textShader = Shaders::get("text");
 		useShader(textShader.ID);
 		shaderSetInt(textShader.ID, "textTexture", 0);
@@ -56,7 +73,7 @@ namespace ChooseMenu {
 
         const char* curr = game->trainModel->name.c_str();
 
-        if(input->a_pressed) {
+        if(input->a_pressed || input->left_pressed) {
             game->input_timeout = 0.1;
             if (strcmp(curr, "locomotive") == 0)
 		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
@@ -65,7 +82,7 @@ namespace ChooseMenu {
 		        game->trainModel = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
         }
 
-        if(input->d_pressed) {
+        if(input->d_pressed || input->right_pressed) {
             game->input_timeout = 0.1;
             if (strcmp(curr, "locomotive") == 0)
 		        game->trainModel = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
@@ -95,6 +112,8 @@ namespace ChooseMenu {
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
 		renderImage(game->logo, projection, view);
+		renderImage(game->chooseRight, projection, view);
+		renderImage(game->chooseLeft, projection, view);
         
         // Draw Mr Train
 		Model *trainModel = game->trainModel;

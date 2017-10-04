@@ -114,6 +114,8 @@ struct GameState {
 
     /* CHOOSE SCREEN STATE */
     Train *chooseTrain;
+    MenuImage *chooseRight;
+    MenuImage *chooseLeft;
 
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
