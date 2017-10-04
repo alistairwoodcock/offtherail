@@ -7,7 +7,7 @@
 const unsigned int TRAIN_MODEL_NUM = 3;
 
 enum TrainTypes {
-	DEFAULT,
+	DEFAULT = 0,
 	ROCK,
 	OUR_BOY_THOMAS
 };

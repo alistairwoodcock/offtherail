@@ -11,7 +11,7 @@ namespace Trains {
     void setupTrainModels(){
     	game->trainModels[0] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
         game->trainModels[1] = new Model("train2", "models/rocks/rock4.obj", glm::vec3(0.2f));
-        game->trainModels[2] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+        game->trainModels[2] = new Model("train2", "models/rocks/rock1.obj", glm::vec3(0.3f));
     }
 
     void setTrainModel(TrainTypes type){

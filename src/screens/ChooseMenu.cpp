@@ -72,31 +72,19 @@ namespace ChooseMenu {
 		
 		Input *input = &platform->input;
 
-        const char* curr = game->trainModel->name.c_str();
-
-        bool nextTrain = false;
+        TrainTypes current = game->currentTrain;
 
         if(input->a_pressed || input->left_pressed) {
             game->input_timeout = 0.1;
-            nextTrain = true;
+            TrainTypes prev = static_cast<TrainTypes>((current - 1 + TRAIN_MODEL_NUM) % TRAIN_MODEL_NUM);
+            Trains::setTrainModel(prev);
+            updateScale();
         }
 
         if(input->d_pressed || input->right_pressed) {
             game->input_timeout = 0.1;
-            nextTrain = true;
-        }
-
-        if(nextTrain){
-        	if (strcmp(curr, "locomotive") == 0){
-            	Trains::setTrainModel(ROCK);
-            } else if (strcmp(curr, "train2") == 0) {
-            	Trains::setTrainModel(OUR_BOY_THOMAS);
-            } else if (strcmp(curr, "thomas") == 0) {
-            	Trains::setTrainModel(DEFAULT);
-            }
-        }
-
-        if (strcmp(curr, game->trainModel->name.c_str()) != 0) {
+            TrainTypes next = static_cast<TrainTypes>((current + 1) % TRAIN_MODEL_NUM);
+            Trains::setTrainModel(next);
             updateScale();
         }
 
