@@ -20,7 +20,6 @@ namespace Tracks {
 		}
 	}
 
-
 	void update(float time, float deltaTime) {
 		
 		for(int i = 0; i < game->trackCount; i++){
@@ -32,7 +31,6 @@ namespace Tracks {
 				track->z = game->trackLen - (game->trackCount-1)*game->trackLen;
 			}
 		}
-
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view) {
@@ -56,7 +54,6 @@ namespace Tracks {
 			shaderSetMat4(ID, "model", model);
 			trackModel->Draw(trackShader);
 		}
-
 	}
 	
 }
