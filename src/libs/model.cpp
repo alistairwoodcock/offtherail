@@ -2,7 +2,7 @@
 #include "texture.h"
 #include "shader.h"
 
-Model::Model(string const &modelName, string const &path, glm::vec3 modelSize, bool gamma = false) : gammaCorrection(gamma)
+Model::Model(string const &modelName, string const &path, glm::vec3 modelSize = glm::vec3(1.0f), bool gamma = false) : gammaCorrection(gamma)
 {
 	name = modelName;
 	loadModel(path);

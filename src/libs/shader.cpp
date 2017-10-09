@@ -279,7 +279,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
     shader.ID = ID;
     //shader.name = "";
 
-    int shaderNameLen = strlen(shaderName);
+    // int shaderNameLen = strlen(shaderName);
 
     /*if(shaderNameLen > 0){
         

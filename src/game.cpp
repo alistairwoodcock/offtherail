@@ -20,6 +20,7 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
+#include "entities/Track.cpp"
 #include "entities/Train.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
@@ -78,18 +79,21 @@ static void init(State *state)
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
+	/* -- Set Up Sky --*/
+	SkyBoxes::setup();
+
     /* -- Train Setup -- */
     Trains::setup();
+
+    /* -- Track Setup -- */
+    Tracks::setup();
     
     /* -- Menu Setup --*/
     MainMenu::setup();
     ChooseMenu::setup();
     OverlayMenu::setup();
 
-	/* -- Set Up Sky --*/
-	SkyBoxes::setup();
-
-    /* -- Shadow Setup --*/
+	/* -- Shadow Setup --*/
     unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
@@ -241,6 +245,8 @@ static void updateAndRender(){
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
+				Tracks::update(platform->currTime, platform->deltaTime);
+
 			}	
 
 			//First render to depth map (for shadows)
@@ -275,6 +281,7 @@ static void updateAndRender(){
 			SkyBoxes::render(projection, view);
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
+			Tracks::render(projection, view);
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
