@@ -20,12 +20,12 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
+#include "entities/Track.cpp"
 #include "entities/Train.cpp"
 #include "entities/Track.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
-#include "entities/Track.cpp"
 
 #include "screens/MainMenu.cpp"
 #include "screens/OverlayMenu.cpp"

@@ -9,4 +9,6 @@ public:
 
 };
 
+Track* getSelectedTrack();
+
 #endif

@@ -11,11 +11,11 @@
 
 #include "entities/Entity.h"
 #include "entities/Camera.h"
+#include "entities/Track.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
-#include "entities/Track.h"
 
 #include "screens/MenuImage.h"
 
@@ -97,8 +97,18 @@ struct GameState {
 	//remove the depth map with '
 	Model* trackModel;
 	float trackLen;
-	int trackCount = 50;
-	Track tracks[50];
+	int trackCount;
+	Track *tracks;
+	Track *track1;
+	Track *track2;
+	Track *track3;
+
+	/* TRACK SWITCH STATE */
+	Track switches[20];
+	int switchesCount;
+	int maxSwitches;
+	float nextSwitchCountdown;
+	int selectedTrack;
 
     /* GRASS STATE */
     int grass_count;
