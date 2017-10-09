@@ -138,7 +138,8 @@ namespace ChooseMenu {
 		model = glm::scale(model, train->scale);
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
-		
+
+        // Anothe temp grass/rock shit    
         if (rock) {
 		shaderSetVec3(ID, "objectColor", 1.0f, 1.0f, 1.0f);
 		shaderSetVec3(ID, "lightColor", 1.0f, 0.0f, 0.0f);
@@ -155,7 +156,47 @@ namespace ChooseMenu {
         } else {
         shaderSetMat4(ID, "model", model);
 		trainModel->Draw(trainShader);
+	
+        // Reflections??
+
+		glBindVertexArray(game->Particle_VAO);
+		model = glm::mat4();
+		model = glm::translate(model, glm::vec3(0.0, game->ground, 5.0));
+		model = glm::scale(model, glm::vec3(15.0f,15.0f,15.0f));
+        model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
+		shaderSetMat4(ID, "model", model);
+		shaderSetVec3(ID, "color", glm::vec3(0.5));
+		shaderSetFloat(ID, "alpha", 0.5);
+
+        glEnable(GL_STENCIL_TEST);
+        
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilMask(0xFF);
+        
+        glDepthMask(GL_FALSE);
+        glClear(GL_STENCIL_BUFFER_BIT);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0x00);
+        glDepthMask(GL_TRUE);
+		glBindVertexArray(0);
+    
+        model = glm::mat4(); 
+		model = glm::translate(model, glm::vec3(train->x, 3*game->ground - train->y, train->z));
+        
+        model = glm::scale(model, glm::vec3(1, -1, 1));
+		model = glm::scale(model, train->scale);
+		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
+        shaderSetMat4(ID, "model", model);
+		trainModel->Draw(trainShader);
+        
+        glDisable(GL_STENCIL_TEST);
         }
+
+
 
 
 	}
