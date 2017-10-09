@@ -100,7 +100,6 @@ struct GameState {
 	int trackCount = 50;
 	Track tracks[50];
 
-
     /* GRASS STATE */
     int grass_count;
     Grass* grass;

@@ -241,12 +241,12 @@ static void updateAndRender(){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
 
-
 				Grasses::update(platform->currTime, platform->deltaTime);
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
 				Tracks::update(platform->currTime, platform->deltaTime);
+
 			}	
 
 			//First render to depth map (for shadows)
@@ -285,6 +285,7 @@ static void updateAndRender(){
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
+
 			
 			if(game->showDepthMap)
 			{
