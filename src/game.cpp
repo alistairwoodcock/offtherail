@@ -92,10 +92,7 @@ static void init(State *state)
     /* -- Track Setup -- */
     Tracks::setup();
 
-	/* -- Track Setup -- */
-	Tracks::setup(state);
-
-    /* -- Shadow Setup --*/
+	/* -- Shadow Setup --*/
     unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
@@ -281,7 +278,6 @@ static void updateAndRender(){
 			// render scene 
 			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
 
-<<<<<<< HEAD
 			SkyBoxes::render(projection, view);
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
@@ -289,16 +285,6 @@ static void updateAndRender(){
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
-
-=======
-			SkyBoxes::render(state, projection, view);
-			Lights::render(state, projection, view);
-			Grasses::render(state, projection, view);
-			Trains::render(state, projection, view);
-			Particles::render(state, projection, view);
-			OverlayMenu::render(state, projection, view);
-			Tracks::render(state, projection, view);
->>>>>>> Add Straight Track into Game
 			
 			if(game->showDepthMap)
 			{

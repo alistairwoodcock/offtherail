@@ -12,7 +12,7 @@ namespace Tracks {
 		game->trackModel = new Model("track", "models/smalltrack/smallstraighttextured.obj");
 		
 		game->trackLen = 62.5;
-		game->trackCount = 8;
+		game->trackCount = 10;
 		for(int i = 0; i < game->trackCount; i++){
 			game->tracks[i].x = 0;
 			game->tracks[i].y = game->ground - 4.85;
