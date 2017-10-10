@@ -114,7 +114,6 @@ struct GameState {
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
-    Model* grassModel;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;
