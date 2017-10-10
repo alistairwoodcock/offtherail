@@ -19,4 +19,9 @@ public:
     glm::vec3 scale;
 };
 
+class Bogie: public Entity {
+public:
+	int currentTrack;
+};
+
 #endif

@@ -40,17 +40,20 @@ namespace Trains {
         game->train->size = glm::vec3(1.0f);
         updateScale();
 
-		game->bogieFront = new Entity();
+		game->bogieFront = new Bogie();
 		game->bogieFront->z = -1;
-		game->bogieBack = new Entity();
+		game->bogieFront->currentTrack = 1;
+
+		game->bogieBack = new Bogie();
 		game->bogieBack->z = 9;
+		game->bogieBack->currentTrack = 1;
 	}
 
 	void update(float time, float deltaTime){
 		
 		Entity *train = game->train;
-		Entity *bogieFront = game->bogieFront;
-		Entity *bogieBack = game->bogieBack;
+		Bogie *bogieFront = game->bogieFront;
+		Bogie *bogieBack = game->bogieBack;
 		
 		Input input = platform->input;
 
@@ -100,9 +103,31 @@ namespace Trains {
 		// bogieBack->x += bogieBack->x_vel * deltaTime;
 		// bogieBack->z += bogieBack->z_vel * deltaTime;
 
-		Track *t = Tracks::getSelectedTrack();
-		bogieFront->x = t->x;
-		bogieBack->x = game->track2->x;
+		// Track *t = Tracks::getSelectedTrack();
+		// bogieFront->x = t->x;
+		
+		for(int i = 0; i < game->switchesCount; i++)
+		{
+			TrackSwitch *s = &game->switches[i];
+
+			if(s->fromTrack == bogieFront->currentTrack)
+			{
+				if(s->z > bogieFront->z && abs(s->z - bogieFront->z) < 5 && s->rotate_speed == 0){
+					bogieFront->currentTrack = s->toTrack;
+				}
+			}
+
+			if(s->fromTrack == bogieBack->currentTrack)
+			{
+				if(s->z > bogieBack->z && abs(s->z - bogieBack->z) < 5 && s->rotate_speed == 0){
+					bogieBack->currentTrack = s->toTrack;
+				}
+			}
+		}
+
+		bogieFront->x = Tracks::getTrack(bogieFront->currentTrack)->x;
+		bogieBack->x = Tracks::getTrack(bogieBack->currentTrack)->x;
+
 
 		b_x_diff = bogieBack->x - bogieFront->x;
 		b_z_diff = bogieBack->z - bogieFront->z;

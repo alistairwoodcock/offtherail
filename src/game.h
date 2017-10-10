@@ -102,13 +102,14 @@ struct GameState {
 	Track *track1;
 	Track *track2;
 	Track *track3;
+	int selectedTrack;
 
 	/* TRACK SWITCH STATE */
-	Track switches[20];
+	TrackSwitch switches[20];
 	int switchesCount;
 	int maxSwitches;
 	float nextSwitchCountdown;
-	int selectedTrack;
+	int selectedSwitch;
 
     /* GRASS STATE */
     int grass_count;
@@ -118,8 +119,8 @@ struct GameState {
 	/* TRAIN STATE */ 
 	Model *trainModel;
 	Train *train;
-	Entity *bogieFront;
-	Entity *bogieBack;
+	Bogie *bogieFront;
+	Bogie *bogieBack;
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 

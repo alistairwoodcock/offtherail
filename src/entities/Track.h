@@ -9,6 +9,14 @@ public:
 
 };
 
-Track* getSelectedTrack();
+class TrackSwitch : public Entity {
+public:
+	int fromTrack;
+	int toTrack;
+	float rotate_speed;
+	float target_y_rot;
+
+};
+
 
 #endif
