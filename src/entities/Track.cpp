@@ -55,8 +55,6 @@ namespace Tracks {
 		return getTrack(game->selectedTrack);
 	}
 
-
-	
 	void changeSwitch(int i, int toTrack){
 		if(i == -1 || i > game->switchesCount) return;
 
@@ -186,25 +184,32 @@ namespace Tracks {
 
 
 	void update(float time, float deltaTime) {
-
 		
+		//update tracks and also get the furthest behind
+		int lastTrack = 0;
 		for(int i = 0; i < game->trackCount * 3; i++){
+			game->tracks[i].z += game->speed * deltaTime;
+			if(game->tracks[i].z < game->tracks[lastTrack].z) lastTrack = i;
+		}
 
-			Track *track = &game->tracks[i];
+		for(int i = 0; i < game->trackCount * 3; i++){
+			Track *t = &game->tracks[i];
 
-			track->z += game->speed * deltaTime;
-			
-			if(track->z > 125 * 0.3){
-				track->z = game->trackLen - (game->trackCount-1)*game->trackLen;
+			//move track back to last
+			if(t->z > 125 * 0.3){
+				t->z = game->tracks[lastTrack].z - game->trackLen;
 			}
 		}
+
 
 		game->nextSwitchCountdown -= deltaTime;
 
 		if(game->nextSwitchCountdown < 0){
-			game->nextSwitchCountdown = rand()%10;
+			game->nextSwitchCountdown = rand()%10 - (game->speed / 10);
 
 			placeSwitch();
+
+			game->speed += 1;
 		}
 
 		Input input = platform->input;
@@ -240,9 +245,6 @@ namespace Tracks {
 				float dir = abs(rot_diff) / rot_diff;
 
 				s->y_rot += dir * game->switches[i].rotate_speed * deltaTime;
-
-
-				printf("s->target_rot: %f,  s->y_rot: %f,  rot_diff: %f\n", s->target_y_rot, s->y_rot, rot_diff);
 
 				if(abs(rot_diff) < 0.01){
 					s->y_rot = s->target_y_rot;

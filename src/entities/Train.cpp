@@ -177,34 +177,34 @@ namespace Trains {
 		shaderSetMat4(ID, "model", model);
 		trainModel->Draw(trainShader);
 
-		Shader particleShader = Shaders::get("particle");
-		ID = particleShader.ID;
+		// Shader particleShader = Shaders::get("particle");
+		// ID = particleShader.ID;
 
-		useShader(ID);
-		glBindVertexArray(game->Particle_VAO);
+		// useShader(ID);
+		// glBindVertexArray(game->Particle_VAO);
 
-		Entity *bogieFront = game->bogieFront;
-		model = glm::mat4();
-		model = glm::translate(model, glm::vec3(bogieFront->x, bogieFront->y, bogieFront->z));
-		model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
-		shaderSetMat4(ID, "model", model);
-		shaderSetVec3(ID, "color", glm::vec3(0,0.0,1.0));
-		shaderSetFloat(ID, "alpha", 0.5);
+		// Entity *bogieFront = game->bogieFront;
+		// model = glm::mat4();
+		// model = glm::translate(model, glm::vec3(bogieFront->x, bogieFront->y, bogieFront->z));
+		// model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
+		// shaderSetMat4(ID, "model", model);
+		// shaderSetVec3(ID, "color", glm::vec3(0,0.0,1.0));
+		// shaderSetFloat(ID, "alpha", 0.5);
 		
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		// glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
-		Entity *bogieBack = game->bogieBack;
-		model = glm::mat4();
-		model = glm::translate(model, glm::vec3(bogieBack->x, bogieBack->y, bogieBack->z));
-		model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
-		shaderSetMat4(ID, "model", model);
-		shaderSetVec3(ID, "color", glm::vec3(0,0.1,0.0));
-		shaderSetFloat(ID, "alpha", 0.5);
+		// Entity *bogieBack = game->bogieBack;
+		// model = glm::mat4();
+		// model = glm::translate(model, glm::vec3(bogieBack->x, bogieBack->y, bogieBack->z));
+		// model = glm::scale(model, glm::vec3(5.0f,5.0f,5.0f));
+		// shaderSetMat4(ID, "model", model);
+		// shaderSetVec3(ID, "color", glm::vec3(0,0.1,0.0));
+		// shaderSetFloat(ID, "alpha", 0.5);
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		// glDrawArrays(GL_TRIANGLES, 0, 36);
 		
-		glBindVertexArray(0);
+		// glBindVertexArray(0);
 
 
 
