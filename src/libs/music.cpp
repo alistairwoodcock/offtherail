@@ -109,10 +109,9 @@ namespace Music {
 	}
 
 	void init() {
-        #ifdef __APPLE__
-		alutInitWithoutContext(NULL, 0);
-        #else
         alutInit(NULL, 0);
+        #ifdef __APPLE__
+        alutInitWithoutContext(NULL, 0);
         #endif
 		alGetError();
 		SetListenerValues();
