@@ -31,7 +31,7 @@
 #include "screens/OverlayMenu.cpp"
 
 //the larger these are, the higher resolution shadow we can have
-const unsigned int SHADOW_WIDTH = 2048*4, SHADOW_HEIGHT = 2048*4;
+const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
 
 
 static void init(State *state)
@@ -130,10 +130,10 @@ void renderQuad()
     {
         float quadVertices[] = {
             // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+             -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
+             -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
         // setup plane VAO
         glGenVertexArrays(1, &quadVAO);
@@ -227,13 +227,18 @@ static void updateAndRender(){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
-				// printf("camera(%f, %f, %f)\n", camera->Position.x, camera->Position.y, camera->Position.z);
-				// printf("camera YAW(%f)\n", camera->Yaw);
-				// printf("camera PITCH(%f)\n", camera->Pitch);
 			} else {
 				if(platform->input.apostrophe_pressed){
 					game->showDepthMap = !game->showDepthMap;
 					game->input_timeout = 0.1;
+				}
+
+				if(game->showDepthMap){
+					int s = 10;
+					if(platform->input.up_pressed) game->lightPos.y += s * platform->deltaTime;
+					if(platform->input.down_pressed) game->lightPos.y -= s * platform->deltaTime;
+					if(platform->input.left_pressed) game->lightPos.x -= s * platform->deltaTime;
+					if(platform->input.right_pressed) game->lightPos.x += s * platform->deltaTime;
 				}
 			}
 			
@@ -255,8 +260,9 @@ static void updateAndRender(){
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
 			//Shadow matrices
-			float near_plane = 10.0f, far_plane = 70.5f;
-			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
+			float near_plane = 0.0f, far_plane = 100.5f;
+			glm::mat4 lightProjection = glm::ortho(-64.0f, 64.0f, -64.0f, 64.0f, near_plane, far_plane); 
+			// game->lightPos *= 1.01;
 			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 

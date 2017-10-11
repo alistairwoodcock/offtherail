@@ -5,10 +5,10 @@ namespace Grasses {
     void resetPos(Grass *p) {
 		p->alpha = 0.8;
 		
-        p->x = (std::rand()%200)/10.0 + 6;
+        p->x = (std::rand()%150)/10.0 + 6;
         if (std::rand()%2 == 0) p->x *= -1;
 		p->y = game->ground;
-		p->z = -200 - std::rand()%50;
+		p->z = -150 - std::rand()%150;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
 		p->z_vel = game->speed;

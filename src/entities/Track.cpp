@@ -205,11 +205,9 @@ namespace Tracks {
 		game->nextSwitchCountdown -= deltaTime;
 
 		if(game->nextSwitchCountdown < 0){
-			game->nextSwitchCountdown = rand()%10 - (game->speed / 10);
+			game->nextSwitchCountdown = rand()%10;
 
 			placeSwitch();
-
-			game->speed += 1;
 		}
 
 		Input input = platform->input;
