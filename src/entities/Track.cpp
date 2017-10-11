@@ -49,6 +49,7 @@ namespace Tracks {
 			case 1: return game->track2;
 			case 2: return game->track3;
 		}
+		return NULL;
 	}
 
 	Track* getSelectedTrack(){

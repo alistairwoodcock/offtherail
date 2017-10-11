@@ -17,7 +17,10 @@
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
 
+#include "libs/font.h"
+
 #include "screens/MenuImage.h"
+
 
 
 enum Screens {
@@ -130,6 +133,10 @@ struct GameState {
 	MenuImage *logo;
 	MenuImage *startText;
 	MenuImage *exitText;
+	
+	/* FONTS */
+	Font *testFont;
+
 	bool start_active;
 	bool exit_active;
 

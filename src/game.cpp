@@ -10,6 +10,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
+
 #include "game.h"
 
 #include "libs/shader.cpp"
@@ -33,68 +34,93 @@
 //the larger these are, the higher resolution shadow we can have
 const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
 
-
 static void init(State *state)
 {
+	unsigned char* ttf_buffer = (unsigned char*)malloc(sizeof(char)*(1<<25));
+
+	stbtt_fontinfo font;
+	unsigned char *bitmap;
+	int w,h,i,j,c = 'a', s = 15;
+
+	fread(ttf_buffer, 1, 1<<25, fopen("./fonts/OpenSans-Regular.ttf", "rb"));
+
+	stbtt_InitFont(&font, ttf_buffer, stbtt_GetFontOffsetForIndex(ttf_buffer,0));
+
+	const char* text = "Hello, World!";
+	while (*text) {
+      if (*text >= 32 && *text < 128) {
+      	int w, h;
+      	unsigned char* bitmap = stbtt_GetCodepointBitmap(&font, 0,stbtt_ScaleForPixelHeight(&font, 20), text[0], &w, &h, 0,0);
+
+      	for (int j=0; j < h; ++j) {
+      		for (int i=0; i < w; ++i)
+      			putchar(" .:ioVM@"[bitmap[j*w+i]>>5]);
+      		putchar('\n');
+      	}
+      }
+      ++text;
+   	}
+	
+
 	GlobalState = state;
 	game = &state->game_state;
 	platform = &state->platform;
 
 	printf("INIT");
 	
-    //Game state for runtime
-    game->game_started = false;
-    game->quit_game = false;
-    changeScreen(MAIN_MENU);
-    
-    game->camera_locked = true;
-    game->input_timeout = 0;
+	//Game state for runtime
+	game->game_started = false;
+	game->quit_game = false;
+	changeScreen(MAIN_MENU);
+	
+	game->camera_locked = true;
+	game->input_timeout = 0;
 
-    game->ground = -2;
-    game->speed = 10;
+	game->ground = -2;
+	game->speed = 10;
 
-    game->showDepthMap = false;
+	game->showDepthMap = false;
 
-    //GL Setup
-    glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
+	//GL Setup
+	glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    
+	
 
-    /* -- Shaders Setup -- */
+	/* -- Shaders Setup -- */
 	Shaders::setup();
 
-    
-    /* -- Particles Setup -- */
-    Particles::setup();
-    
-    /* -- Lights Setup -- */
-    Lights::setup();
+	
+	/* -- Particles Setup -- */
+	Particles::setup();
+	
+	/* -- Lights Setup -- */
+	Lights::setup();
 
-    /* -- Grasss Setup -- */
-    Grasses::setup();
-    
-    /* -- Camera Setup -- */
-    game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
-    
+	/* -- Grasss Setup -- */
+	Grasses::setup();
+	
+	/* -- Camera Setup -- */
+	game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
+	
 	/* -- Set Up Sky --*/
 	SkyBoxes::setup();
 
-    /* -- Train Setup -- */
-    Trains::setup();
+	/* -- Train Setup -- */
+	Trains::setup();
 
-    /* -- Track Setup -- */
-    Tracks::setup();
-    
-    /* -- Menu Setup --*/
-    MainMenu::setup();
-    ChooseMenu::setup();
-    OverlayMenu::setup();
+	/* -- Track Setup -- */
+	Tracks::setup();
+	
+	/* -- Menu Setup --*/
+	MainMenu::setup();
+	ChooseMenu::setup();
+	OverlayMenu::setup();
 
 	/* -- Shadow Setup --*/
-    unsigned int depthMapFBO;
+	unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
 	unsigned int depthMap;
@@ -126,29 +152,29 @@ unsigned int quadVAO = 0;
 unsigned int quadVBO;
 void renderQuad()
 {
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
-             -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
+			 -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 
@@ -319,7 +345,7 @@ void changeScreen(Screens screen) {
 }
 
 void paused(bool paused) {
-    game->paused = paused;
+	game->paused = paused;
 }
 
 static bool shouldClose(){
@@ -345,10 +371,10 @@ static void unload(State *state){
 }
 
 const GameAPI GAME_API = {
-    .init = init,
-    .finalize = finalize,
-    .reload = reload,
-    .unload = unload,
-    .updateAndRender = updateAndRender,
-    .shouldClose = shouldClose
+	.init = init,
+	.finalize = finalize,
+	.reload = reload,
+	.unload = unload,
+	.updateAndRender = updateAndRender,
+	.shouldClose = shouldClose
 };
