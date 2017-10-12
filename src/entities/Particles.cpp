@@ -28,7 +28,7 @@ namespace Particles {
 	    game->Particle_VAO = VAO;
 	    game->Particle_VBO = VBO;
 
-	    game->particle_count = 1000;
+	    game->particle_count = 5000;
 
 	    int particle_count = game->particle_count;
 		
@@ -42,7 +42,8 @@ namespace Particles {
 
 			p->x_vel = ((std::rand()%100) - (std::rand()%100))/1000.0;
 			p->y_vel = ((std::rand()%100))/50.0;
-			p->z_vel = ((std::rand()%100) - (std::rand()%100))/1000.0;
+			p->z_vel = game->speed;//((std::rand()%100) - (std::rand()%100))/1000.0;
+			p->render = false;
 			
 			game->particles[i] = *p;
 		}
@@ -54,33 +55,42 @@ namespace Particles {
 		int particle_count = game->particle_count;
 		Particle *particles = game->particles;
 
+		bool sparkTime = (game->bogieBack->currentTrack != game->bogieFront->currentTrack);
+
 		for(int i = 0; i < particle_count; i++)
-		{
+		{	
 			Particle *p = particles+i;
 
+			if(!p->render && !sparkTime) continue;
+			
 			p->x += p->x_vel * deltaTime;
 			p->y += p->y_vel * deltaTime;
 			p->z += p->z_vel * deltaTime;
 
-			p->y_vel -= 0.98 * deltaTime;
+			p->y_vel += 0.98 * deltaTime;
 
-			p->z_rot += (p->y_vel/std::abs(p->y_vel)) * 10 * deltaTime;
+			p->z_rot += (std::rand()%100/123.4f) * deltaTime;
 
-			p->alpha -= 0.6 * deltaTime;
-
-			if(p->y < -2)
+			p->alpha -= 0.1 * deltaTime;
+			
+			if(p->y < -2 || p->z > 30)
 			{
+				
+				float r = std::rand()%100/12.3f;
+				// printf("%f\n", r);
 				Entity *train = game->train;
-				p->y = -2;
-				p->x = train->x;
-				p->z = 0;
-				p->x_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
-				p->y_vel = ((std::rand()%100))/50.0;
-				p->z_vel = ((std::rand()%100) - (std::rand()%100))/300.0;
-
+				p->y = -1.7;
+				p->x = game->bogieBack->x + (std::rand()%2 == 0 ? 0.7 : -0.7);
+				p->z = 8;
+				p->x_vel = ((std::rand()%100) - (std::rand()%100))/73.2f;
+				p->y_vel = 0 + std::rand()%100/103.2;
+				p->z_vel = game->speed/16.2f + r;//((std::rand()%100) - (std::rand()%100))/300.0;
+				p->scale = r/81.3f;
 				if(p->y_vel >= 2) p->y_vel = 1;
 
-				p->alpha = 0.8;
+				p->alpha = 0.5 + r/50.0f;
+				
+				p->render = sparkTime;
 			}
 		}
 	}
@@ -98,19 +108,31 @@ namespace Particles {
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
+
 		for(int i = 0; i < particle_count; i++)
 		{
-
 			Particle *p = particles+i;
+			
+			if(!p->render) continue;
+
 
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-			model = glm::scale(model, glm::vec3(0.02f));
+			model = glm::scale(model, glm::vec3(p->scale));
 			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
 			
 			shaderSetMat4(ID, "model", model);
-			shaderSetVec3(ID, "color", glm::vec3(1,0.0,0.0));
 			shaderSetFloat(ID, "alpha", p->alpha);
+
+			float r = std::rand()%2;
+
+			if(r == 0){
+				shaderSetVec3(ID, "color", glm::vec3(0.95,0.9,0.5));
+			} else{//} if(r == 1){
+				shaderSetVec3(ID, "color", glm::vec3(0.95,0.4,0.4));
+			} /*else {
+				shaderSetVec3(ID, "color", glm::vec3(0.95,0.0,0.0));
+			} */
 
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
@@ -131,7 +153,7 @@ namespace Particles {
 
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-			model = glm::scale(model, glm::vec3(0.02f));
+			model = glm::scale(model, glm::vec3(p->scale));
 			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
 			
 			shaderSetMat4(shader.ID, "model", model);

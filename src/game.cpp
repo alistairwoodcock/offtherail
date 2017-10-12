@@ -53,7 +53,7 @@ static void init(State *state)
     game->input_timeout = 0;
 
     game->ground = -2;
-    game->speed = 10;
+    game->speed = 70;
 
     game->showDepthMap = false;
 
@@ -158,6 +158,8 @@ void renderQuad()
 
 
 static void updateAndRender(){
+
+	game->speed = 50;
 
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);

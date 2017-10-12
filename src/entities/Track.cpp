@@ -205,7 +205,7 @@ namespace Tracks {
 		game->nextSwitchCountdown -= deltaTime;
 
 		if(game->nextSwitchCountdown < 0){
-			game->nextSwitchCountdown = rand()%10;
+			game->nextSwitchCountdown = rand()%5+0.5;
 
 			placeSwitch();
 		}
