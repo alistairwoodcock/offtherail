@@ -107,9 +107,9 @@ namespace OverlayMenu{
 		if(game->overlay_active){
 			Entity *overlay = game->overlay;
 
-			renderImage(game->logo, projection, view);
-			renderImage(game->resumeText, projection, view);
-			renderImage(game->exitText, projection, view);
+			renderImage(game->logo);
+			renderImage(game->resumeText);
+			renderImage(game->exitText);
 
 			Shader shader = Shaders::get("flat");
 			unsigned int ID = shader.ID;

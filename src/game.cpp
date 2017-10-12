@@ -50,17 +50,24 @@ static void init(State *state)
 	while (*text) {
       if (*text >= 32 && *text < 128) {
       	int w, h;
-      	unsigned char* bitmap = stbtt_GetCodepointBitmap(&font, 0,stbtt_ScaleForPixelHeight(&font, 20), text[0], &w, &h, 0,0);
+      	bitmap = stbtt_GetCodepointBitmap(&font, 0,stbtt_ScaleForPixelHeight(&font, 20), text[0], &w, &h, 0,0);
+
+      	printf("bitmap (wxh) = (%i,%i)\n", w,h);
 
       	for (int j=0; j < h; ++j) {
-      		for (int i=0; i < w; ++i)
-      			putchar(" .:ioVM@"[bitmap[j*w+i]>>5]);
+      		for (int i=0; i < w; ++i){
+      			int row = (j*w);
+      			int col = i;
+
+      			putchar(" aaaaaaa"[bitmap[j*w+i]>>5]);
+      		}
       		putchar('\n');
       	}
       }
       ++text;
    	}
 	
+	free(bitmap);
 
 	GlobalState = state;
 	game = &state->game_state;
