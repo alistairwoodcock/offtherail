@@ -94,6 +94,7 @@ namespace Grasses {
 		for(int i = 0; i < grass_count; i++)
 		{
 			Grass *p = grass+i;
+			p->z_vel = game->speed;
 
 			p->x += p->x_vel * deltaTime;
 			p->y += p->y_vel * deltaTime;

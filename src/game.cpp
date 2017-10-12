@@ -159,8 +159,6 @@ void renderQuad()
 
 static void updateAndRender(){
 
-	game->speed = 50;
-
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

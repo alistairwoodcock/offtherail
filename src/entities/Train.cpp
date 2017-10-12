@@ -141,18 +141,21 @@ namespace Trains {
 
 		if(bogieBack->z > bogieFront->z) angle += M_PI;
 
-		
-		// if(bogie_dist <= 10){
+		if(bogie_dist <= 12){
 			train->y_rot = angle;
 			train->x = (bogieBack->x + bogieFront->x)/2;
 			train->z = (bogieBack->z + bogieFront->z)/2;
 			train->z_rot = 0;
-		// } else {
-		// 	train->z_rot = M_PI / 2;
-		// 	if(bogieFront->x > bogieBack->x){
-		// 		train->z_rot *= -1;	
-		// 	}
-		// }
+		} else {
+			train->z_rot = M_PI / 2;
+			if(bogieFront->x > bogieBack->x){
+				train->z_rot *= -1;	
+				
+				//TODO(AL): Make this a flag for fallen over we can check
+				if(game->speed > 0) game->speed -= 50 * deltaTime;
+				if(game->speed < 0) game->speed = 0;
+			}
+		}
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
