@@ -94,7 +94,7 @@ void setupFont(const char* fontPath, Font *font){
     /* calculate font scaling */
     float scale = stbtt_ScaleForPixelHeight(&info, l_h);
 
-    char* word = "Hello, There Pals!";
+    char* word = "Hello, There Pals!!!!!!!";
     
     int x = 0;
        
@@ -198,7 +198,8 @@ void renderFont(Font* font){
 	glBindVertexArray(font->VAO);
 
 	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(0, 0, 0));
+	model = glm::translate(model, glm::vec3(font->x, font->y, font->z));
+	model = glm::scale(model, glm::vec3(0.2));
 	
 	shaderSetMat4(ID, "position", model);
 	

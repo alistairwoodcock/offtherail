@@ -65,7 +65,7 @@ namespace MainMenu{
 
 		game->testFont = new Font();
 		game->testFont->x = 0;
-		game->testFont->y = 0;
+		game->testFont->y = -1;
 		game->testFont->z = 0;
 		
 		setupFont("./fonts/OpenSans-Regular.ttf", game->testFont);
@@ -77,7 +77,7 @@ namespace MainMenu{
 
 	void update(float time, float deltaTime){
 
-		game->testFont->y += 1 * deltaTime;
+		// game->testFont->y += 1 * deltaTime;
 		
 		MenuImage *logo = game->logo;
 		MenuImage *startText = game->startText;
@@ -137,9 +137,13 @@ namespace MainMenu{
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
-		// renderImage(game->logo);
-		// renderImage(game->startText);
-		// renderImage(game->exitText);
+		game->testFont->x = -0.6;
+		game->testFont->y = 0.75;
+		
+
+		renderImage(game->logo);
+		renderImage(game->startText);
+		renderImage(game->exitText);
 
 		renderFont(game->testFont);
 	}
