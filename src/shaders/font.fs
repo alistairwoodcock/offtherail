@@ -1,17 +1,13 @@
 #version 330 core
-out vec4 FragColor;
-  
-in vec2 TexCoord;
 
-uniform sampler2D textTexture;
+uniform sampler2D mainTex;
+
+in vec2 uv0;
+
+out vec4 fragColor;
 
 void main()
 {
-    FragColor = texture(textTexture, TexCoord);
-    if(FragColor.r == 0 && FragColor.g == 0 && FragColor.b == 0) discard;
-    FragColor = vec4(0,0,0,1);
-    // if(FragColor.r > 0.9 && FragColor.g >= 0.9 && FragColor.b >= 0.9) discard;
-    // FragColor *= vec4(0,0,0,1.0);
-    // if(FragColor.r >= 0.7 && FragColor.g >= 0.7 && FragColor.b >= 0.7) discard;
-    
+	vec4 c = texture(mainTex, uv0);
+	fragColor = vec4(c.r, c.g, c.b, c.a);
 }

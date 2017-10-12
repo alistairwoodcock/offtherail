@@ -68,7 +68,7 @@ namespace MainMenu{
 		game->testFont->y = 0;
 		game->testFont->z = 0;
 		
-		setupFont("./fonts/OpenSans-Regular.ttf", game->testFont, logo_vertices, sizeof(logo_vertices));
+		setupFont("./fonts/OpenSans-Regular.ttf", game->testFont);
 
 		Shader textShader = Shaders::get("text");
 		useShader(textShader.ID);
@@ -137,9 +137,9 @@ namespace MainMenu{
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
-		renderImage(game->logo);
-		renderImage(game->startText);
-		renderImage(game->exitText);
+		// renderImage(game->logo);
+		// renderImage(game->startText);
+		// renderImage(game->exitText);
 
 		renderFont(game->testFont);
 	}

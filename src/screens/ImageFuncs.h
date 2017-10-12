@@ -61,7 +61,7 @@ void renderImage(MenuImage *image, const char* shader = NULL){
 }
 
 
-void setupFont(const char* fontPath, Font *font, float vertices[], unsigned int vert_size){
+void setupFont(const char* fontPath, Font *font){
 
    	/* load font file */
     long size;
@@ -129,24 +129,51 @@ void setupFont(const char* fontPath, Font *font, float vertices[], unsigned int 
         x += kern * scale;
     }
 
-    /* save out a 1 channel image */
-    stbi_write_png("./images/out.png", b_w, b_h, 1, bitmap, b_w);
-    
     font->width = b_w;
 	font->height = b_h;
 	font->info = info;
-	
-	MenuImage *img = new MenuImage();
-	img->x = font->x;
-	img->y = font->y;
-	img->width = font->width;
-	img->height = font->height;
-	img->scale = glm::vec3(1);
-	img->scale_vel = 0;
 
-	setupImage("./images/out.png", img, vertices, vert_size);
+	glGenTextures(1, &font->glTexture);
+    glBindTexture(GL_TEXTURE_2D, font->glTexture);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, font->width, font->height, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
+    glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
-	font->img = img;
+ 	const float vertices[] =
+    {
+        -1, -1, 0,
+        -1,  1, 0,
+         1,  1, 0,
+        -1, -1, 0,
+         1,  1, 0,
+         1, -1, 0,
+    };
+
+    const float uvs[] =
+    {
+        0, 1,
+        0, 0,
+        1, 0,
+        0, 1,
+        1, 0,
+        1, 1,
+    };
+
+    glGenVertexArrays(1, &font->VAO);
+    glBindVertexArray(font->VAO);
+
+    glGenBuffers(1, &font->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, font->VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 18, vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(0);
+
+    glGenBuffers(1, &font->UVB);
+    glBindBuffer(GL_ARRAY_BUFFER, font->UVB);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 12, uvs, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(1);
 
 
 	free(fontBuffer);
@@ -154,8 +181,30 @@ void setupFont(const char* fontPath, Font *font, float vertices[], unsigned int 
 }
 
 void renderFont(Font* font){
+	
+	unsigned int ID = Shaders::get("font").ID;
+	
+	useShader(ID);
 
-	renderImage(font->img, "font");
+	glBindTexture(GL_TEXTURE_2D, font->glTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+    glActiveTexture(GL_TEXTURE0);
+    glUniform1i(glGetUniformLocation(ID, "mainTex"), 0);
+
+	glBindVertexArray(font->VAO);
+
+	glm::mat4 model;
+	model = glm::translate(model, glm::vec3(0, 0, 0));
+	
+	shaderSetMat4(ID, "position", model);
+	
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindVertexArray(0);
 
 }
 

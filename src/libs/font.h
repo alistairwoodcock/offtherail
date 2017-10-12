@@ -13,6 +13,7 @@ public:
 	unsigned int glTexture;
 	unsigned int VAO;
 	unsigned int VBO;
+	unsigned int UVB;
 
 	int width;
 	int height;
