@@ -6,6 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "libs/music.h"
 #include "libs/shader.h"
 #include "libs/model.h"
 
@@ -69,6 +70,11 @@ struct GameState {
 	/* SHADER STATE */
 	ShaderMap shaderMap;
 	float shaderUpdateTimeout;
+
+	/* MUSIC STATE */
+	std::map<const char*, Sound> sounds;
+    Sound music;
+	const char* current;
 
 	/* LEVEL STATE */
     float speed; //Speed of train, scenery, etc.

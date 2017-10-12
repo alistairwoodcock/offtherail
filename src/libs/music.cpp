@@ -1,45 +1,8 @@
-#ifdef __APPLE__
-
-#include "OpenAL/al.h"
-#include "OpenAL/alc.h"
-#include "AL/alut.h"
-
-#else 
-
-#include "AL/al.h"
-#include "AL/alc.h"
-#include "AL/alut.h"
-
-#endif
-
-#include <map>
+#include "music.h"
 
 namespace Music {
 
-    class Sound {
-    public:
-        ALuint Buffer; // Buffer to hold the sound data.
-        ALuint Source; // Source is the point of emission.
-
-        float getDuration() {
-            ALint size, channels, bits, frequency;
-
-            alGetBufferi(Buffer, AL_SIZE, &size);
-            alGetBufferi(Buffer, AL_CHANNELS, &channels);
-            alGetBufferi(Buffer, AL_BITS, &bits);
-            alGetBufferi(Buffer, AL_FREQUENCY, &frequency);
-
-            float lengthInSamples = size * 8 / (channels * bits);
-            return lengthInSamples / (float) frequency;
-        }
-    };
-
-    std::map<const char*, Sound> sounds;
-
-    Sound music;
-	const char* current;
-
-	/*
+    /*
 	 * These are 3D cartesian vector coordinates. A structure or class would be
 	 * a more flexible of handling these, but for the sake of simplicity we will
 	 * just leave it as is.
@@ -52,8 +15,8 @@ namespace Music {
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
 	ALboolean LoadMusic(Sound &sound, const char* file) {
-        auto search = sounds.find(file);
-        if (search != sounds.end()) {
+        auto search = game->sounds.find(file);
+        if (search != game->sounds.end()) {
             sound = search->second;
             return AL_TRUE;
         }
@@ -61,7 +24,7 @@ namespace Music {
 		Sound s = {0};
 
         printf("Loading %s\n", file);
-		current = file;
+		game->current = file;
 		s.Buffer = alutCreateBufferFromFile(file);
 
         // Check for alut error
@@ -89,7 +52,7 @@ namespace Music {
 		if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
         
-        sounds.insert(sounds.begin(), std::pair<const char*,Sound>(file,s));
+        game->sounds.insert(game->sounds.begin(), std::pair<const char*,Sound>(file,s));
         sound = s;
         return AL_TRUE;
 	}
@@ -102,7 +65,7 @@ namespace Music {
 
 	void destroy() {
 		//alDeleteBuffers(1, &Buffer);
-        alDeleteSources(1, &music.Source);
+        alDeleteSources(1, &game->music.Source);
 		if (alutExit() == AL_FALSE) {
 			printf("Error unloading ALUT: %s\n", alutGetErrorString(alutGetError()));
 		}
@@ -118,16 +81,16 @@ namespace Music {
 	}
 
 	void play(const char* file) {
-		if (current != file) {
-			if (music.Source)
-				alSourceStop(music.Source);
+		if (game->current != file) {
+			if (game->music.Source)
+				alSourceStop(game->music.Source);
 			LoadMusic(music, file);
-			alSourcePlay(music.Source);
+			alSourcePlay(game->music.Source);
 		}
 	}
 
 	void pause(bool paused) {
-		paused ? alSourcePause(music.Source) : alSourcePlay(music.Source);
+		paused ? alSourcePause(game->music.Source) : alSourcePlay(game->music.Source);
 	}
 
     void soundEffect(const char* file, bool sleep=false) {
