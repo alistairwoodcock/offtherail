@@ -12,6 +12,7 @@
 
 #include "entities/Entity.h"
 #include "entities/Camera.h"
+#include "entities/Track.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
@@ -68,11 +69,11 @@ struct GameState {
 	Screens current_screen;
 
 	/* SHADER STATE */
-	ShaderMap shaderMap;
+	ShaderMap* shaderMap;
 	float shaderUpdateTimeout;
 
 	/* MUSIC STATE */
-	std::map<const char*, Sound> sounds;
+	std::map<const char*, Sound> *sounds;
     Sound music;
 	const char* current;
 
@@ -97,16 +98,36 @@ struct GameState {
 	unsigned int Plane_VAO;
 	unsigned int Plane_VBO;
 
+	/* TRACK STATE*/
+	//By having both these lines the game will not run propoerly, cannot
+	//remove the depth map with '
+	Model* trackModel;
+	float trackLen;
+	int trackCount;
+	Track *tracks;
+	Track *track1;
+	Track *track2;
+	Track *track3;
+	int selectedTrack;
+
+	/* TRACK SWITCH STATE */
+	TrackSwitch switches[20];
+	int switchesCount;
+	int maxSwitches;
+	float nextSwitchCountdown;
+	int selectedSwitch;
+
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
-    Model* grassModel;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;
 	Train *train;
-	Entity *bogieFront;
-	Entity *bogieBack;
+	Bogie *bogieFront;
+	Bogie *bogieBack;
+
+	Model* trainModels[TRAIN_MODEL_NUM];
 
 	/* INPUT STATE */
 	float input_timeout;
@@ -117,6 +138,12 @@ struct GameState {
 	MenuImage *exitText;
 	bool start_active;
 	bool exit_active;
+
+    /* CHOOSE SCREEN STATE */
+    Train *chooseTrain;
+    TrainTypes currentTrain;
+    MenuImage *chooseRight;
+    MenuImage *chooseLeft;
 
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
@@ -141,8 +168,14 @@ struct State {
 	PlatformState platform;
 };
 
-void changeScreen(State *state, Screens screen);
-void paused(State *state, bool paused);
+//Our global references to game state
+//these get setup on init + update of game library
+State *GlobalState;
+GameState* game;
+PlatformState* platform;
+
+void changeScreen(Screens screen);
+void paused(bool paused);
 
 struct GameAPI {
 
@@ -154,9 +187,9 @@ struct GameAPI {
 
 	void (*unload)(State *s);
 
-	void (*updateAndRender)(State *s);
+	void (*updateAndRender)();
 
-	bool (*shouldClose)(State *s);
+	bool (*shouldClose)();
 };
 
 extern const struct GameAPI GAME_API;

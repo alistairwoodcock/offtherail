@@ -3,9 +3,8 @@
 
 namespace OverlayMenu{
 	
-	void setup(State *state){
-		GameState *game = &state->game_state;
-
+	void setup(){
+		
 		game->overlay_active = false;
 		game->resume_active = false;
 		game->exit_active = false;
@@ -33,15 +32,14 @@ namespace OverlayMenu{
 		setupImage("images/resume.png", game->resumeText, logo_vertices, sizeof(logo_vertices));
 	}	
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game = &state->game_state;
-		PlatformState *platform = &state->platform;
+	void update(float time, float deltaTime){
+		
 		Input input = platform->input;
 
 		if(!game->overlay_active && (input.p_pressed || input.escape_pressed)){
 			game->overlay_active = true;
 			game->resume_active = true;
-            paused(state, true);
+            paused(true);
 		} 
 
 		if(!game->overlay_active){
@@ -89,8 +87,8 @@ namespace OverlayMenu{
 		if(input.space_pressed || input.enter_pressed){
 			
 			if(game->exit_active){
-                changeScreen(state, MAIN_MENU);
-                paused(state, false);
+                changeScreen(MAIN_MENU);
+                paused(false);
 				game->overlay_active = false;
 				game->exit_active = false;
 				game->resume_active = false;
@@ -98,31 +96,29 @@ namespace OverlayMenu{
 				game->input_timeout = 0.5;
 			} 
 			if(game->resume_active){
-                changeScreen(state, GAME);
-                paused(state, false);
+                changeScreen(GAME);
+                paused(false);
 				game->overlay_active = false;
 			}
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		GameState *game = &state->game_state;
-		
+	void render(glm::mat4 &projection, glm::mat4 &view){
 		if(game->overlay_active){
 			Entity *overlay = game->overlay;
 
-			renderImage(state, game->logo, projection, view);
-			renderImage(state, game->resumeText, projection, view);
-			renderImage(state, game->exitText, projection, view);
+			renderImage(game->logo, projection, view);
+			renderImage(game->resumeText, projection, view);
+			renderImage(game->exitText, projection, view);
 
-			Shader shader = Shaders::get(state, "flat");
+			Shader shader = Shaders::get("flat");
 			unsigned int ID = shader.ID;
 
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(overlay->x,overlay->y,overlay->z));
 			model = glm::scale(model, glm::vec3(10.0f));
 			
-			glBindVertexArray(state->game_state.Particle_VAO);
+			glBindVertexArray(game->Particle_VAO);
 			useShader(ID);
 			shaderSetVec3(ID, "color", glm::vec3(1.0,1,1.0));
 			shaderSetFloat(ID, "alpha", 0.7);

@@ -6,6 +6,7 @@
 class Grass: public Entity {
 public:
 		float alpha;
+		Model* model;
 };
 
 #endif

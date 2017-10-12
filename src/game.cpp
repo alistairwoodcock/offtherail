@@ -21,16 +21,19 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
+#include "entities/Track.cpp"
 #include "entities/Train.cpp"
-#include "entities/SkyBox.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
+#include "entities/SkyBox.cpp"
 
 #include "screens/MainMenu.cpp"
+#include "screens/ChooseMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
 //the larger these are, the higher resolution shadow we can have
-const unsigned int SHADOW_WIDTH = 2048*4, SHADOW_HEIGHT = 2048*4;
+const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
+
 
 static void init(State *state)
 {
@@ -38,15 +41,13 @@ static void init(State *state)
 	
 	//Setup our entire game and GL state 
 
-    /* -- Music Setup -- */
-    Music::init(); // Need to init before first changeScreen()
-    
-    GameState *game = &state->game_state;
+	GlobalState = state;
+	game = &state->game_state;
+	platform = &state->platform;
 
     //Game state for runtime
     game->game_started = false;
     game->quit_game = false;
-    changeScreen(state, MAIN_MENU);
     
     game->camera_locked = true;
     game->input_timeout = 0;
@@ -54,41 +55,48 @@ static void init(State *state)
     game->ground = -2;
     game->speed = 10;
 
+    game->showDepthMap = false;
+
     //GL Setup
     glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    
+    /* -- Music Setup -- */
+    Music::init(); // Need to init before first changeScreen()
+	
+	/* -- Shaders Setup -- */
+	Shaders::setup();
 
-    /* -- Shaders Setup -- */
-	Shaders::setup(state);
-
-    
+ 
     /* -- Particles Setup -- */
-    Particles::setup(state);
+    Particles::setup();
     
     /* -- Lights Setup -- */
-    Lights::setup(state);
+    Lights::setup();
 
     /* -- Grasss Setup -- */
-    Grasses::setup(state);
+    Grasses::setup();
     
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
-    /* -- Menu Setup --*/
-    MainMenu::setup(state);
-    OverlayMenu::setup(state);
-
 	/* -- Set Up Sky --*/
-	SkyBoxes::setup(state);
+	SkyBoxes::setup();
 
     /* -- Train Setup -- */
-    Trains::setup(state);
+    Trains::setup();
 
-    /* -- Shadow Setup --*/
+    /* -- Track Setup -- */
+    Tracks::setup();
+    
+    /* -- Menu Setup --*/
+    MainMenu::setup();
+    ChooseMenu::setup();
+    OverlayMenu::setup();
+
+	/* -- Shadow Setup --*/
     unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
@@ -114,8 +122,9 @@ static void init(State *state)
 	game->lightPos = glm::vec3(15, 30, -40);
 
 	/* -- Ground Setup -- */
-	Ground::setup(state);
+	Ground::setup();
 
+	changeScreen(MAIN_MENU);
 }
 
 unsigned int quadVAO = 0;
@@ -126,10 +135,10 @@ void renderQuad()
     {
         float quadVertices[] = {
             // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
+            -1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
             -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
+             -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
+             -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
         };
         // setup plane VAO
         glGenVertexArrays(1, &quadVAO);
@@ -148,14 +157,12 @@ void renderQuad()
 }
 
 
-static void updateAndRender(State *state){
+static void updateAndRender(){
 
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	GameState *game = &state->game_state;
-	PlatformState *platform = &state->platform;
 	Camera *camera = &game->camera;
 	
 	if(platform->windowResized){
@@ -179,28 +186,27 @@ static void updateAndRender(State *state){
 	glm::mat4 view = camera->GetViewMatrix();
 
 	// update shaders
-	Shaders::update(state);
+	Shaders::update();
 	
 	switch(game->current_screen)
 	{
 		case MAIN_MENU: {
 			
-			MainMenu::update(state, platform->currTime, platform->deltaTime);
-			
-			MainMenu::render(state, projection, view);
+			MainMenu::update(platform->currTime, platform->deltaTime);
+			MainMenu::render(projection, view);
 
 		} break;
 
 		case CHOOSE: {
 			
-
-
+			ChooseMenu::update(platform->currTime, platform->deltaTime);
+			ChooseMenu::render(projection, view);
 
 		} break;
 
 		case GAME: {
 			
-			OverlayMenu::update(state, platform->currTime, platform->deltaTime);
+			OverlayMenu::update(platform->currTime, platform->deltaTime);
 
 			if(platform->input.u_pressed){
 				if(game->camera_locked){
@@ -226,13 +232,18 @@ static void updateAndRender(State *state){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
-				// printf("camera(%f, %f, %f)\n", camera->Position.x, camera->Position.y, camera->Position.z);
-				// printf("camera YAW(%f)\n", camera->Yaw);
-				// printf("camera PITCH(%f)\n", camera->Pitch);
 			} else {
 				if(platform->input.apostrophe_pressed){
 					game->showDepthMap = !game->showDepthMap;
 					game->input_timeout = 0.1;
+				}
+
+				if(game->showDepthMap){
+					int s = 10;
+					if(platform->input.up_pressed) game->lightPos.y += s * platform->deltaTime;
+					if(platform->input.down_pressed) game->lightPos.y -= s * platform->deltaTime;
+					if(platform->input.left_pressed) game->lightPos.x -= s * platform->deltaTime;
+					if(platform->input.right_pressed) game->lightPos.x += s * platform->deltaTime;
 				}
 			}
 			
@@ -240,10 +251,12 @@ static void updateAndRender(State *state){
 				//update camera based on state
 				//this is just for now, we're going to have a fixed camera in the future.
 
-				Grasses::update(state, platform->currTime, platform->deltaTime);
-				Trains::update(state, platform->currTime, platform->deltaTime);
-				Particles::update(state, platform->currTime, platform->deltaTime);
-				Lights::update(state, platform->currTime, platform->deltaTime);
+				Grasses::update(platform->currTime, platform->deltaTime);
+				Trains::update(platform->currTime, platform->deltaTime);
+				Particles::update(platform->currTime, platform->deltaTime);
+				Lights::update(platform->currTime, platform->deltaTime);
+				Tracks::update(platform->currTime, platform->deltaTime);
+
 			}	
 
 			//First render to depth map (for shadows)
@@ -252,20 +265,21 @@ static void updateAndRender(State *state){
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
 			//Shadow matrices
-			float near_plane = 10.0f, far_plane = 70.5f;
-			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
+			float near_plane = 0.0f, far_plane = 100.5f;
+			glm::mat4 lightProjection = glm::ortho(-64.0f, 64.0f, -64.0f, 64.0f, near_plane, far_plane); 
+			// game->lightPos *= 1.01;
 			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
 			//Render to depth buffer to produce shadows
-			Shader shadow = Shaders::get(state, "simpleDepthShader");
+			Shader shadow = Shaders::get("simpleDepthShader");
 
 			useShader(shadow.ID);
 			shaderSetMat4(shadow.ID, "lightSpaceMatrix", lightSpaceMatrix);
 
 			//Render anything you want to have shadows here
-			Grasses::renderShadow(state, shadow);
-			Trains::renderShadow(state, shadow);
+			Grasses::renderShadow(shadow);
+			Trains::renderShadow(shadow);
 			
 			//Render scene as normal with shadow mapping (using depth map)
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -273,19 +287,20 @@ static void updateAndRender(State *state){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			// render scene 
-			Ground::render(state, projection, view, lightSpaceMatrix); //ground first for shadows
+			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
 
-			SkyBoxes::render(state, projection, view);
-			Lights::render(state, projection, view);
-			Grasses::render(state, projection, view);
-			Trains::render(state, projection, view);
-			Particles::render(state, projection, view);
-			OverlayMenu::render(state, projection, view);
+			SkyBoxes::render(projection, view);
+			Lights::render(projection, view);
+			Grasses::render(projection, view);
+			Tracks::render(projection, view);
+			Trains::render(projection, view);
+			Particles::render(projection, view);
+			OverlayMenu::render(projection, view);
 
 			
 			if(game->showDepthMap)
 			{
-				Shader debug = Shaders::get(state, "debugQuad");
+				Shader debug = Shaders::get("debugQuad");
 
 				useShader(debug.ID);
 				shaderSetFloat(debug.ID, "near_plane", near_plane);
@@ -302,36 +317,38 @@ static void updateAndRender(State *state){
 
 }
 
-void changeScreen(State *state, Screens screen) {
-    state->game_state.current_screen = screen;
+void changeScreen(Screens screen) {
+	if (screen == GAME) Trains::updateScale();
 
-    switch(screen)
-    {
-    	case MAIN_MENU: {
-        	Music::play("sounds/dejavu.wav");
-    	} break;
+	game->current_screen = screen; 
 
-    	case CHOOSE: {
+	switch(screen)
+	{
+		case MAIN_MENU: {
+			Music::play("sounds/dejavu.wav");
+		} break;
 
-    	} break;
+		case CHOOSE: {
 
-    	case GAME: {
-        	Music::play("sounds/running90s.wav");
-    	} break;
-    }
-    
+		} break;
+
+		case GAME: {
+			Music::play("sounds/running90s.wav");
+		} break;
+	}
+
 }
 
-void paused(State *state, bool paused) {
-    state->game_state.paused = paused;
+void paused(bool paused) {
+    game->paused = paused;
     Music::pause(paused);
 }
 
-static bool shouldClose(State *state){
-	if(state->game_state.quit_game){
+static bool shouldClose(){
+	if(game->quit_game){
 		printf("SHOULD CLOSE\n");
 	}
-	return state->game_state.quit_game;
+	return game->quit_game;
 }
 
 static void finalize(State *state){
@@ -342,7 +359,9 @@ static void finalize(State *state){
 
 static void reload(State *state){
 	printf("RELOAD\n");
-	
+	GlobalState = state;
+	game = &state->game_state;
+	platform = &state->platform;
 }
 static void unload(State *state){
 	printf("UNLOAD\n");

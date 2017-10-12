@@ -148,7 +148,7 @@ int main(){
 	if(game.window == NULL) {
 		printf("Failed to create GLFW window\n");
 		glfwTerminate();
-		return false;
+		return 1;
 	}
 
 	game.state = state;
@@ -167,7 +167,7 @@ int main(){
 	if(glewInit() != GLEW_OK) {
 		printf("Failed to initialize GLEW\n");
 		glfwTerminate();
-		return false;
+		return 1;
 	}
 
 	bool close = false;
@@ -203,9 +203,9 @@ int main(){
 			game.state->platform.screenWidth = screenWidth;
 			game.state->platform.screenHeight = screenHeight;
 				
-			game.api.updateAndRender(game.state);
+			game.api.updateAndRender();
 
-			close = game.api.shouldClose(game.state);
+			close = game.api.shouldClose();
 
 
 		}

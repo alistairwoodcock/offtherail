@@ -2,25 +2,29 @@
 
 namespace Grasses {
 
-    void resetPos(State *state, Grass *p) {
+    void resetPos(Grass *p) {
 		p->alpha = 0.8;
 		
-        p->x = (std::rand()%200)/10.0 + 6;
+        p->x = (std::rand()%150)/10.0 + 6;
         if (std::rand()%2 == 0) p->x *= -1;
-		p->y = state->game_state.ground;
-		p->z = -50 - std::rand()%50;
+		p->y = game->ground;
+		p->z = -150 - std::rand()%150;
 		p->x_vel = 0.0;
 		p->y_vel = 0.0;
-		p->z_vel = state->game_state.speed;
+		p->z_vel = game->speed;
         p->y_rot = std::rand()%5;
     }
 
     Model* randomModel() {
-        switch(rand()%4) {
-            case 0: return new Model("grass1", "models/rocks/rock1.obj");
-            case 1: return new Model("grass2", "models/rocks/rock2.obj");
-            case 2: return new Model("grass3", "models/rocks/rock3.obj");
-            case 3: return new Model("grass4", "models/rocks/rock4.obj");
+        switch(rand()%7) {
+            case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
+            case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
+            case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
+            case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(0.2f));
+            case 4: return new Model("grass5", "models/grass/grass1.obj", glm::vec3(0.05f));
+            case 5: return new Model("grass6", "models/grass/grass2.obj", glm::vec3(0.05f));
+            case 6: return new Model("grass7", "models/grass/grass3.obj", glm::vec3(0.05f));
+            case 7: return new Model("grass7", "models/grass/grass4.obj", glm::vec3(0.05f));
         }
     }
 
@@ -28,7 +32,8 @@ namespace Grasses {
 	//structure of our includes. Requires casting when receiving
     void grassShaderSetup(void *state){
     	GameState *game = &((State*)state)->game_state;
-    	Shader grassShader = Shaders::get((State*)state, "grass");
+    	
+    	Shader grassShader = Shaders::get("grass");
 		
 		unsigned int ID = grassShader.ID;
 
@@ -56,39 +61,35 @@ namespace Grasses {
 		shaderSetVec3(ID, "light.specular", 1.0f, 1.0f, 1.0f); 
     }
 
-	void setup(State *state) {
+	void setup() {
         printf("SETUP GRASS\n");
 
-		GameState *game = &state->game_state;
-
-		state->game_state.grass_count = 10;
+		game->grass_count = 15;
         
-		game->grassModel = randomModel();
-		
 		//setting a reload callback because we have shader vals set on startup
 		//these will need to be reinitialised
-		grassShaderSetup((void*)state);
-		Shaders::reloadCallback(state, "grass", *grassShaderSetup);
+		grassShaderSetup((void*)GlobalState);
+		Shaders::reloadCallback("grass", *grassShaderSetup);
 
-
-		int grass_count = game->grass_count;
+        int grass_count = game->grass_count;
         game->grass = (Grass*)malloc(grass_count*sizeof(Grass));
 
-		for(int i = 0; i < grass_count; i++)
+        for(int i = 0; i < grass_count; i++)
 		{
 			Grass *p = new Grass();
-            resetPos(state, p);
+            p->model = randomModel();
+            resetPos(p);
             p->alpha = 1.0;
-            p->z += 50 - std::rand()%100; // Initial offset
-			game->grass[i] = *p;
+            game->grass[i] = *p;
 		}
 
+        printf("SETUP GRASS - 6\n");
 	}
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game  = &state->game_state;
-		int grass_count = state->game_state.grass_count;
-		Grass *grass = state->game_state.grass;
+	void update(float time, float deltaTime){
+		
+		int grass_count = game->grass_count;
+		Grass *grass = game->grass;
 
 		for(int i = 0; i < grass_count; i++)
 		{
@@ -100,18 +101,17 @@ namespace Grasses {
 			p->alpha += 0.025 * deltaTime;
 
 			if (p->z > 18) {
-                resetPos(state, p);
+                resetPos(p);
 			}
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		GameState *game = &state->game_state;
-        Model *grassModel = game->grassModel;
+	void render(glm::mat4 &projection, glm::mat4 &view){
+		
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
-		Shader grassShader = Shaders::get(state, "grass");
+		Shader grassShader = Shaders::get("grass");
 		unsigned int ID = grassShader.ID;
 
 		useShader(ID);
@@ -140,16 +140,14 @@ namespace Grasses {
 		    shaderSetMat4(ID, "model", model);
 		    shaderSetMat4(ID, "inverseModel", glm::inverse(model));
 			
-			grassModel->Draw(grassShader);
+			p->model->Draw(grassShader);
         }
 		
 		glBindVertexArray(0);
 		useShader(0);
 	}
 
-	void renderShadow(State *state, Shader &shader){
-		GameState *game = &state->game_state;
-        Model *grassModel = game->grassModel;
+	void renderShadow(Shader &shader){
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
@@ -168,7 +166,7 @@ namespace Grasses {
 
 		    shaderSetMat4(ID, "model", model);
 		    
-		    grassModel->Draw(shader);
+		    p->model->Draw(shader);
         }
 
 	}

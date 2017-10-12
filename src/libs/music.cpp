@@ -15,13 +15,13 @@ namespace Music {
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
 	ALboolean LoadMusic(Sound &sound, const char* file) {
-        auto search = game->sounds.find(file);
-        if (search != game->sounds.end()) {
+        auto search = game->sounds->find(file);
+        if (search != game->sounds->end()) {
             sound = search->second;
             return AL_TRUE;
         }
 
-		Sound s = {0};
+        Sound s = {0};
 
         printf("Loading %s\n", file);
 		game->current = file;
@@ -35,27 +35,39 @@ namespace Music {
 		}
         printf("Successfully loaded %s into the buffer\n", file);
 
-		// Bind the buffer with the source.
+        // Bind the buffer with the source.
 		alGenSources(1, &s.Source);
 
-		if(alGetError() != AL_NO_ERROR)
+        if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
 
-		alSourcei (s.Source, AL_BUFFER,   s.Buffer );
+        alSourcei (s.Source, AL_BUFFER,   s.Buffer );
 		alSourcef (s.Source, AL_PITCH,    1.0      );
 		alSourcef (s.Source, AL_GAIN,     1.0      );
 		alSourcefv(s.Source, AL_POSITION, SourcePos);
 		alSourcefv(s.Source, AL_VELOCITY, SourceVel);
 		alSourcei (s.Source, AL_LOOPING,  AL_TRUE  );
-	
+        
 		// Do another error check and return.
 		if(alGetError() != AL_NO_ERROR)
 			return AL_FALSE;
         
-        game->sounds.insert(game->sounds.begin(), std::pair<const char*,Sound>(file,s));
+        game->sounds->insert(game->sounds->begin(), std::pair<const char*,Sound>(file,s));
         sound = s;
         return AL_TRUE;
 	}
+
+	float getDuration(Sound &sound) {
+    	ALint size, channels, bits, frequency;
+
+    	alGetBufferi(sound.Buffer, AL_SIZE, &size);
+    	alGetBufferi(sound.Buffer, AL_CHANNELS, &channels);
+    	alGetBufferi(sound.Buffer, AL_BITS, &bits);
+    	alGetBufferi(sound.Buffer, AL_FREQUENCY, &frequency);
+
+    	float lengthInSamples = size * 8 / (channels * bits);
+    	return lengthInSamples / (float) frequency;
+    }
 
 	void SetListenerValues() {
 		alListenerfv(AL_POSITION,    ListenerPos);
@@ -78,13 +90,15 @@ namespace Music {
         #endif
 		alGetError();
 		SetListenerValues();
+
+		game->sounds = new std::map<const char*, Sound>();
 	}
 
 	void play(const char* file) {
 		if (game->current != file) {
 			if (game->music.Source)
 				alSourceStop(game->music.Source);
-			LoadMusic(music, file);
+			LoadMusic(game->music, file);
 			alSourcePlay(game->music.Source);
 		}
 	}
@@ -100,6 +114,6 @@ namespace Music {
         alSourcePlay(effect.Source);
 
         if (sleep)
-            alutSleep(effect.getDuration());
+            alutSleep(getDuration(effect));
     }
 }

@@ -5,7 +5,6 @@
 
 class SkyBox : public Entity {
 public:
-	Shader skyboxShader;
 	unsigned int skyboxVAO, skyboxVBO;
 	unsigned int cubemapTexture;
 	

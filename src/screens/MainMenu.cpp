@@ -3,9 +3,8 @@
 
 namespace MainMenu{
 	
-	void setup(State *state){
-		GameState *game = &state->game_state;
-
+	void setup(){
+		
 		game->start_active = true;
 		game->exit_active = false;
 
@@ -42,15 +41,13 @@ namespace MainMenu{
 		game->exitText->scale_vel = 0;
 		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
 
-		Shader textShader = Shaders::get(state, "text");
+		Shader textShader = Shaders::get("text");
 		useShader(textShader.ID);
 		shaderSetInt(textShader.ID, "textTexture", 0);
 	}	
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game = &state->game_state;
-		PlatformState *platform = &state->platform;
-
+	void update(float time, float deltaTime){
+		
 		MenuImage *logo = game->logo;
 		MenuImage *startText = game->startText;
 		MenuImage *exitText = game->exitText;
@@ -100,7 +97,8 @@ namespace MainMenu{
 				game->quit_game = true;
 			} 
 			if(game->start_active){
-                changeScreen(state, GAME);
+                changeScreen(CHOOSE);
+                game->input_timeout = 0.5;
 			}
 		}
 
@@ -110,11 +108,11 @@ namespace MainMenu{
 		}
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
+	void render(glm::mat4 &projection, glm::mat4 &view){
 
-		renderImage(state, state->game_state.logo, projection, view);
-		renderImage(state, state->game_state.startText, projection, view);
-		renderImage(state, state->game_state.exitText, projection, view);
+		renderImage(game->logo, projection, view);
+		renderImage(game->startText, projection, view);
+		renderImage(game->exitText, projection, view);
 	}
 
 }
