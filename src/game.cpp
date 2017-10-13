@@ -245,13 +245,8 @@ static void updateAndRender(){
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
-				Tracks::update(platform->currTime, platform->deltaTime);
+				//Tracks::update(platform->currTime, platform->deltaTime);
 
-<<<<<<< HEAD
-
-				//Tracks::update(state, platform->currTime, platform->deltaTime);
-=======
->>>>>>> 1ae3073d36d47e2b2795b70bc86237f006f1d58a
 			}	
 
 			//First render to depth map (for shadows)

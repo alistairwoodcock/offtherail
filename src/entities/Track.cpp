@@ -5,7 +5,6 @@
 #include "../libs/model.h"
 
 namespace Tracks {
-<<<<<<< HEAD
 
 	static float MAX_CP_LENGTH = 5;
 	static float MIN_CP_LENGTH = 2;
@@ -27,12 +26,12 @@ namespace Tracks {
 	void bufferData(GameState* game);
 	unsigned int timeToCurveIndex(GLfloat time);
 	Vertex getPointAt(State *state, unsigned int curveIndex, GLfloat t);
-	void extend(State *state);
+	void extend();
 	float getRandomNumber(float min, float max);
 	void normalize(vector<GLfloat>& vec);
 
-	void setup(State *state) {
-		GameState *game = &state->game_state;
+	void setup() {
+		//GameState *game = &state->game_state;
 		std::cout << "SETTING UP MyModel" << std::endl;
 		//game->mymodel = new Model("mymodel", "models/teapot/teapot.obj");
 
@@ -55,20 +54,20 @@ namespace Tracks {
 		Vertex p2 = Vertex({ 1,0,-8 });
 		Vertex p3 = Vertex({ -1,0,-12 });
 
-		Tracks::generateCurveSegments(game, p0, p1, p2, p3);
+		generateCurveSegments(game, p0, p1, p2, p3);
 
 		//Add a 2nd piece
-		extend(state);
+		extend();
 		
 	}
 
 	//glm::mat4 model
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view) 
+	void render(glm::mat4 &projection, glm::mat4 &view) 
 	{
 		std::cout << "Rednder Track" << std::endl;
-		Model* trackModel = state->game_state.trackModel;
+		Model* trackModel = game->trackModel;
 
-		Shader trackShader = Shaders::get(state, "track");
+		Shader trackShader = Shaders::get("track");
 		unsigned int ID = trackShader.ID;
 
 		useShader(ID);
@@ -86,7 +85,7 @@ namespace Tracks {
 
 			//Bind the vertex array
 			glBindVertexArray(trackModel->meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, trackModel->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, state->game_state.track->trackPieceTransforms.size());
+			glDrawElementsInstanced(GL_TRIANGLES, trackModel->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, game->track->trackPieceTransforms.size());
 			glBindVertexArray(0);
 		}
 		
@@ -122,9 +121,9 @@ namespace Tracks {
 		}
 	}
 
-	void extend(State *state)
+	void extend()
 	{
-		GameState *game = &state->game_state;
+		//GameState *game = &state->game_state;
 		//The first control point must be co linear with currentEnd and currentEndCP G1 Continuity
 		//Calculate the line between them
 		//Find the direction vector between the two points
