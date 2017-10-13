@@ -74,10 +74,8 @@ namespace ShaderMaps{
 
 namespace Shaders{
 
-    void setup(State *state){
-        printf("setup Shader");
-        GameState* game = &state->game_state;
-        
+    void setup(){
+        printf("setup Shader\n");
         // game->shaderMap = ShaderMap();
         game->shaderMap = new ShaderMap;
         game->shaderMap->count = 0;
@@ -169,10 +167,8 @@ namespace Shaders{
         game->shaderUpdateTimeout = 2;
     }
 
-    void update(State *state){
-        GameState* game = &state->game_state;
-        PlatformState* platform = &state->platform;
-
+    void update(){
+        /*
         game->shaderUpdateTimeout -= platform->deltaTime;
 
         if(game->shaderUpdateTimeout > 0) return;
@@ -196,21 +192,17 @@ namespace Shaders{
             game->shaderMap->elements[i].val = shader;
         }
 
-        game->shaderUpdateTimeout = 2.0;
+        game->shaderUpdateTimeout = 2.0;*/
     }
 
-    Shader get(State* state, const char* shaderName){
-        GameState* game = &state->game_state;
-
+    Shader get(const char* shaderName){
         return ShaderMaps::get(game->shaderMap, shaderName);
     }
 
-    void reloadCallback(State* state, const char* name, void(*callback)(void *state)){
-        GameState* game = &state->game_state;
-        
+    void reloadCallback(const char* name, void(*callback)(void *state)){
         ShaderMaps::setCallback(game->shaderMap, name, callback);
 
-        callback(state);
+        callback(GlobalState);
     }
 
 }
@@ -287,9 +279,9 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
     shader.ID = ID;
     //shader.name = "";
 
-    int shaderNameLen = strlen(shaderName);
+    // int shaderNameLen = strlen(shaderName);
 
-    if(shaderNameLen > 0){
+    /*if(shaderNameLen > 0){
         
         shader.name = (char*)malloc(strlen(shaderName)+1);
         for(int i = 0; i < strlen(shaderName); i++){
@@ -297,7 +289,7 @@ Shader loadShader(const char* shaderName, const char* vertexPath, const char* fr
             shader.name[i+1] = '\0';
         }
         
-    }
+    }*/
 
     free(vShaderCode);
     free(fShaderCode);

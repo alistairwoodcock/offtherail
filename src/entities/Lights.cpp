@@ -1,8 +1,6 @@
 namespace Lights {
 	
-	void setup(State *state){
-		GameState *game = &state->game_state;
-
+	void setup(){
 		game->sun = new Entity();
 		game->sun->x = 15;
 		game->sun->y = 13;
@@ -11,19 +9,14 @@ namespace Lights {
 
 	}
 
-	void update(State *state, float time, float deltaTime){
-		GameState *game = &state->game_state;
-
+	void update(float time, float deltaTime){
 		game->sun->z_rot += 10 * deltaTime;
-		
 	}
 
-	void render(State *state, glm::mat4 &projection, glm::mat4 &view){
-		glBindVertexArray(state->game_state.Particle_VAO);
+	void render(glm::mat4 &projection, glm::mat4 &view){
+		glBindVertexArray(game->Particle_VAO);
 		
-		GameState *game = &state->game_state;
-
-		Shader shader = Shaders::get(state, "particle");
+		Shader shader = Shaders::get("particle");
 		unsigned int ID = shader.ID;
 
 		useShader(ID);
