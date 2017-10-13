@@ -247,7 +247,7 @@ static void updateAndRender(State *state){
 				Lights::update(state, platform->currTime, platform->deltaTime);
 
 
-				Tracks::update(state, platform->currTime, platform->deltaTime);
+				//Tracks::update(state, platform->currTime, platform->deltaTime);
 			}	
 
 			//First render to depth map (for shadows)

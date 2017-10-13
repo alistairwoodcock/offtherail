@@ -26,6 +26,16 @@ struct Vertex {
 	glm::vec3 Tangent;
 	// bitangent
 	glm::vec3 Bitangent;
+
+	Vertex() {}
+	Vertex(std::vector<GLfloat> position) {
+		setPosition(position);
+	}
+	void setPosition(std::vector<GLfloat> xyz) {
+		Position.x = xyz[0];
+		Position.y = xyz[1];
+		Position.z = xyz[2];
+	}
 };
 
 struct Texture {

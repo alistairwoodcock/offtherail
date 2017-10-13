@@ -96,7 +96,7 @@ struct GameState {
 	//By having both these lines the game will not run propoerly, cannot
 	//remove the depth map with '
 	Model* trackModel;
-	Track *track;
+	Track* track;
 
     /* GRASS STATE */
     int grass_count;
