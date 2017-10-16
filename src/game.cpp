@@ -325,7 +325,7 @@ void changeScreen(Screens screen) {
 	switch(screen)
 	{
 		case MAIN_MENU: {
-			Music::play("sounds/dejavu.wav");
+			Music::play("sounds/running90s.wav");
 		} break;
 
 		case CHOOSE: {
@@ -333,7 +333,7 @@ void changeScreen(Screens screen) {
 		} break;
 
 		case GAME: {
-			Music::play("sounds/running90s.wav");
+			Music::play("sounds/dejavu.wav");
 		} break;
 	}
 
