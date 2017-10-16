@@ -93,6 +93,7 @@ namespace MainMenu{
 		if(input->space_pressed || input->enter_pressed){
 			
 			if(game->exit_active){
+                Music::pause(true);
                 Music::soundEffect("sounds/exit.wav", true);
 				game->quit_game = true;
 			} 
