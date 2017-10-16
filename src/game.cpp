@@ -21,6 +21,7 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
+#include "entities/Puddle.cpp"
 #include "entities/Track.cpp"
 #include "entities/Train.cpp"
 #include "entities/Lights.cpp"
@@ -53,7 +54,7 @@ static void init(State *state)
     game->input_timeout = 0;
 
     game->ground = -2;
-    game->speed = 70;
+    game->speed = 15;//70;
 
     game->showDepthMap = false;
 
@@ -78,6 +79,7 @@ static void init(State *state)
 
     /* -- Grasss Setup -- */
     Grasses::setup();
+    Puddles::setup();
     
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
@@ -252,6 +254,7 @@ static void updateAndRender(){
 				//this is just for now, we're going to have a fixed camera in the future.
 
 				Grasses::update(platform->currTime, platform->deltaTime);
+				Puddles::update(platform->currTime, platform->deltaTime);
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
@@ -287,9 +290,12 @@ static void updateAndRender(){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			// render scene 
-			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
-
 			SkyBoxes::render(projection, view);
+		glDepthMask(GL_FALSE);
+			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
+            Puddles::render(projection, view);
+		glDepthMask(GL_TRUE);
+
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
 			Tracks::render(projection, view);

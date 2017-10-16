@@ -17,6 +17,7 @@
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
+#include "entities/Puddle.h"
 
 #include "screens/MenuImage.h"
 
@@ -120,6 +121,10 @@ struct GameState {
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
+
+    /* PUDDLE STATE */
+    int puddle_count;
+    Puddle* puddle;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;

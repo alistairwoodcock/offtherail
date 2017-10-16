@@ -83,6 +83,7 @@ namespace SkyBoxes {
 
 	void render(glm::mat4 &projection, glm::mat4 &view) {
 		// draw skybox as last
+		glDepthMask(GL_FALSE);
 		glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 		SkyBox* skybox = game->skybox;
 		Shader skyboxShader = Shaders::get("skybox");
@@ -100,6 +101,7 @@ namespace SkyBoxes {
 		glDrawArrays(GL_TRIANGLES, 0, 36);
 		glBindVertexArray(0);
 		glDepthFunc(GL_LESS); // set depth function back to default
+		glDepthMask(GL_TRUE);
 	}
 
 	// loads a cubemap texture from 6 individual texture faces

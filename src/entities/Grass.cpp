@@ -16,7 +16,7 @@ namespace Grasses {
     }
 
     Model* randomModel() {
-        switch(rand()%7) {
+        switch(rand()%8) {
             case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
             case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
             case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
@@ -147,6 +147,46 @@ namespace Grasses {
 		glBindVertexArray(0);
 		useShader(0);
 	}
+
+	void renderReflections(glm::mat4 &projection, glm::mat4 &view) {
+		Grass *grass = game->grass;
+		int grass_count = game->grass_count;
+
+		Shader grassShader = Shaders::get("grass");
+		unsigned int ID = grassShader.ID;
+
+		useShader(ID);
+		shaderSetMat4(ID, "projection", projection);
+		shaderSetMat4(ID, "view", view);
+
+        // Different to normal render method
+		shaderSetVec3(ID, "objectColor", 1.0f, 1.0f, 1.0f);
+		shaderSetVec3(ID, "lightColor", 1.0f, 0.0f, 0.0f);
+		shaderSetVec3(ID, "viewPos", game->camera.Position);
+		shaderSetVec3(ID, "material.ambient",  1.0f, 1.0f, 1.0f);
+		shaderSetVec3(ID, "material.diffuse",  0.5f, 0.5f, 0.31f);
+		shaderSetVec3(ID, "material.specular", 0.25f, 0.25f, 0.25f);
+		shaderSetFloat(ID, "material.shininess", 128.0f);
+
+		for(int i = 0; i < grass_count; i++) {
+			Grass *p = grass+i;
+		    
+            // render the loaded model
+		    glm::mat4 model;
+			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
+			model = glm::scale(model, glm::vec3(1, -1, 1));
+            model = glm::scale(model, glm::vec3(0.8));
+
+		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		    shaderSetMat4(ID, "model", model);
+		    shaderSetMat4(ID, "inverseModel", glm::inverse(model));
+			
+			p->model->Draw(grassShader);
+        }
+		
+		glBindVertexArray(0);
+		useShader(0);
+    }
 
 	void renderShadow(Shader &shader){
 		Grass *grass = game->grass;
