@@ -101,7 +101,7 @@ namespace ChooseMenu {
 
         // Update Mr Floor
         Entity *floor = game->chooseFloor;
-        floor->y_rot -= 0.5 * deltaTime;
+        floor->y_rot -= deltaTime;
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
@@ -186,7 +186,7 @@ namespace ChooseMenu {
 			glBindVertexArray(0);
 		
 			model = glm::mat4(); 
-			model = glm::translate(model, glm::vec3(train->x, 3*game->ground - train->y, train->z));
+			model = glm::translate(model, glm::vec3(train->x, 3*floor->y - train->y, train->z));
 			
 			model = glm::scale(model, glm::vec3(1, -1, 1));
 			model = glm::scale(model, train->scale);
