@@ -20,6 +20,11 @@ namespace ChooseMenu {
 
 		game->chooseTrain->size = glm::vec3(1.0f);
 		updateScale();
+
+        game->chooseFloor = new Entity();
+		game->chooseFloor->x = 0.0f;
+		game->chooseFloor->y = game->ground;
+		game->chooseFloor->z = 0.0f;
 		
 		float logo_vertices[] = {
 			-0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
@@ -93,6 +98,10 @@ namespace ChooseMenu {
 		Train *train = game->chooseTrain;
 		train->y_rot += 0.5 * deltaTime;
 		train->y = game->ground + sin(time) * 0.8;
+
+        // Update Mr Floor
+        Entity *floor = game->chooseFloor;
+        floor->y_rot -= 0.5 * deltaTime;
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
@@ -108,14 +117,12 @@ namespace ChooseMenu {
 		const char* curr = game->trainModel->name.c_str();
 		bool rock = strcmp(curr, "train2") == 0;
 	   
-		Shader grassShader;
-		Shader trainShader;
+		Shader grassShader = Shaders::get("grass");
+		Shader trainShader = Shaders::get("train");
 		unsigned int ID;
 		if (rock) {
-		grassShader = Shaders::get("grass");
 		ID = grassShader.ID;
 		} else {
-		trainShader = Shaders::get("train");
 		ID = trainShader.ID;
 		}
 
@@ -149,13 +156,16 @@ namespace ChooseMenu {
 			trainModel->Draw(trainShader);
 		
 			// Reflections??
+            Entity *floor = game->chooseFloor;
 
 			glBindVertexArray(game->Particle_VAO);
 			model = glm::mat4();
-			model = glm::translate(model, glm::vec3(0.0, game->ground, 5.0));
-			model = glm::scale(model, glm::vec3(15.0f,15.0f,15.0f));
+			model = glm::translate(model, glm::vec3(floor->x, floor->y, floor->z));
+			model = glm::scale(model, glm::vec3(14.0f));
+		    model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
 			model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
-			shaderSetMat4(ID, "model", model);
+			
+            shaderSetMat4(ID, "model", model);
 			shaderSetVec3(ID, "color", glm::vec3(0.5));
 			shaderSetFloat(ID, "alpha", 0.5);
 
@@ -186,9 +196,6 @@ namespace ChooseMenu {
 			
 			glDisable(GL_STENCIL_TEST);
 		}
-
-
-
 
 	}
 

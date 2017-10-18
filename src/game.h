@@ -148,6 +148,7 @@ struct GameState {
 
     /* CHOOSE SCREEN STATE */
     Train *chooseTrain;
+    Entity *chooseFloor;
     TrainTypes currentTrain;
     MenuImage *chooseRight;
     MenuImage *chooseLeft;
