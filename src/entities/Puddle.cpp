@@ -5,7 +5,7 @@ namespace Puddles {
     void resetPos(Puddle *p) {
 		p->alpha = 0.8;
 		
-        p->x = (std::rand()%150)/10.0 + 8;
+        p->x = (std::rand()%150)/10.0 + 12;
         if (std::rand()%2 == 0) p->x *= -1;
 		p->y = game->ground;
 		p->z = -150 - std::rand()%150;

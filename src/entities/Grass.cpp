@@ -152,7 +152,7 @@ namespace Grasses {
 		Grass *grass = game->grass;
 		int grass_count = game->grass_count;
 
-		Shader grassShader = Shaders::get("grass");
+		Shader grassShader = Shaders::get("water");
 		unsigned int ID = grassShader.ID;
 
 		useShader(ID);
@@ -160,13 +160,8 @@ namespace Grasses {
 		shaderSetMat4(ID, "view", view);
 
         // Different to normal render method
-		shaderSetVec3(ID, "objectColor", 1.0f, 1.0f, 1.0f);
-		shaderSetVec3(ID, "lightColor", 1.0f, 0.0f, 0.0f);
-		shaderSetVec3(ID, "viewPos", game->camera.Position);
-		shaderSetVec3(ID, "material.ambient",  1.0f, 1.0f, 1.0f);
-		shaderSetVec3(ID, "material.diffuse",  0.5f, 0.5f, 0.31f);
-		shaderSetVec3(ID, "material.specular", 0.25f, 0.25f, 0.25f);
-		shaderSetFloat(ID, "material.shininess", 128.0f);
+		shaderSetVec3(ID, "color", 0.4f, 0.4f, 1.0f);
+        shaderSetFloat(ID, "alpha", 1.0f);
 
 		for(int i = 0; i < grass_count; i++) {
 			Grass *p = grass+i;
@@ -179,7 +174,6 @@ namespace Grasses {
 
 		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
 		    shaderSetMat4(ID, "model", model);
-		    shaderSetMat4(ID, "inverseModel", glm::inverse(model));
 			
 			p->model->Draw(grassShader);
         }
