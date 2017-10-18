@@ -5,7 +5,7 @@ namespace Puddles {
     void resetPos(Puddle *p) {
 		p->alpha = 0.8;
 		
-        p->x = (std::rand()%150)/10.0 + 6;
+        p->x = (std::rand()%150)/10.0 + 8;
         if (std::rand()%2 == 0) p->x *= -1;
 		p->y = game->ground;
 		p->z = -150 - std::rand()%150;
@@ -16,11 +16,9 @@ namespace Puddles {
     }
 
     Model* randomModel() {
-        switch(rand()%4) {
-            case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
-            case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
-            case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
-            case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(0.2f));
+        switch(rand()%2) {
+            case 0: return new Model("puddle1", "models/puddles/puddle1.obj");
+            case 1: return new Model("puddle2", "models/puddles/puddle2.obj");
         }
     }
 
@@ -37,7 +35,7 @@ namespace Puddles {
 			Puddle *p = new Puddle();
             p->model = randomModel();
             resetPos(p);
-            p->alpha = 1.0;
+            //p->alpha = 1.0;
             game->puddle[i] = *p;
 		}
 	}
@@ -57,7 +55,7 @@ namespace Puddles {
 			p->z += p->z_vel * deltaTime;
 			p->alpha += 0.025 * deltaTime;
 
-			if (p->z > 18) {
+			if (p->z > 26) {
                 resetPos(p);
 			}
 		}
@@ -93,7 +91,7 @@ namespace Puddles {
             // render the loaded model
 		    glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-		    model = glm::scale(model, glm::vec3(10.0, 0.01, 10.0));
+		    model = glm::scale(model, glm::vec3(6.0, 1.0, 6.0));
 
 		    model = glm::rotate(model, p->y_rot, glm::vec3(0.0, 1.0, 0.0));
 		    shaderSetMat4(ID, "model", model);
