@@ -54,7 +54,7 @@ static void init(State *state)
     game->input_timeout = 0;
 
     game->ground = -2;
-    game->speed = 15;//70;
+    game->speed = 70;
 
     game->showDepthMap = false;
 
@@ -218,6 +218,7 @@ static void updateAndRender(){
 					game->camera_locked = true;	
 					game->input_timeout = 0.1;
 					camera->Reset();
+                    game->speed = 70; // Reset speed
 				}
 			}
 
@@ -234,6 +235,8 @@ static void updateAndRender(){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
+				if(platform->input.left_shift_pressed) game->speed -= 1;
+				if(platform->input.right_shift_pressed) game->speed += 1;
 			} else {
 				if(platform->input.apostrophe_pressed){
 					game->showDepthMap = !game->showDepthMap;

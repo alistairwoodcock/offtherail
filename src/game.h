@@ -46,6 +46,8 @@ struct Input {
 	bool right_bracket_pressed;
 	bool semicolon_pressed;
 	bool apostrophe_pressed;
+	bool left_shift_pressed;
+	bool right_shift_pressed;
 };
 
 struct PlatformState {
