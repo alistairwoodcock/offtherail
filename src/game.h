@@ -139,9 +139,6 @@ struct GameState {
 	TextArea *startText;
 	TextArea *exitText;
 	
-	/* FONTS */
-	Font *testFont;
-	TextArea *testTextArea;
 
 	bool start_active;
 	bool exit_active;
@@ -167,6 +164,13 @@ struct GameState {
 	unsigned int shadowDepthMapFBO;
 	unsigned int shadowDepthMap;
 	bool showDepthMap;
+
+	/* SCORING STATE */
+	int score;
+	float pointCountdown;
+
+	TextArea *scoreText;
+
 	
 };
 

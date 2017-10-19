@@ -157,6 +157,17 @@ static void init(State *state)
 
 	/* -- Ground Setup -- */
 	Ground::setup();
+
+	/* -- Score Setup -- */
+	game->score = 0;
+	game->pointCountdown = 0;
+
+	game->scoreText = createTextArea(game->comicSans, 700, 512, 128, "SCORE: 00000", 12);
+	game->scoreText->x = 0;
+	game->scoreText->y = 0.7;
+	game->scoreText->z = 0;
+	game->scoreText->scale = glm::vec3(0.3);
+	game->scoreText->scale_vel = 0;
 }
 
 unsigned int quadVAO = 0;
@@ -239,7 +250,24 @@ static void updateAndRender(){
 		case GAME: {
 			
 			OverlayMenu::update(platform->currTime, platform->deltaTime);
+				
+			/* UPDATE SCORING */	
+			if(game->pointCountdown > 0){
+				game->pointCountdown -= platform->deltaTime;
+			}
 
+			if(game->bogieFront->currentTrack != game->bogieBack->currentTrack){
+				if(game->pointCountdown <= 0){
+					game->pointCountdown = 0.5;
+					game->score += 1;
+
+					char buff[1000];
+					sprintf(buff, "SCORE: %05i\0", game->score);
+					setText(game->scoreText, buff);
+
+				}			
+			}
+			
 			if(platform->input.u_pressed){
 				if(game->camera_locked){
 					game->camera_locked = false;
@@ -343,6 +371,7 @@ static void updateAndRender(){
 			}
 
 
+			renderText(game->scoreText);
 
 		} break;
 	}
@@ -359,6 +388,7 @@ static void updateAndRender(){
 		setFont(game->startText, newFont);
 		setFont(game->exitText, newFont);
 		setFont(game->resumeText, newFont);
+		setFont(game->scoreText, newFont);
 
 		game->input_timeout = 0.1;
 
