@@ -17,8 +17,8 @@
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
 
-#include "screens/MenuImage.h"
 #include "libs/font.h"
+#include "screens/MenuImage.h"
 
 
 
@@ -136,6 +136,7 @@ struct GameState {
 	
 	/* FONTS */
 	Font *testFont;
+	TextArea *testTextArea;
 
 	bool start_active;
 	bool exit_active;

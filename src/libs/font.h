@@ -8,21 +8,42 @@
 #include "stb_truetype.h"
 
 
-class Font: public Entity {
+class Font{
+public:
+	bool initialised;
+
+	// stbtt_bakedchar cdata[96];
+	stbtt_fontinfo info;
+};
+
+
+class TextArea: public Entity{
 public:
 	unsigned int glTexture;
 	unsigned int VAO;
 	unsigned int VBO;
 	unsigned int UVB;
 
+	float scale; //scale the font when rendering
+
 	int width;
 	int height;
+	int line_height;
+	unsigned char* bitmap; //used multiple times for text image allocation
 
-	MenuImage *img;
+	float r,g,b,a; //text colour
+	
 
-	stbtt_bakedchar cdata[96];
-	stbtt_fontinfo info;
+	char* text; // the actual text
+	bool text_set;
+	bool text_updated; //flag to avoid many renders of the font
+
+	Font* font; //the font that we will use to render with
 };
 
 
+Font* createFont(const char* fontPath);
+TextArea* createTextArea(Font* font, int width, int height, int line_height, char* text);
+void setText(TextArea *ta, char* text);
+void renderText(TextArea *ta);
 #endif

@@ -61,152 +61,152 @@ void renderImage(MenuImage *image, const char* shader = NULL){
 }
 
 
-void setupFont(const char* fontPath, Font *font){
+// void setupFont(const char* fontPath, Font *font){
 
-   	/* load font file */
-    long size;
-    unsigned char* fontBuffer;
+//    	/* load font file */
+//     long size;
+//     unsigned char* fontBuffer;
     
-    FILE* fontFile = fopen(fontPath, "rb");
-    fseek(fontFile, 0, SEEK_END);
-    size = ftell(fontFile); /* how long is the file ? */
-    fseek(fontFile, 0, SEEK_SET); /* reset */
+//     FILE* fontFile = fopen(fontPath, "rb");
+//     fseek(fontFile, 0, SEEK_END);
+//     size = ftell(fontFile); /* how long is the file ? */
+//     fseek(fontFile, 0, SEEK_SET); /* reset */
     
-    fontBuffer = (unsigned char*)malloc(size);
+//     fontBuffer = (unsigned char*)malloc(size);
     
-    fread(fontBuffer, size, 1, fontFile);
-    fclose(fontFile);
+//     fread(fontBuffer, size, 1, fontFile);
+//     fclose(fontFile);
 
-    /* prepare font */
-    stbtt_fontinfo info;
-    if (!stbtt_InitFont(&info, fontBuffer, 0))
-    {
-        printf("failed\n");
-    }
+//     /* prepare font */
+//     stbtt_fontinfo info;
+//     if (!stbtt_InitFont(&info, fontBuffer, 0))
+//     {
+//         printf("failed\n");
+//     }
     
-    int b_w = 512; /* bitmap width */
-    int b_h = 128; /* bitmap height */
-    int l_h = 64; /* line height */
+//     int b_w = 512; /* bitmap width */
+//     int b_h = 128; /* bitmap height */
+//     int l_h = 64; /* line height */
 
-    /* create a bitmap for the phrase */
-    unsigned char* bitmap = (unsigned char*)calloc(b_w * b_h, sizeof(char));
+//     /* create a bitmap for the phrase */
+//     unsigned char* bitmap = (unsigned char*)calloc(b_w * b_h, sizeof(char));
     
-    /* calculate font scaling */
-    float scale = stbtt_ScaleForPixelHeight(&info, l_h);
+//     /* calculate font scaling */
+//     float scale = stbtt_ScaleForPixelHeight(&info, l_h);
 
-    char* word = "Hello, There Pals!!!!!!!";
+//     char* word = "Hello, There Pals!!!!!!!";
     
-    int x = 0;
+//     int x = 0;
        
-    int ascent, descent, lineGap;
-    stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
+//     int ascent, descent, lineGap;
+//     stbtt_GetFontVMetrics(&info, &ascent, &descent, &lineGap);
     
-    ascent *= scale;
-    descent *= scale;
+//     ascent *= scale;
+//     descent *= scale;
     
-    int i;
-    for (i = 0; i < strlen(word); ++i)
-    {
-        /* get bounding box for character (may be offset to account for chars that dip above or below the line */
-        int c_x1, c_y1, c_x2, c_y2;
-        stbtt_GetCodepointBitmapBox(&info, word[i], scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
+//     int i;
+//     for (i = 0; i < strlen(word); ++i)
+//     {
+//         /* get bounding box for character (may be offset to account for chars that dip above or below the line */
+//         int c_x1, c_y1, c_x2, c_y2;
+//         stbtt_GetCodepointBitmapBox(&info, word[i], scale, scale, &c_x1, &c_y1, &c_x2, &c_y2);
         
-        /* compute y (different characters have different heights */
-        int y = ascent + c_y1;
+//         /* compute y (different characters have different heights */
+//         int y = ascent + c_y1;
         
-        /* render character (stride and offset is important here) */
-        int byteOffset = x + (y  * b_w);
-        stbtt_MakeCodepointBitmap(&info, bitmap + byteOffset, c_x2 - c_x1, c_y2 - c_y1, b_w, scale, scale, word[i]);
+//         /* render character (stride and offset is important here) */
+//         int byteOffset = x + (y  * b_w);
+//         stbtt_MakeCodepointBitmap(&info, bitmap + byteOffset, c_x2 - c_x1, c_y2 - c_y1, b_w, scale, scale, word[i]);
         
-        /* how wide is this character */
-        int ax;
-        stbtt_GetCodepointHMetrics(&info, word[i], &ax, 0);
-        x += ax * scale;
+//         /* how wide is this character */
+//         int ax;
+//         stbtt_GetCodepointHMetrics(&info, word[i], &ax, 0);
+//         x += ax * scale;
         
-        /* add kerning */
-        int kern;
-        kern = stbtt_GetCodepointKernAdvance(&info, word[i], word[i + 1]);
-        x += kern * scale;
-    }
+//         /* add kerning */
+//         int kern;
+//         kern = stbtt_GetCodepointKernAdvance(&info, word[i], word[i + 1]);
+//         x += kern * scale;
+//     }
 
-    font->width = b_w;
-	font->height = b_h;
-	font->info = info;
+//     font->width = b_w;
+// 	font->height = b_h;
+// 	font->info = info;
 
-	glGenTextures(1, &font->glTexture);
-    glBindTexture(GL_TEXTURE_2D, font->glTexture);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, font->width, font->height, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
-    glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
-    glGenerateMipmap(GL_TEXTURE_2D);
+// 	glGenTextures(1, &font->glTexture);
+//     glBindTexture(GL_TEXTURE_2D, font->glTexture);
+//     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+//     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, font->width, font->height, 0, GL_RED, GL_UNSIGNED_BYTE, bitmap);
+//     glHint(GL_GENERATE_MIPMAP_HINT, GL_NICEST);
+//     glGenerateMipmap(GL_TEXTURE_2D);
 
- 	const float vertices[] =
-    {
-        -1, -1, 0,
-        -1,  1, 0,
-         1,  1, 0,
-        -1, -1, 0,
-         1,  1, 0,
-         1, -1, 0,
-    };
+//  	const float vertices[] =
+//     {
+//         -1, -1, 0,
+//         -1,  1, 0,
+//          1,  1, 0,
+//         -1, -1, 0,
+//          1,  1, 0,
+//          1, -1, 0,
+//     };
 
-    const float uvs[] =
-    {
-        0, 1,
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 0,
-        1, 1,
-    };
+//     const float uvs[] =
+//     {
+//         0, 1,
+//         0, 0,
+//         1, 0,
+//         0, 1,
+//         1, 0,
+//         1, 1,
+//     };
 
-    glGenVertexArrays(1, &font->VAO);
-    glBindVertexArray(font->VAO);
+//     glGenVertexArrays(1, &font->VAO);
+//     glBindVertexArray(font->VAO);
 
-    glGenBuffers(1, &font->VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, font->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 18, vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(0);
+//     glGenBuffers(1, &font->VBO);
+//     glBindBuffer(GL_ARRAY_BUFFER, font->VBO);
+//     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * 18, vertices, GL_STATIC_DRAW);
+//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
+//     glEnableVertexAttribArray(0);
 
-    glGenBuffers(1, &font->UVB);
-    glBindBuffer(GL_ARRAY_BUFFER, font->UVB);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 12, uvs, GL_STATIC_DRAW);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-    glEnableVertexAttribArray(1);
+//     glGenBuffers(1, &font->UVB);
+//     glBindBuffer(GL_ARRAY_BUFFER, font->UVB);
+//     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 12, uvs, GL_STATIC_DRAW);
+//     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+//     glEnableVertexAttribArray(1);
 
 
-	free(fontBuffer);
-    free(bitmap);
-}
+// 	free(fontBuffer);
+//     free(bitmap);
+// }
 
-void renderFont(Font* font){
+// void renderFont(Font* font){
 	
-	unsigned int ID = Shaders::get("font").ID;
+// 	unsigned int ID = Shaders::get("font").ID;
 	
-	useShader(ID);
+// 	useShader(ID);
 
-	glBindTexture(GL_TEXTURE_2D, font->glTexture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
-    glActiveTexture(GL_TEXTURE0);
-    glUniform1i(glGetUniformLocation(ID, "mainTex"), 0);
+// 	glBindTexture(GL_TEXTURE_2D, font->glTexture);
+// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+//     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+//     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 8);
+//     glActiveTexture(GL_TEXTURE0);
+//     glUniform1i(glGetUniformLocation(ID, "mainTex"), 0);
 
-	glBindVertexArray(font->VAO);
+// 	glBindVertexArray(font->VAO);
 
-	glm::mat4 model;
-	model = glm::translate(model, glm::vec3(font->x, font->y, font->z));
-	model = glm::scale(model, glm::vec3(0.2));
+// 	glm::mat4 model;
+// 	model = glm::translate(model, glm::vec3(font->x, font->y, font->z));
+// 	model = glm::scale(model, glm::vec3(0.2));
 	
-	shaderSetMat4(ID, "position", model);
+// 	shaderSetMat4(ID, "position", model);
 	
-	glDrawArrays(GL_TRIANGLES, 0, 6);
+// 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glBindVertexArray(0);
+// 	glBindVertexArray(0);
 
-}
+// }
 
 #endif

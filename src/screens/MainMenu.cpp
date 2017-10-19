@@ -63,12 +63,8 @@ namespace MainMenu{
 		game->exitText->scale_vel = 0;
 		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
 
-		game->testFont = new Font();
-		game->testFont->x = 0;
-		game->testFont->y = -1;
-		game->testFont->z = 0;
-		
-		setupFont("./fonts/OpenSans-Regular.ttf", game->testFont);
+		game->testFont = createFont("./fonts/OpenSans-Regular.ttf");
+		game->testTextArea = createTextArea(game->testFont, 512, 128, 64, "Hello, World!");
 
 		Shader textShader = Shaders::get("text");
 		useShader(textShader.ID);
@@ -112,11 +108,15 @@ namespace MainMenu{
 		if(game->start_active && input->s_pressed){
 			game->start_active = false;
 			game->exit_active = true;
+
+			setText(game->testTextArea, "S PRESSED!");
 		}
 
 		if(game->exit_active && input->w_pressed){
 			game->start_active = true;
 			game->exit_active = false;
+
+			setText(game->testTextArea, "W PRESSED!!!!");
 		}
 
 		if(input->space_pressed || input->enter_pressed){
@@ -134,18 +134,27 @@ namespace MainMenu{
 		{
 			game->quit_game = true;
 		}
+
+
+		static int t_count = 0;
+		t_count++;
+
+		char buff[500]; 
+		sprintf(buff, "%i", t_count);
+		setText(game->testTextArea, buff);
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
-		game->testFont->x = -0.6;
-		game->testFont->y = 0.75;
+		game->testTextArea->x = -0.6f;
+		game->testTextArea->y = 0.75f;
+		game->testTextArea->scale = 0.2f;
 		
 
 		renderImage(game->logo);
 		renderImage(game->startText);
 		renderImage(game->exitText);
 
-		renderFont(game->testFont);
+		renderText(game->testTextArea);
 	}
 
 }
