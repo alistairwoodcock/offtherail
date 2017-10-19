@@ -23,7 +23,7 @@ namespace OverlayMenu{
 		game->overlay->y = 0;
 		game->overlay->z = 5;
 
-		game->resumeText = createTextArea(game->comicSans, 700, 512, 128, "RESUME", 7);
+		game->resumeText = createTextArea(game->comicSans, 700, 512, 128, "RESUM", 7);
 		game->resumeText->x = 0.25;
 		game->resumeText->y = -0.4;
 		game->resumeText->z = 0;
