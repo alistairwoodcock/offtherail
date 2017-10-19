@@ -10,63 +10,68 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "libs/stb_image.h"
 
+
 #include "game.h"
 
 #include "libs/shader.cpp"
 #include "libs/texture.cpp"
 #include "libs/mesh.cpp"
 #include "libs/model.cpp"
+#include "libs/music.cpp"
+#include "libs/font.cpp"
+
 
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
-#include "entities/Train.cpp"
 #include "entities/Track.cpp"
+#include "entities/Train.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
-#include "entities/Track.cpp"
 
 #include "screens/MainMenu.cpp"
+#include "screens/ChooseMenu.cpp"
 #include "screens/OverlayMenu.cpp"
 
 //the larger these are, the higher resolution shadow we can have
-const unsigned int SHADOW_WIDTH = 2048*4, SHADOW_HEIGHT = 2048*4;
-
+const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
 
 static void init(State *state)
 {
+	printf("INIT\n");
+	
+	//Setup our entire game and GL state 
+
 	GlobalState = state;
 	game = &state->game_state;
 	platform = &state->platform;
 
-	printf("INIT");
-	
     //Game state for runtime
     game->game_started = false;
     game->quit_game = false;
-    changeScreen(MAIN_MENU);
     
     game->camera_locked = true;
     game->input_timeout = 0;
 
     game->ground = -2;
-    game->speed = 10;
+    game->speed = 70;
 
-    game->showDepthMap = false;
+	game->showDepthMap = false;
 
-    //GL Setup
-    glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
+	//GL Setup
+	glViewport(0, 0, state->platform.screenWidth, state->platform.screenHeight);
 	glEnable(GL_DEPTH_TEST);  
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    
-
-    /* -- Shaders Setup -- */
+    /* -- Music Setup -- */
+    Music::init(); // Need to init before first changeScreen()
+	
+	/* -- Shaders Setup -- */
 	Shaders::setup();
 
-    
+ 
     /* -- Particles Setup -- */
     Particles::setup();
     
@@ -79,21 +84,26 @@ static void init(State *state)
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
     
-    /* -- Menu Setup --*/
-    MainMenu::setup();
-    OverlayMenu::setup();
+	/* -- Font Setup -- */
+	game->openSans = createFont("./fonts/OpenSans-Regular.ttf");
+	game->comicSans = createFont("./fonts/comic.ttf");
 
 	/* -- Set Up Sky --*/
 	SkyBoxes::setup();
 
-    /* -- Train Setup -- */
-    Trains::setup();
+	/* -- Train Setup -- */
+	Trains::setup();
 
-    /* -- Track Setup -- */
-    Tracks::setup();
+	/* -- Track Setup -- */
+	Tracks::setup();
+	
+	/* -- Menu Setup --*/
+	MainMenu::setup();
+	ChooseMenu::setup();
+	OverlayMenu::setup();
 
 	/* -- Shadow Setup --*/
-    unsigned int depthMapFBO;
+	unsigned int depthMapFBO;
 	glGenFramebuffers(1, &depthMapFBO);
 
 	unsigned int depthMap;
@@ -119,35 +129,49 @@ static void init(State *state)
 
 	/* -- Ground Setup -- */
 	Ground::setup();
+
+	/* -- Score Setup -- */
+	game->score = 0;
+	game->pointCountdown = 0;
+
+	game->scoreText = createTextArea(game->comicSans, 700, 512, 128, "SCORE: 00000", 12);
+	game->scoreText->x = 0;
+	game->scoreText->y = 0.7;
+	game->scoreText->z = 0;
+	game->scoreText->scale = glm::vec3(0.3);
+	game->scoreText->scale_vel = 0;
+
+
+	changeScreen(MAIN_MENU);
 }
 
 unsigned int quadVAO = 0;
 unsigned int quadVBO;
 void renderQuad()
 {
-    if (quadVAO == 0)
-    {
-        float quadVertices[] = {
-            // positions        // texture Coords
-            -1.0f,  1.0f, 0.0f, 0.0f, 1.0f,
-            -1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-             1.0f,  1.0f, 0.0f, 1.0f, 1.0f,
-             1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-        };
-        // setup plane VAO
-        glGenVertexArrays(1, &quadVAO);
-        glGenBuffers(1, &quadVBO);
-        glBindVertexArray(quadVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    }
-    glBindVertexArray(quadVAO);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
+	if (quadVAO == 0)
+	{
+		float quadVertices[] = {
+			// positions        // texture Coords
+			-1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+			 -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
+			 -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
+		};
+		// setup plane VAO
+		glGenVertexArrays(1, &quadVAO);
+		glGenBuffers(1, &quadVBO);
+		glBindVertexArray(quadVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+	}
+	glBindVertexArray(quadVAO);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
 }
 
 
@@ -187,22 +211,38 @@ static void updateAndRender(){
 		case MAIN_MENU: {
 			
 			MainMenu::update(platform->currTime, platform->deltaTime);
-			
 			MainMenu::render(projection, view);
 
 		} break;
 
 		case CHOOSE: {
 			
-
-
+			ChooseMenu::update(platform->currTime, platform->deltaTime);
+			ChooseMenu::render(projection, view);
 
 		} break;
 
 		case GAME: {
 			
 			OverlayMenu::update(platform->currTime, platform->deltaTime);
+				
+			/* UPDATE SCORING */	
+			if(game->pointCountdown > 0){
+				game->pointCountdown -= platform->deltaTime;
+			}
 
+			if(game->bogieFront->currentTrack != game->bogieBack->currentTrack){
+				if(game->pointCountdown <= 0){
+					game->pointCountdown = 0.5;
+					game->score += 1;
+
+					char buff[1000];
+					sprintf(buff, "SCORE: %05i\0", game->score);
+					setText(game->scoreText, buff);
+
+				}			
+			}
+			
 			if(platform->input.u_pressed){
 				if(game->camera_locked){
 					game->camera_locked = false;
@@ -227,13 +267,18 @@ static void updateAndRender(){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
-				// printf("camera(%f, %f, %f)\n", camera->Position.x, camera->Position.y, camera->Position.z);
-				// printf("camera YAW(%f)\n", camera->Yaw);
-				// printf("camera PITCH(%f)\n", camera->Pitch);
 			} else {
 				if(platform->input.apostrophe_pressed){
 					game->showDepthMap = !game->showDepthMap;
 					game->input_timeout = 0.1;
+				}
+
+				if(game->showDepthMap){
+					int s = 10;
+					if(platform->input.up_pressed) game->lightPos.y += s * platform->deltaTime;
+					if(platform->input.down_pressed) game->lightPos.y -= s * platform->deltaTime;
+					if(platform->input.left_pressed) game->lightPos.x -= s * platform->deltaTime;
+					if(platform->input.right_pressed) game->lightPos.x += s * platform->deltaTime;
 				}
 			}
 			
@@ -245,7 +290,7 @@ static void updateAndRender(){
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
-				//Tracks::update(platform->currTime, platform->deltaTime);
+				Tracks::update(platform->currTime, platform->deltaTime);
 
 			}	
 
@@ -255,8 +300,9 @@ static void updateAndRender(){
 			glClear(GL_DEPTH_BUFFER_BIT);
 			
 			//Shadow matrices
-			float near_plane = 10.0f, far_plane = 70.5f;
-			glm::mat4 lightProjection = glm::ortho(-40.0f, 40.0f, -40.0f, 40.0f, near_plane, far_plane); 
+			float near_plane = 0.0f, far_plane = 100.5f;
+			glm::mat4 lightProjection = glm::ortho(-64.0f, 64.0f, -64.0f, 64.0f, near_plane, far_plane); 
+			// game->lightPos *= 1.01;
 			glm::mat4 lightView = glm::lookAt(game->lightPos, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0, 1.0, 0.0));
 			glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
@@ -300,18 +346,56 @@ static void updateAndRender(){
 			}
 
 
+			renderText(game->scoreText);
 
 		} break;
+	}
+
+	/* -- FONT UPDATE -- */
+	if(platform->input.c_pressed){
+		//we are switching the fonts for all TextAreas (manual process for now)
+
+		Font* newFont = game->openSans;
+		if(game->startText->font == game->openSans){
+			newFont = game->comicSans;
+		} 
+
+		setFont(game->startText, newFont);
+		setFont(game->exitText, newFont);
+		setFont(game->resumeText, newFont);
+		setFont(game->scoreText, newFont);
+
+		game->input_timeout = 0.1;
+
 	}
 
 }
 
 void changeScreen(Screens screen) {
-   game->current_screen = screen; 
+	if (screen == GAME) Trains::updateScale();
+
+	game->current_screen = screen; 
+
+	switch(screen)
+	{
+		case MAIN_MENU: {
+			Music::play("sounds/running90s.wav");
+		} break;
+
+		case CHOOSE: {
+
+		} break;
+
+		case GAME: {
+			Music::play("sounds/dejavu.wav");
+		} break;
+	}
+
 }
 
 void paused(bool paused) {
     game->paused = paused;
+    Music::pause(paused);
 }
 
 static bool shouldClose(){
@@ -324,6 +408,7 @@ static bool shouldClose(){
 static void finalize(State *state){
 	printf("FINALIZE\n");
 	free(state);
+    Music::destroy();
 }
 
 static void reload(State *state){
@@ -337,10 +422,10 @@ static void unload(State *state){
 }
 
 const GameAPI GAME_API = {
-    .init = init,
-    .finalize = finalize,
-    .reload = reload,
-    .unload = unload,
-    .updateAndRender = updateAndRender,
-    .shouldClose = shouldClose
+	.init = init,
+	.finalize = finalize,
+	.reload = reload,
+	.unload = unload,
+	.updateAndRender = updateAndRender,
+	.shouldClose = shouldClose
 };

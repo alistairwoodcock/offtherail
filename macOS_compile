@@ -1,5 +1,5 @@
 mkdir build > /dev/null 2>&1
 
-g++ -std=c++11 -framework OpenGL -framework GLUT -lglfw -lglew -lassimp -dynamiclib -o build/game.dylib src/game.cpp
+g++ -std=c++11 -framework OpenGL -framework GLUT -framework OpenAL -lalut -lglfw -lglew -lassimp -dynamiclib -o build/game.dylib src/game.cpp
 
 g++ -std=c++11 -framework OpenGL -lglfw -lglew -lassimp src/main.cpp -o build/main

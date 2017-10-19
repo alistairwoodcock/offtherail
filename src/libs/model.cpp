@@ -2,10 +2,11 @@
 #include "texture.h"
 #include "shader.h"
 
-Model::Model(string const &modelName, string const &path, bool gamma = false) : gammaCorrection(gamma)
+Model::Model(string const &modelName, string const &path, glm::vec3 modelSize = glm::vec3(1.0f), bool gamma = false) : gammaCorrection(gamma)
 {
 	name = modelName;
 	loadModel(path);
+    size = modelSize;
 }
 
 // draws the model, and thus all its meshes
@@ -60,6 +61,7 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 	vector<Vertex> vertices;
 	vector<unsigned int> indices;
 	vector<Texture> textures;
+
 	// Walk through each of the mesh's vertices
 	for (unsigned int i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -106,7 +108,6 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
 		
 	
 		vertices.push_back(vertex);
-
 
 	}
 

@@ -6,18 +6,22 @@
 
 #include <GLFW/glfw3.h>
 
+#include "libs/music.h"
 #include "libs/shader.h"
 #include "libs/model.h"
 
 #include "entities/Entity.h"
 #include "entities/Camera.h"
+#include "entities/Track.h"
 #include "entities/Train.h"
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
-#include "entities/Track.h"
 
+#include "libs/font.h"
 #include "screens/MenuImage.h"
+
+
 
 
 enum Screens {
@@ -33,6 +37,7 @@ struct Input {
 	bool s_pressed;
 	bool p_pressed;
 	bool u_pressed;
+	bool c_pressed;
 	bool up_pressed;
 	bool down_pressed;
 	bool left_pressed;
@@ -71,6 +76,11 @@ struct GameState {
 	ShaderMap* shaderMap;
 	float shaderUpdateTimeout;
 
+	/* MUSIC STATE */
+	std::map<const char*, Sound> *sounds;
+    Sound music;
+	const char* current;
+
 	/* LEVEL STATE */
     float speed; //Speed of train, scenery, etc.
 	
@@ -98,33 +108,57 @@ struct GameState {
 	Model* trackModel;
 	Track* track;
 	float trackLen;
-	int trackCount = 50;
-	Track tracks[50];
+	int trackCount;
+	Track *tracks;
+	Track *track1;
+	Track *track2;
+	Track *track3;
+	int selectedTrack;
+
+	/* TRACK SWITCH STATE */
+	TrackSwitch switches[20];
+	int switchesCount;
+	int maxSwitches;
+	float nextSwitchCountdown;
+	int selectedSwitch;
 
     /* GRASS STATE */
     int grass_count;
     Grass* grass;
-    Model* grassModel;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;
 	Train *train;
-	Entity *bogieFront;
-	Entity *bogieBack;
+	Bogie *bogieFront;
+	Bogie *bogieBack;
+
+	Model* trainModels[TRAIN_MODEL_NUM];
+
+	/* FONTS */
+	Font *openSans;
+	Font *comicSans;
 
 	/* INPUT STATE */
 	float input_timeout;
 
 	/* MENU SCREEN STATE */
 	MenuImage *logo;
-	MenuImage *startText;
-	MenuImage *exitText;
+	TextArea *startText;
+	TextArea *exitText;
+	
+
 	bool start_active;
 	bool exit_active;
 
+    /* CHOOSE SCREEN STATE */
+    Train *chooseTrain;
+    TrainTypes currentTrain;
+    MenuImage *chooseRight;
+    MenuImage *chooseLeft;
+
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
-	MenuImage *resumeText;
+	TextArea *resumeText;
 	bool overlay_active;
 	bool resume_active;
 
@@ -137,6 +171,13 @@ struct GameState {
 	unsigned int shadowDepthMapFBO;
 	unsigned int shadowDepthMap;
 	bool showDepthMap;
+
+	/* SCORING STATE */
+	int score;
+	float pointCountdown;
+
+	TextArea *scoreText;
+
 	
 };
 

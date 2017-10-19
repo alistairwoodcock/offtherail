@@ -6,6 +6,8 @@
 class Particle: public Entity {
 public:
 		float alpha;
+		float scale;
+		bool render;
 };
 
 #endif
