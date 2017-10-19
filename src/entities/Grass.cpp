@@ -26,6 +26,8 @@ namespace Grasses {
             case 6: return new Model("grass7", "models/grass/grass3.obj", glm::vec3(0.05f));
             case 7: return new Model("grass7", "models/grass/grass4.obj", glm::vec3(0.05f));
         }
+
+        return new Model("grass7", "models/grass/grass4.obj", glm::vec3(0.05f));
     }
 
 	//we have to take (void *state) because of the dependency 

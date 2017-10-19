@@ -230,6 +230,7 @@ Input get_current_input(GLFWwindow* window){
 	in.d_pressed = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS);
 	in.p_pressed = (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 	in.u_pressed = (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS);
+	in.c_pressed = (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
 	in.up_pressed = (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
 	in.down_pressed = (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
 	in.left_pressed = (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
