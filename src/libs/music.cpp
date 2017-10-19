@@ -91,6 +91,7 @@ namespace Music {
 		alGetError();
 		SetListenerValues();
 
+        game->current = "";
 		game->sounds = new std::map<const char*, Sound>();
 	}
 
