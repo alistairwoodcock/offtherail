@@ -96,6 +96,9 @@ static void init(State *state)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
 	
+	/* -- Font Setup -- */
+	game->openSans = createFont("./fonts/OpenSans-Regular.ttf");
+	game->comicSans = createFont("./fonts/comic.ttf");
 
 	/* -- Shaders Setup -- */
 	Shaders::setup();
@@ -342,6 +345,23 @@ static void updateAndRender(){
 
 
 		} break;
+	}
+
+	/* -- FONT UPDATE -- */
+	if(platform->input.c_pressed){
+		//we are switching the fonts for all TextAreas (manual process for now)
+
+		Font* newFont = game->openSans;
+		if(game->startText->font == game->openSans){
+			newFont = game->comicSans;
+		} 
+
+		setFont(game->startText, newFont);
+		setFont(game->exitText, newFont);
+		setFont(game->resumeText, newFont);
+
+		game->input_timeout = 0.1;
+
 	}
 
 }

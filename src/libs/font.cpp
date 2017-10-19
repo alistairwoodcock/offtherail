@@ -31,7 +31,7 @@ Font* createFont(const char* fontPath){
     return font;
 }
 
-TextArea* createTextArea(Font* font, int width, int height, int line_height, char* text = NULL){
+TextArea* createTextArea(Font* font, int width, int height, int line_height, char* text = NULL, int min_kern = 0){
 	TextArea *textarea = new TextArea();
 	
 	//default position
@@ -40,16 +40,16 @@ TextArea* createTextArea(Font* font, int width, int height, int line_height, cha
 	textarea->z = 0;
 
 	//setting our default colours
-	textarea->r = 0;
-	textarea->g = 0;
-	textarea->b = 0;
-	textarea->a = 1;
+	textarea->colour = glm::vec4(0,0,0,1);
 
 
-	textarea->scale = 1.0f;
+	textarea->scale = glm::vec3(1.0f);
 	textarea->width = width;
 	textarea->height = height;
+
 	textarea->line_height = line_height;
+	textarea->min_kern = 0;
+
 	textarea->font = font;
 
 	if(textarea == NULL){
@@ -123,6 +123,11 @@ void setText(TextArea *ta, char* text){
 	ta->text_set = true;
 }
 
+void setFont(TextArea *ta, Font* newFont){
+	ta->font = newFont;
+	ta->text_updated = true;
+}
+
 void renderText(TextArea *ta){
 	if(!ta->text_set) return;
 	if(ta->text == NULL) return;
@@ -176,6 +181,8 @@ void renderText(TextArea *ta){
 	        int kern;
 	        kern = stbtt_GetCodepointKernAdvance(&info, word[i], word[i + 1]);
 	        x += kern * scale;
+
+	        x += ta->min_kern;
 	    }
 
 	    glBindTexture(GL_TEXTURE_2D, ta->glTexture);
@@ -203,11 +210,11 @@ void renderText(TextArea *ta){
 
 	glm::mat4 model;
 	model = glm::translate(model, glm::vec3(ta->x, ta->y, ta->z));
-	model = glm::scale(model, glm::vec3(ta->scale));
+	model = glm::scale(model, ta->scale);
 	
 	shaderSetMat4(ID, "position", model);
 
-	shaderSetVec4(ID, "textColour", glm::vec4(ta->r, ta->g, ta->b, ta->a));
+	shaderSetVec4(ID, "textColour", ta->colour);
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 

@@ -36,6 +36,7 @@ struct Input {
 	bool s_pressed;
 	bool p_pressed;
 	bool u_pressed;
+	bool c_pressed;
 	bool up_pressed;
 	bool down_pressed;
 	bool left_pressed;
@@ -126,13 +127,17 @@ struct GameState {
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 
+	/* FONTS */
+	Font *openSans;
+	Font *comicSans;
+
 	/* INPUT STATE */
 	float input_timeout;
 
 	/* MENU SCREEN STATE */
 	MenuImage *logo;
-	MenuImage *startText;
-	MenuImage *exitText;
+	TextArea *startText;
+	TextArea *exitText;
 	
 	/* FONTS */
 	Font *testFont;
@@ -149,7 +154,7 @@ struct GameState {
 
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
-	MenuImage *resumeText;
+	TextArea *resumeText;
 	bool overlay_active;
 	bool resume_active;
 

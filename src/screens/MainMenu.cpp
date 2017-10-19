@@ -47,24 +47,25 @@ namespace MainMenu{
 		game->logo->scale_vel = 0.1;
 		setupImage("images/logo.png", game->logo, logo_vertices, sizeof(logo_vertices));
 
-		game->startText = new MenuImage();
-		game->startText->x = 0;
-		game->startText->y = -0.2;
+		game->startText = createTextArea(game->comicSans, 700, 512, 128, "START", 7);
+		game->startText->x = 0.25;
+		game->startText->y = -0.4;
 		game->startText->z = 0;
-		game->startText->scale = glm::vec3(0.5);
+		game->startText->scale = glm::vec3(0.1);
 		game->startText->scale_vel = 0;
-		setupImage("images/start.png", game->startText, logo_vertices, sizeof(logo_vertices));
-		
-		game->exitText = new MenuImage();
-		game->exitText->x = 0;
-		game->exitText->y = -0.5;
-		game->exitText->z = 0;
-		game->exitText->scale = glm::vec3(0.3);
-		game->exitText->scale_vel = 0;
-		setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
+		game->startText->colour = glm::vec4(1,0,0,1);
+		// setupImage("images/start.png", game->startText, logo_vertices, sizeof(logo_vertices));
 
-		game->testFont = createFont("./fonts/OpenSans-Regular.ttf");
-		game->testTextArea = createTextArea(game->testFont, 512, 128, 64, "Hello, World!");
+		game->exitText = createTextArea(game->comicSans, 700, 512, 128, "EXIT", 7);
+		game->exitText->x = 0.25;
+		game->exitText->y = -0.7;
+		game->exitText->z = 0;
+		game->exitText->scale = glm::vec3(0.2);
+		game->exitText->scale_vel = 0;
+		// setupImage("images/exit.png", game->exitText, logo_vertices, sizeof(logo_vertices));
+
+		// game->testFont = createFont("./fonts/OpenSans-Regular.ttf");
+		// game->testTextArea = createTextArea(game->testFont, 512, 256, 256, "Hello, World!");
 
 		Shader textShader = Shaders::get("text");
 		useShader(textShader.ID);
@@ -72,12 +73,12 @@ namespace MainMenu{
 	}	
 
 	void update(float time, float deltaTime){
-
-		// game->testFont->y += 1 * deltaTime;
+		
+		game->startText->colour = glm::vec4(sin(time), cos(time), sin(time), 1.0f);
 		
 		MenuImage *logo = game->logo;
-		MenuImage *startText = game->startText;
-		MenuImage *exitText = game->exitText;
+		TextArea *startText = game->startText;
+		TextArea *exitText = game->exitText;
 		
 		logo->scale += glm::vec3(1.0)*logo->scale_vel*deltaTime*0.5f;
 		startText->scale += glm::vec3(1.0)*startText->scale_vel*deltaTime;
@@ -108,15 +109,11 @@ namespace MainMenu{
 		if(game->start_active && input->s_pressed){
 			game->start_active = false;
 			game->exit_active = true;
-
-			setText(game->testTextArea, "S PRESSED!");
 		}
 
 		if(game->exit_active && input->w_pressed){
 			game->start_active = true;
 			game->exit_active = false;
-
-			setText(game->testTextArea, "W PRESSED!!!!");
 		}
 
 		if(input->space_pressed || input->enter_pressed){
@@ -134,27 +131,16 @@ namespace MainMenu{
 		{
 			game->quit_game = true;
 		}
-
-
-		static int t_count = 0;
-		t_count++;
-
-		char buff[500]; 
-		sprintf(buff, "%i", t_count);
-		setText(game->testTextArea, buff);
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
-		game->testTextArea->x = -0.6f;
-		game->testTextArea->y = 0.75f;
-		game->testTextArea->scale = 0.2f;
 		
-
 		renderImage(game->logo);
-		renderImage(game->startText);
-		renderImage(game->exitText);
+		
+		renderText(game->startText);
+		renderText(game->exitText);
 
-		renderText(game->testTextArea);
+		// renderText(game->testTextArea);
 	}
 
 }

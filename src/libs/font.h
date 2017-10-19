@@ -24,15 +24,17 @@ public:
 	unsigned int VBO;
 	unsigned int UVB;
 
-	float scale; //scale the font when rendering
+	glm::vec3 scale; //scale the font when rendering
+	float scale_vel;
 
 	int width;
 	int height;
 	int line_height;
+	int min_kern;
 	unsigned char* bitmap; //used multiple times for text image allocation
 
-	float r,g,b,a; //text colour
-	
+	glm::vec4 colour; //text colour
+
 
 	char* text; // the actual text
 	bool text_set;
@@ -43,7 +45,8 @@ public:
 
 
 Font* createFont(const char* fontPath);
-TextArea* createTextArea(Font* font, int width, int height, int line_height, char* text);
+TextArea* createTextArea(Font* font, int width, int height, int line_height, char* text, int min_kern);
 void setText(TextArea *ta, char* text);
 void renderText(TextArea *ta);
+void setFont(TextArea *ta, Font* newFont);
 #endif

@@ -23,13 +23,12 @@ namespace OverlayMenu{
 		game->overlay->y = 0;
 		game->overlay->z = 5;
 
-		game->resumeText = new MenuImage();
-		game->resumeText->x = 0;
-		game->resumeText->y = -0.2;
+		game->resumeText = createTextArea(game->comicSans, 700, 512, 128, "RESUME", 7);
+		game->resumeText->x = 0.25;
+		game->resumeText->y = -0.4;
 		game->resumeText->z = 0;
 		game->resumeText->scale = glm::vec3(0.4);
 		game->resumeText->scale_vel = 0;
-		setupImage("images/resume.png", game->resumeText, logo_vertices, sizeof(logo_vertices));
 	}	
 
 	void update(float time, float deltaTime){
@@ -47,8 +46,8 @@ namespace OverlayMenu{
 		}
 
 		MenuImage *logo = game->logo;
-		MenuImage *resumeText = game->resumeText;
-		MenuImage *exitText = game->exitText;
+		TextArea *resumeText = game->resumeText;
+		TextArea *exitText = game->exitText;
 		
 		logo->scale += glm::vec3(1.0)*logo->scale_vel*deltaTime*0.5f;
 		resumeText->scale += glm::vec3(1.0)*resumeText->scale_vel*deltaTime;
@@ -108,8 +107,9 @@ namespace OverlayMenu{
 			Entity *overlay = game->overlay;
 
 			renderImage(game->logo);
-			renderImage(game->resumeText);
-			renderImage(game->exitText);
+			
+			renderText(game->resumeText);
+			renderText(game->exitText);
 
 			Shader shader = Shaders::get("flat");
 			unsigned int ID = shader.ID;

@@ -14,5 +14,5 @@ void main()
 	if(c.r == 0 && c.g == 0 && c.b == 0) discard;
 
 
-	fragColor = vec4(textColour.r, textColour.g, textColour.b, ((c.r+c.g+c.b)/2) * textColour.a);
+	fragColor = vec4(textColour.r, textColour.g, textColour.b, c.a);
 }
