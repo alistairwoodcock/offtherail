@@ -136,7 +136,7 @@ static void init(State *state)
 	game->score = 0;
 	game->pointCountdown = 0;
 
-	game->scoreText = createTextArea(game->comicSans, 700, 512, 128, "SCORE: 00000", 12);
+	game->scoreText = createTextArea(game->comicSans, 700, 520, 128, "SCORE: 00000", 12);
 	game->scoreText->x = 0;
 	game->scoreText->y = 0.7;
 	game->scoreText->z = 0;
@@ -369,9 +369,19 @@ static void updateAndRender(){
 		Font* newFont = game->openSans;
 		if(game->startText->font == game->openSans){
 			newFont = game->comicSans;
-		} 
+			game->startText->min_kern = 0;
+			game->exitText->min_kern = 0;
+			game->resumeText->min_kern = 0;
+			game->scoreText->min_kern = 0;
+		} else {
+			game->startText->min_kern = 10;
+			game->exitText->min_kern = 10;
+			game->resumeText->min_kern = 10;
+			game->scoreText->min_kern = 6;
+		}
 
 		setFont(game->startText, newFont);
+
 		setFont(game->exitText, newFont);
 		setFont(game->resumeText, newFont);
 		setFont(game->scoreText, newFont);

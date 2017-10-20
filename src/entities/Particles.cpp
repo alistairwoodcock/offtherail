@@ -123,10 +123,8 @@ namespace Particles {
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
 			model = glm::scale(model, glm::vec3(p->scale));
-			// model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
-			// model = glm::rotate(model, glm::radians(p->x_rot), glm::vec3(1.0, 0.0, 0.0));
-			// model = glm::rotate(model, 2.0f, glm::vec3(1.0, 0.0, 0.0));
-			// model = glm::lookAt(game->camera, )
+			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			model = glm::rotate(model, glm::radians(p->x_rot), glm::vec3(1.0, 0.0, 0.0));
 			model = model*glm::lookAt(glm::vec3(p->x, p->y, p->z), game->camera.Position, glm::vec3(0.0,1.0,0.0));
 			
 			shaderSetMat4(ID, "model", model);
