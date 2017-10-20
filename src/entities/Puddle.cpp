@@ -66,13 +66,14 @@ namespace Puddles {
 		Puddle *puddle = game->puddle;
 		int puddle_count = game->puddle_count;
 
-		Shader trackShader = Shaders::get("track");
+		Shader trackShader = Shaders::get("water");
 		unsigned int ID = trackShader.ID;
 
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
-		shaderSetVec3(ID, "colour", glm::vec3(0.7f, 0.7f, 0.95f));
+		shaderSetVec3(ID, "color", glm::vec3(0.7f, 0.7f, 1.0f));
+        shaderSetFloat(ID, "alpha", 1.0f);
 
         // ENABLE STENCIL
 		glEnable(GL_STENCIL_TEST);
