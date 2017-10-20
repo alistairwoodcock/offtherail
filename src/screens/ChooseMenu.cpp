@@ -105,9 +105,9 @@ namespace ChooseMenu {
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
-		renderImage(game->logo, projection, view);
-		renderImage(game->chooseRight, projection, view);
-		renderImage(game->chooseLeft, projection, view);
+		renderImage(game->logo);
+		renderImage(game->chooseRight);
+		renderImage(game->chooseLeft);
 		
 		// Draw Mr Train
 		Model *trainModel = game->trainModel;

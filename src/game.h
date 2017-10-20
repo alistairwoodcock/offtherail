@@ -19,7 +19,10 @@
 #include "entities/Grass.h"
 #include "entities/Puddle.h"
 
+#include "libs/font.h"
 #include "screens/MenuImage.h"
+
+
 
 
 enum Screens {
@@ -35,6 +38,7 @@ struct Input {
 	bool s_pressed;
 	bool p_pressed;
 	bool u_pressed;
+	bool c_pressed;
 	bool up_pressed;
 	bool down_pressed;
 	bool left_pressed;
@@ -136,13 +140,19 @@ struct GameState {
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 
+	/* FONTS */
+	Font *openSans;
+	Font *comicSans;
+
 	/* INPUT STATE */
 	float input_timeout;
 
 	/* MENU SCREEN STATE */
 	MenuImage *logo;
-	MenuImage *startText;
-	MenuImage *exitText;
+	TextArea *startText;
+	TextArea *exitText;
+	
+
 	bool start_active;
 	bool exit_active;
 
@@ -155,7 +165,7 @@ struct GameState {
 
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;
-	MenuImage *resumeText;
+	TextArea *resumeText;
 	bool overlay_active;
 	bool resume_active;
 
@@ -168,6 +178,13 @@ struct GameState {
 	unsigned int shadowDepthMapFBO;
 	unsigned int shadowDepthMap;
 	bool showDepthMap;
+
+	/* SCORING STATE */
+	int score;
+	float pointCountdown;
+
+	TextArea *scoreText;
+
 	
 };
 
