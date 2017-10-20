@@ -241,6 +241,8 @@ Input get_current_input(GLFWwindow* window){
 	in.right_bracket_pressed = (glfwGetKey(window, GLFW_KEY_RIGHT_BRACKET) == GLFW_PRESS);
 	in.semicolon_pressed = (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS);
 	in.apostrophe_pressed = (glfwGetKey(window, GLFW_KEY_APOSTROPHE) == GLFW_PRESS);
+	in.left_shift_pressed = (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+	in.right_shift_pressed = (glfwGetKey(window, GLFW_KEY_RIGHT_SHIFT) == GLFW_PRESS);
 
 	return in;
 }

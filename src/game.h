@@ -17,6 +17,7 @@
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
+#include "entities/Puddle.h"
 
 #include "libs/font.h"
 #include "screens/MenuImage.h"
@@ -49,6 +50,8 @@ struct Input {
 	bool right_bracket_pressed;
 	bool semicolon_pressed;
 	bool apostrophe_pressed;
+	bool left_shift_pressed;
+	bool right_shift_pressed;
 };
 
 struct PlatformState {
@@ -125,6 +128,10 @@ struct GameState {
     int grass_count;
     Grass* grass;
 
+    /* PUDDLE STATE */
+    int puddle_count;
+    Puddle* puddle;
+
 	/* TRAIN STATE */ 
 	Model *trainModel;
 	Train *train;
@@ -151,6 +158,7 @@ struct GameState {
 
     /* CHOOSE SCREEN STATE */
     Train *chooseTrain;
+    Entity *chooseFloor;
     TrainTypes currentTrain;
     MenuImage *chooseRight;
     MenuImage *chooseLeft;
