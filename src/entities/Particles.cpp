@@ -70,6 +70,10 @@ namespace Particles {
 			p->y_vel += 0.98 * deltaTime;
 
 			p->z_rot += (std::rand()%100/123.4f) * deltaTime;
+			
+			static float sad = 0;
+			sad += 0.01;
+			p->x_rot = 0.01;
 
 			p->alpha -= 0.1 * deltaTime;
 			
@@ -119,7 +123,11 @@ namespace Particles {
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
 			model = glm::scale(model, glm::vec3(p->scale));
-			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			// model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			// model = glm::rotate(model, glm::radians(p->x_rot), glm::vec3(1.0, 0.0, 0.0));
+			// model = glm::rotate(model, 2.0f, glm::vec3(1.0, 0.0, 0.0));
+			// model = glm::lookAt(game->camera, )
+			model = model*glm::lookAt(glm::vec3(p->x, p->y, p->z), game->camera.Position, glm::vec3(0.0,1.0,0.0));
 			
 			shaderSetMat4(ID, "model", model);
 			shaderSetFloat(ID, "alpha", p->alpha);

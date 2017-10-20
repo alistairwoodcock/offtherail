@@ -349,6 +349,8 @@ static void updateAndRender(){
 			renderText(game->scoreText);
 
 		} break;
+
+
 	}
 
 	/* -- FONT UPDATE -- */
