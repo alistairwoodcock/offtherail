@@ -11,9 +11,6 @@ public:
 	vector<glm::mat4> trackPieceTransforms;
 	vector<vector<GLfloat>> controlPoints;
 
-	
-	
-	
 };
 
 

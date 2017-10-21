@@ -23,7 +23,7 @@ namespace Switches {
 		
 		float XDIFF = DIST_BETWEEN_TRACKS;
 		
-		bool left;		//Is the track switching to the left?
+		bool left = false;		//Is the track switching to the left?
 		if (left) {
 			XDIFF = -XDIFF;
 		}
