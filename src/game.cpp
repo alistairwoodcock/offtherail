@@ -288,9 +288,7 @@ static void updateAndRender(){
 			}
 			
 			if(!game->paused){
-				//update camera based on state
-				//this is just for now, we're going to have a fixed camera in the future.
-
+				
 				Grasses::update(platform->currTime, platform->deltaTime);
 				Puddles::update(platform->currTime, platform->deltaTime);
 				Trains::update(platform->currTime, platform->deltaTime);

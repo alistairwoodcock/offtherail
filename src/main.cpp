@@ -183,6 +183,29 @@ int main(){
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
 
+			float frame = game.state->platform.deltaTime*1000;
+			#define avg_max 50
+			static float avg[avg_max] = {0};
+			static int avg_i = 0;
+
+			avg[avg_i] = frame;
+
+			if(avg_i+1 == avg_max)
+			{
+				float total = 0;
+				for(int i = 0; i < avg_max; i++) total += avg[i];
+				total /= avg_max;
+				printf("time: %f\n", total);
+				
+				avg_i = 0;
+			}
+			else
+			{
+				avg_i++;
+			}
+			
+
+
 			float sleep_time_ms = 33 - game.state->platform.deltaTime * 1000;
 
 			if(sleep_time_ms > 0){
