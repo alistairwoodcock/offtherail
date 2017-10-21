@@ -17,6 +17,7 @@
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
+#include "entities/Switch.h"
 
 #include "libs/font.h"
 #include "screens/MenuImage.h"
@@ -121,6 +122,9 @@ struct GameState {
 	int maxSwitches;
 	float nextSwitchCountdown;
 	int selectedSwitch;
+
+	Switch* curvedSwitches;
+	Model* switchModel;
 
     /* GRASS STATE */
     int grass_count;

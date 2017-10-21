@@ -29,6 +29,7 @@
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
+#include "entities/Switch.cpp"
 
 #include "screens/MainMenu.cpp"
 #include "screens/ChooseMenu.cpp"
@@ -96,6 +97,8 @@ static void init(State *state)
 
 	/* -- Track Setup -- */
 	Tracks::setup();
+
+	Switches::setup();
 	
 	/* -- Menu Setup --*/
 	MainMenu::setup();
@@ -332,6 +335,7 @@ static void updateAndRender(){
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
 
+			Switches::render(projection, view);
 			
 			if(game->showDepthMap)
 			{
