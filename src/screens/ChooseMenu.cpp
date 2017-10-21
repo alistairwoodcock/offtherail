@@ -157,6 +157,10 @@ namespace ChooseMenu {
 		
 			// Reflections??
             Entity *floor = game->chooseFloor;
+		    
+            Shader floorShader = Shaders::get("particle");
+    		unsigned int floorID = floorShader.ID;
+    		useShader(floorID);
 
 			glBindVertexArray(game->Particle_VAO);
 			model = glm::mat4();
@@ -165,9 +169,11 @@ namespace ChooseMenu {
 		    model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
 			model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
 			
-            shaderSetMat4(ID, "model", model);
-			shaderSetVec3(ID, "color", glm::vec3(0.5));
-			shaderSetFloat(ID, "alpha", 0.5);
+		    shaderSetMat4(floorID, "projection", projection);
+		    shaderSetMat4(floorID, "view", view);
+            shaderSetMat4(floorID, "model", model);
+			shaderSetVec3(floorID, "color", glm::vec3(0.9, 0.9, 1.0));
+			shaderSetFloat(floorID, "alpha", 1.0);
 
 			glEnable(GL_STENCIL_TEST);
 			
@@ -178,13 +184,15 @@ namespace ChooseMenu {
 			glDepthMask(GL_FALSE);
 			glClear(GL_STENCIL_BUFFER_BIT);
 
-			glDrawArrays(GL_TRIANGLES, 0, 36);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
 
 			glStencilFunc(GL_EQUAL, 1, 0xFF);
 			glStencilMask(0x00);
 			glDepthMask(GL_TRUE);
 			glBindVertexArray(0);
 		
+            // Swap back to train shader
+            useShader(ID);
 			model = glm::mat4(); 
 			model = glm::translate(model, glm::vec3(train->x, 3*floor->y - train->y, train->z));
 			
