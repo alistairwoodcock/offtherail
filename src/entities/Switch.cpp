@@ -66,11 +66,22 @@ namespace Switches {
 		}
 	}
 
+
+	void update(float time, float deltaTime) {
+
+		//update tracks and also get the furthest behind
+		int lastTrack = 0;
+		Switch* s = game->curvedSwitches;
+		s->z -= 0.02;
+		
+	}
+
 	void render(glm::mat4 &projection, glm::mat4 &view)
 	{
 		
 		std::cout << "Render Switch" << game->curvedSwitches->trackPieceTransforms.size() << std::endl;
 		Model* switchModel = game->switchModel;
+		Switch* s = game->curvedSwitches;
 
 		Shader switchShader = Shaders::get("switch");
 		unsigned int ID = switchShader.ID;
@@ -78,6 +89,11 @@ namespace Switches {
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
+
+		//Create model matrix to translate the switch to the correct position
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(s->x, s->y, s->z));
+		shaderSetMat4(ID, "model", model);
 
 		//Loop through each mesh of the model and draw an instance of the track	
 		for (unsigned int i = 0; i < switchModel->meshes.size(); i++)

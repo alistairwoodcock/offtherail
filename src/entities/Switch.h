@@ -10,8 +10,6 @@ public:
 	unsigned int switchVBO;
 	vector<glm::mat4> trackPieceTransforms;
 	vector<vector<GLfloat>> controlPoints;
-
-	
 	
 	
 };
