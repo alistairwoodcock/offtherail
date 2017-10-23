@@ -37,6 +37,8 @@ namespace Trains {
 		game->bogieFront->currentTrack = 1;
 		game->bogieBack->z = 9;
 		game->bogieBack->currentTrack = 1;
+
+        game->fallen = false;
     }
 
 	void setup() {
@@ -107,6 +109,17 @@ namespace Trains {
 
 		// Track *t = Tracks::getSelectedTrack();
 		// bogieFront->x = t->x;
+        
+        if(game->fallen) {
+			train->z_rot = M_PI / 2;
+			if(bogieFront->x > bogieBack->x){
+				train->z_rot *= -1;	
+			}
+			
+			if(game->speed > 0) game->speed -= 50 * deltaTime;
+			if(game->speed < 0) game->speed = 0;
+            return;
+		}
 		
 		for(int i = 0; i < game->switchesCount; i++)
 		{
@@ -149,16 +162,9 @@ namespace Trains {
 			train->z = (bogieBack->z + bogieFront->z)/2;
 			train->z_rot = 0;
 		} else {
-			train->z_rot = M_PI / 2;
-			if(bogieFront->x > bogieBack->x){
-				train->z_rot *= -1;	
-				
-			}
-			
-            //TODO(AL): Make this a flag for fallen over we can check
-			if(game->speed > 0) game->speed -= 50 * deltaTime;
-			if(game->speed < 0) game->speed = 0;
-		}
+            game->fallen = true;
+        }
+
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){

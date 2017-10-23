@@ -51,11 +51,30 @@ namespace Particles {
 
 	}
 
+    void reset(Particle *p, bool sparkTime) {
+		float r = std::rand()%100/12.3f;
+		// printf("%f\n", r);
+		p->y = -1.7;
+		p->x = game->bogieBack->x + (std::rand()%2 == 0 ? 0.7 : -0.7);
+		p->z = 8;
+
+		p->x_vel = ((std::rand()%100) - (std::rand()%100))/73.2f;
+		p->y_vel = 0 + std::rand()%100/103.2;
+		p->z_vel = game->speed/16.2f + r;//((std::rand()%100) - (std::rand()%100))/300.0;
+		p->scale = r/81.3f;
+		if(p->y_vel >= 2) p->y_vel = 1;
+
+		p->alpha = 0.5 + r/50.0f;
+				
+		p->render = sparkTime;
+    }
+
 	void update(float time, float deltaTime){
 		int particle_count = game->particle_count;
 		Particle *particles = game->particles;
 
 		bool sparkTime = (game->bogieBack->currentTrack != game->bogieFront->currentTrack);
+        sparkTime = sparkTime && !game->fallen;
 
 		for(int i = 0; i < particle_count; i++)
 		{	
@@ -77,24 +96,8 @@ namespace Particles {
 
 			p->alpha -= 0.1 * deltaTime;
 			
-			if(p->y < -2 || p->z > 30)
-			{
-				
-				float r = std::rand()%100/12.3f;
-				// printf("%f\n", r);
-				Entity *train = game->train;
-				p->y = -1.7;
-				p->x = game->bogieBack->x + (std::rand()%2 == 0 ? 0.7 : -0.7);
-				p->z = 8;
-				p->x_vel = ((std::rand()%100) - (std::rand()%100))/73.2f;
-				p->y_vel = 0 + std::rand()%100/103.2;
-				p->z_vel = game->speed/16.2f + r;//((std::rand()%100) - (std::rand()%100))/300.0;
-				p->scale = r/81.3f;
-				if(p->y_vel >= 2) p->y_vel = 1;
-
-				p->alpha = 0.5 + r/50.0f;
-				
-				p->render = sparkTime;
+			if(p->y < -2 || p->z > 30) {
+		        reset(p, sparkTime);		
 			}
 		}
 	}

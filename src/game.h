@@ -137,6 +137,7 @@ struct GameState {
 	Train *train;
 	Bogie *bogieFront;
 	Bogie *bogieBack;
+    bool fallen; // Help I've fallen and I can't get up
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 
