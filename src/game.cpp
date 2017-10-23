@@ -409,6 +409,7 @@ void changeScreen(Screens screen) {
 
 		case GAME: {
             game->score = 0;
+			setText(game->scoreText, "SCORE: 00000");
             game->speed = 70;
             Trains::reset();
             Tracks::reset();
