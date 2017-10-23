@@ -21,32 +21,34 @@ namespace Trains {
 		game->trainModel = game->trainModels[type];
 		game->currentTrain = type;
     }
-    
-	void setup(){
+   
+    void reset() {
+        // Size and scale for the train
+        game->train->size = glm::vec3(1.0f);
+        updateScale();
 
+        // Train location itself
+		game->train->x = 0;
+		game->train->y = game->ground;
+		game->train->z = 0.0f;
 
+        // Bogie positions for the front and back of the train
+		game->bogieFront->z = -1;
+		game->bogieFront->currentTrack = 1;
+		game->bogieBack->z = 9;
+		game->bogieBack->currentTrack = 1;
+    }
+
+	void setup() {
         setupTrainModels();
 
 		game->train = new Train();
 		setTrainModel(DEFAULT);
 
-        glm::vec3 s = game->trainModel->size;
-        printf("Train size is %f,%f,%f\n", s.x,s.y,s.z);
-
-		game->train->x = 0;
-		game->train->y = game->ground;
-		game->train->z = 0.0f;
-
-        game->train->size = glm::vec3(1.0f);
-        updateScale();
-
 		game->bogieFront = new Bogie();
-		game->bogieFront->z = -1;
-		game->bogieFront->currentTrack = 1;
-
 		game->bogieBack = new Bogie();
-		game->bogieBack->z = 9;
-		game->bogieBack->currentTrack = 1;
+        
+        reset();
 	}
 
 	void update(float time, float deltaTime){

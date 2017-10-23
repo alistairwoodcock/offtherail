@@ -408,6 +408,10 @@ void changeScreen(Screens screen) {
 		} break;
 
 		case GAME: {
+            game->score = 0;
+            game->speed = 70;
+            Trains::reset();
+            Tracks::reset();
 			Music::play("sounds/dejavu.wav");
 		} break;
 	}
