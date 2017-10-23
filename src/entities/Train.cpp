@@ -153,10 +153,11 @@ namespace Trains {
 			if(bogieFront->x > bogieBack->x){
 				train->z_rot *= -1;	
 				
-				//TODO(AL): Make this a flag for fallen over we can check
-				if(game->speed > 0) game->speed -= 50 * deltaTime;
-				if(game->speed < 0) game->speed = 0;
 			}
+			
+            //TODO(AL): Make this a flag for fallen over we can check
+			if(game->speed > 0) game->speed -= 50 * deltaTime;
+			if(game->speed < 0) game->speed = 0;
 		}
 	}
 
