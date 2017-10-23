@@ -71,8 +71,16 @@ namespace Switches {
 
 		//update tracks and also get the furthest behind
 		int lastTrack = 0;
+		float deltaPos = 0.02;
 		Switch* s = game->curvedSwitches;
-		s->z -= 0.02;
+		s->z -= deltaPos;
+
+		//Update the control points so the getPointAt method still works.
+		//Note this should be plus delta not minus to move towards the camera.
+		game->curvedSwitches->controlPoints[0][2] -= deltaPos;
+		game->curvedSwitches->controlPoints[1][2] -= deltaPos;
+		game->curvedSwitches->controlPoints[2][2] -= deltaPos;
+		game->curvedSwitches->controlPoints[3][2] -= deltaPos;
 		
 	}
 
