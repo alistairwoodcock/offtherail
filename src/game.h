@@ -18,6 +18,7 @@
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
 #include "entities/Switch.h"
+#include "entities/Puddle.h"
 
 #include "libs/font.h"
 #include "screens/MenuImage.h"
@@ -39,6 +40,7 @@ struct Input {
 	bool p_pressed;
 	bool u_pressed;
 	bool c_pressed;
+	bool m_pressed;
 	bool up_pressed;
 	bool down_pressed;
 	bool left_pressed;
@@ -50,6 +52,8 @@ struct Input {
 	bool right_bracket_pressed;
 	bool semicolon_pressed;
 	bool apostrophe_pressed;
+	bool left_shift_pressed;
+	bool right_shift_pressed;
 };
 
 struct PlatformState {
@@ -117,18 +121,32 @@ struct GameState {
 	int selectedTrack;
 
 	/* TRACK SWITCH STATE */
-	TrackSwitch switches[20];
+	Switch switches[20];
 	int switchesCount;
 	int maxSwitches;
 	float nextSwitchCountdown;
 	int selectedSwitch;
 
-	Switch* curvedSwitches;
-	Model* switchModel;
+	Model* leftSwitchModel;
+	unsigned int leftSwitchVBO;
+	vector<vector<GLfloat>> leftControlPoints;
+	vector<glm::mat4> leftTrackPieceTransforms;
+	
+	Model* rightSwitchModel;
+	unsigned int rightSwitchVBO;
+	vector<vector<GLfloat>> rightControlPoints;
+	vector<glm::mat4> rightTrackPieceTransforms;
+	
 
-    /* GRASS STATE */
+
+
+	/* GRASS STATE */
     int grass_count;
     Grass* grass;
+
+    /* PUDDLE STATE */
+    int puddle_count;
+    Puddle* puddle;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;
@@ -156,6 +174,7 @@ struct GameState {
 
     /* CHOOSE SCREEN STATE */
     Train *chooseTrain;
+    Entity *chooseFloor;
     TrainTypes currentTrain;
     MenuImage *chooseRight;
     MenuImage *chooseLeft;

@@ -24,12 +24,13 @@
 #include "entities/Camera.h"
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
+#include "entities/Puddle.cpp"
+#include "entities/Switch.cpp"
 #include "entities/Track.cpp"
 #include "entities/Train.cpp"
 #include "entities/Lights.cpp"
 #include "entities/Ground.cpp"
 #include "entities/SkyBox.cpp"
-#include "entities/Switch.cpp"
 
 #include "screens/MainMenu.cpp"
 #include "screens/ChooseMenu.cpp"
@@ -81,6 +82,7 @@ static void init(State *state)
 
     /* -- Grasss Setup -- */
     Grasses::setup();
+    Puddles::setup();
     
     /* -- Camera Setup -- */
     game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
@@ -137,7 +139,7 @@ static void init(State *state)
 	game->score = 0;
 	game->pointCountdown = 0;
 
-	game->scoreText = createTextArea(game->comicSans, 700, 512, 128, "SCORE: 00000", 12);
+	game->scoreText = createTextArea(game->comicSans, 700, 520, 128, "SCORE: 00000", 12);
 	game->scoreText->x = 0;
 	game->scoreText->y = 0.7;
 	game->scoreText->z = 0;
@@ -254,6 +256,7 @@ static void updateAndRender(){
 					game->camera_locked = true;	
 					game->input_timeout = 0.1;
 					camera->Reset();
+                    game->speed = 70; // Reset speed
 				}
 			}
 
@@ -270,6 +273,8 @@ static void updateAndRender(){
 				if(platform->input.semicolon_pressed) camera->UpdatePosition(ROT_LEFT, platform->deltaTime);
 				if(platform->input.apostrophe_pressed) camera->UpdatePosition(ROT_RIGHT, platform->deltaTime);
 
+				if(platform->input.left_shift_pressed) game->speed -= 1;
+				if(platform->input.right_shift_pressed) game->speed += 1;
 			} else {
 				if(platform->input.apostrophe_pressed){
 					game->showDepthMap = !game->showDepthMap;
@@ -286,10 +291,9 @@ static void updateAndRender(){
 			}
 			
 			if(!game->paused){
-				//update camera based on state
-				//this is just for now, we're going to have a fixed camera in the future.
-
+				
 				Grasses::update(platform->currTime, platform->deltaTime);
+				Puddles::update(platform->currTime, platform->deltaTime);
 				Trains::update(platform->currTime, platform->deltaTime);
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
@@ -326,18 +330,20 @@ static void updateAndRender(){
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 			// render scene 
-			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
-
 			SkyBoxes::render(projection, view);
+		glDepthMask(GL_FALSE);
+			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
+            Puddles::render(projection, view);
+		glDepthMask(GL_TRUE);
+
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
 			Tracks::render(projection, view);
+			Switches::render(projection, view);
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
 
-			Switches::render(projection, view);
-			
 			if(game->showDepthMap)
 			{
 				Shader debug = Shaders::get("debugQuad");
@@ -354,6 +360,8 @@ static void updateAndRender(){
 			renderText(game->scoreText);
 
 		} break;
+
+
 	}
 
 	/* -- FONT UPDATE -- */
@@ -363,9 +371,19 @@ static void updateAndRender(){
 		Font* newFont = game->openSans;
 		if(game->startText->font == game->openSans){
 			newFont = game->comicSans;
-		} 
+			game->startText->min_kern = 0;
+			game->exitText->min_kern = 0;
+			game->resumeText->min_kern = 0;
+			game->scoreText->min_kern = 0;
+		} else {
+			game->startText->min_kern = 10;
+			game->exitText->min_kern = 10;
+			game->resumeText->min_kern = 10;
+			game->scoreText->min_kern = 6;
+		}
 
 		setFont(game->startText, newFont);
+
 		setFont(game->exitText, newFont);
 		setFont(game->resumeText, newFont);
 		setFont(game->scoreText, newFont);

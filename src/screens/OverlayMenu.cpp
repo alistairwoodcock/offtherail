@@ -23,15 +23,18 @@ namespace OverlayMenu{
 		game->overlay->y = 0;
 		game->overlay->z = 5;
 
-		game->resumeText = createTextArea(game->comicSans, 700, 512, 128, "RESUM", 7);
-		game->resumeText->x = 0.25;
+		game->resumeText = createTextArea(game->comicSans, 320, 128, 128, "RESUM", 7);
+		game->resumeText->x = 0.0;
 		game->resumeText->y = -0.4;
 		game->resumeText->z = 0;
-		game->resumeText->scale = glm::vec3(0.4);
+		game->resumeText->scale = glm::vec3(0.15);
 		game->resumeText->scale_vel = 0;
 	}	
 
 	void update(float time, float deltaTime){
+
+		game->resumeText->x = 0.0;
+		game->resumeText->y = -0.2;
 		
 		Input input = platform->input;
 
@@ -57,19 +60,19 @@ namespace OverlayMenu{
 		if(logo->scale.x <= 1.17) logo->scale_vel = 0.1;
 		
 		if(game->resume_active){
-			if(resumeText->scale.x < 0.4) resumeText->scale_vel = 0.5;
-			if(resumeText->scale.x >= 0.4) resumeText->scale_vel = 0;
+			if(resumeText->scale.x < 0.15) resumeText->scale_vel = 0.5;
+			if(resumeText->scale.x >= 0.15) resumeText->scale_vel = 0;
 		} else {
-			if(resumeText->scale.x > 0.3) resumeText->scale_vel = -0.5;
-			if(resumeText->scale.x <= 0.3) resumeText->scale_vel = 0;
+			if(resumeText->scale.x > 0.07) resumeText->scale_vel = -0.5;
+			if(resumeText->scale.x <= 0.07) resumeText->scale_vel = 0;
 		}
 
 		if(game->exit_active){
-			if(exitText->scale.x < 0.4) exitText->scale_vel = 0.5;
-			if(exitText->scale.x >= 0.4) exitText->scale_vel = 0;
+			if(exitText->scale.x < 0.15) exitText->scale_vel = 0.5;
+			if(exitText->scale.x >= 0.15) exitText->scale_vel = 0;
 		} else {
-			if(exitText->scale.x > 0.3) exitText->scale_vel = -0.5;
-			if(exitText->scale.x <= 0.3) exitText->scale_vel = 0;
+			if(exitText->scale.x > 0.07) exitText->scale_vel = -0.5;
+			if(exitText->scale.x <= 0.07) exitText->scale_vel = 0;
 		}
 
 

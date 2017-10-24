@@ -108,18 +108,18 @@ namespace Trains {
 		
 		for(int i = 0; i < game->switchesCount; i++)
 		{
-			TrackSwitch *s = &game->switches[i];
+			Switch *s = &game->switches[i];
 
 			if(s->fromTrack == bogieFront->currentTrack)
 			{
-				if(s->z > bogieFront->z && abs(s->z - bogieFront->z) < 5 && s->rotate_speed == 0){
+				if(s->z > bogieFront->z && abs(s->z - bogieFront->z) < 5){
 					bogieFront->currentTrack = s->toTrack;
 				}
 			}
 
 			if(s->fromTrack == bogieBack->currentTrack)
 			{
-				if(s->z > bogieBack->z && abs(s->z - bogieBack->z) < 5 && s->rotate_speed == 0){
+				if(s->z > bogieBack->z && abs(s->z - bogieBack->z) < 5){
 					bogieBack->currentTrack = s->toTrack;
 				}
 			}
