@@ -200,6 +200,7 @@ State *GlobalState;
 GameState* game;
 PlatformState* platform;
 
+void reset();
 void changeScreen(Screens screen);
 void paused(bool paused);
 

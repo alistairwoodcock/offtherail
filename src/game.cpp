@@ -48,15 +48,15 @@ static void init(State *state)
 	game = &state->game_state;
 	platform = &state->platform;
 
-    //Game state for runtime
-    game->game_started = false;
-    game->quit_game = false;
-    
-    game->camera_locked = true;
-    game->input_timeout = 0;
+	//Game state for runtime
+	game->game_started = false;
+	game->quit_game = false;
+	
+	game->camera_locked = true;
+	game->input_timeout = 0;
 
-    game->ground = -2;
-    game->speed = 70;
+	game->ground = -2;
+	game->speed = 70;
 
 	game->showDepthMap = false;
 
@@ -66,26 +66,26 @@ static void init(State *state)
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
-    /* -- Music Setup -- */
-    Music::init(); // Need to init before first changeScreen()
+	/* -- Music Setup -- */
+	Music::init(); // Need to init before first changeScreen()
 	
 	/* -- Shaders Setup -- */
 	Shaders::setup();
 
  
-    /* -- Particles Setup -- */
-    Particles::setup();
-    
-    /* -- Lights Setup -- */
-    Lights::setup();
+	/* -- Particles Setup -- */
+	Particles::setup();
+	
+	/* -- Lights Setup -- */
+	Lights::setup();
 
-    /* -- Grasss Setup -- */
-    Grasses::setup();
-    Puddles::setup();
-    
-    /* -- Camera Setup -- */
-    game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
-    
+	/* -- Grasss Setup -- */
+	Grasses::setup();
+	Puddles::setup();
+	
+	/* -- Camera Setup -- */
+	game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
+	
 	/* -- Font Setup -- */
 	game->openSans = createFont("./fonts/OpenSans-Regular.ttf");
 	game->comicSans = createFont("./fonts/comic.ttf");
@@ -154,8 +154,8 @@ void renderQuad()
 	if (quadVAO == 0)
 	{
 		float quadVertices[] = {
-			// positions        // texture Coords
-			-1.0f,  -0.25f, 0.0f, 0.0f, 1.0f,
+			// positions		// texture Coords
+			-1.0f,	-0.25f, 0.0f, 0.0f, 1.0f,
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
 			 -0.25f, -0.25f, 0.0f, 1.0f, 1.0f,
 			 -0.25f, -1.0f, 0.0f, 1.0f, 0.0f,
@@ -253,7 +253,7 @@ static void updateAndRender(){
 					game->camera_locked = true;	
 					game->input_timeout = 0.1;
 					camera->Reset();
-                    game->speed = 70; // Reset speed
+					game->speed = 70; // Reset speed
 				}
 			}
 
@@ -331,7 +331,7 @@ static void updateAndRender(){
 			SkyBoxes::render(projection, view);
 		glDepthMask(GL_FALSE);
 			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
-            Puddles::render(projection, view);
+			Puddles::render(projection, view);
 		glDepthMask(GL_TRUE);
 
 			Lights::render(projection, view);
@@ -392,6 +392,14 @@ static void updateAndRender(){
 
 }
 
+void reset() {
+	game->score = 0;
+	setText(game->scoreText, "SCORE: 00000");
+	game->speed = 70;
+	Trains::reset();
+	Tracks::reset();
+}
+
 void changeScreen(Screens screen) {
 	if (screen == GAME) Trains::updateScale();
 
@@ -408,11 +416,6 @@ void changeScreen(Screens screen) {
 		} break;
 
 		case GAME: {
-            game->score = 0;
-			setText(game->scoreText, "SCORE: 00000");
-            game->speed = 70;
-            Trains::reset();
-            Tracks::reset();
 			Music::play("sounds/dejavu.wav");
 		} break;
 	}
@@ -420,8 +423,8 @@ void changeScreen(Screens screen) {
 }
 
 void paused(bool paused) {
-    game->paused = paused;
-    Music::pause(paused);
+	game->paused = paused;
+	Music::pause(paused);
 }
 
 static bool shouldClose(){
@@ -434,7 +437,7 @@ static bool shouldClose(){
 static void finalize(State *state){
 	printf("FINALIZE\n");
 	free(state);
-    Music::destroy();
+	Music::destroy();
 }
 
 static void reload(State *state){
