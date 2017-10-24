@@ -15,6 +15,7 @@ namespace Music {
 	ALfloat ListenerOri[] = { 0.0, 0.0, -1.0,  0.0, 1.0, 0.0 };
 
 	ALboolean LoadMusic(Sound &sound, const char* file) {
+		game->current = file;
 		auto search = game->sounds->find(file);
 		if (search != game->sounds->end()) {
 			sound = search->second;
@@ -24,7 +25,6 @@ namespace Music {
 		Sound s = {0};
 
 		printf("Loading %s\n", file);
-		game->current = file;
 		s.Buffer = alutCreateBufferFromFile(file);
 
 		// Check for alut error
@@ -42,8 +42,8 @@ namespace Music {
 			return AL_FALSE;
 
 		alSourcei (s.Source, AL_BUFFER,   s.Buffer);
-		alSourcef (s.Source, AL_PITCH,    1.0);
-		alSourcef (s.Source, AL_GAIN,     1.0);
+		alSourcef (s.Source, AL_PITCH,	  1.0);
+		alSourcef (s.Source, AL_GAIN,	  1.0);
 		alSourcefv(s.Source, AL_POSITION, SourcePos);
 		alSourcefv(s.Source, AL_VELOCITY, SourceVel);
 		alSourcei (s.Source, AL_LOOPING,  AL_TRUE);
