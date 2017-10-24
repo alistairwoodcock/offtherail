@@ -401,12 +401,9 @@ void reset() {
 }
 
 void changeScreen(Screens screen) {
-	if (screen == GAME) Trains::updateScale();
-
 	game->current_screen = screen; 
 
-	switch(screen)
-	{
+	switch(screen) {
 		case MAIN_MENU: {
 			Music::play("sounds/running90s.wav");
 		} break;
