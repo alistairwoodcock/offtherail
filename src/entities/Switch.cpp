@@ -46,13 +46,38 @@ namespace Switches {
 		
 	}
 
-	void changeSwitch(int i, int toTrack){
-
-	
-	}
-
 	void toggleSwitch(int i){
+		Switch *s = &game->switches[i];
 
+		int from = s->fromTrack;
+		int to = s->toTrack;
+
+		switch(from){
+			case 0: {
+				if(to == 0) to = 1;
+				else to = 0;
+			} break;
+
+			case 1: {
+				if(s->left)
+				{
+					if(to == 1) to == 0;
+					else to = 1;
+				}
+				else
+				{
+					if(to == 1) to = 2;
+					else to = 1;
+				}
+			} break;
+
+			case 2: {
+				if(to == 2) to = 1;
+				else to = 0;
+			} break;
+		}
+
+		s->toTrack = to;
 	}
 
 	void update(float time, float deltaTime){
@@ -323,65 +348,6 @@ namespace Switches {
 		}
 
 	}
-
-
-	Vertex getPointAt(State *state, unsigned int curveIndex, GLfloat t)
-	{
-		// GameState *game = &state->game_state;
-
-		// if (t < 0 || t > 1) {
-		// 	//Maybe they forgot to convert?
-		// 	//curveIndex = timeToCurveIndex(t);
-		// 	//t = t - curveIndex;
-		// 	//if (t < 0 || t > 1) {
-		// 		//Nope they're idiots, Invalid t, Exception?
-		// 		//Return empty Vertex for now, so it doesn't crash the program
-		// 	//	cout << "Error finding point at t with t = " << t << endl;
-		// 	//	return Vertex();
-		// 	//}
-		// }
-
-		// //Skip through the cotrol points until we get to the current curve
-		// unsigned int index = 0; //curveIndex * 4;
-		// vector<GLfloat> p0 = game->controlPoints[index];
-		// vector<GLfloat> p1 = game->controlPoints[index + 1];
-		// vector<GLfloat> p2 = game->controlPoints[index + 2];
-		// vector<GLfloat> p3 = game->controlPoints[index + 3];
-
-		// // nice to pre-calculate 1.0f-t because we will need it frequently
-		// float it = 1.0f - t;
-
-		// // calculate blending functions
-		// float b0 = t*t*t;
-		// float b1 = 3 * t*t*it;
-		// float b2 = 3 * t*it*it;
-		// float b3 = it*it*it;
-
-		// // calculate the x,y and z of the curve point by summing
-		// // the Control vertices weighted by their respective blending
-		// // functions
-		// float x = b3*p0[0] +
-		// 	b2*p1[0] +
-		// 	b1*p2[0] +
-		// 	b0*p3[0];
-
-		// //This should always be zero
-		// float y = b3*p0[1] +
-		// 	b2*p1[1] +
-		// 	b1*p2[1] +
-		// 	b0*p3[1];
-
-		// float z = b3*p0[2] +
-		// 	b2*p1[2] +
-		// 	b1*p2[2] +
-		// 	b0*p3[2];
-
-		// //Shouldnt it be -v t?????
-		// Vertex v;
-		// v.Position = glm::vec3(x, y, z);
-		// return v;
-	}
-
 	Vertex getTangentAt(bool left, unsigned int curveIndex, GLfloat t)
 	{
 		if (t < 0 || t > 1) {
