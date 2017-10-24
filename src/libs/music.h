@@ -19,8 +19,8 @@
 
 class Sound {
 public:
-    ALuint Buffer; // Buffer to hold the sound data.
-    ALuint Source; // Source is the point of emission.
+	ALuint Buffer; // Buffer to hold the sound data.
+	ALuint Source; // Source is the point of emission.
 };
 
 #endif

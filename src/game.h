@@ -39,6 +39,7 @@ struct Input {
 	bool p_pressed;
 	bool u_pressed;
 	bool c_pressed;
+	bool m_pressed;
 	bool up_pressed;
 	bool down_pressed;
 	bool left_pressed;
@@ -137,6 +138,7 @@ struct GameState {
 	Train *train;
 	Bogie *bogieFront;
 	Bogie *bogieBack;
+    bool fallen; // Help I've fallen and I can't get up
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 
@@ -199,6 +201,7 @@ State *GlobalState;
 GameState* game;
 PlatformState* platform;
 
+void reset();
 void changeScreen(Screens screen);
 void paused(bool paused);
 

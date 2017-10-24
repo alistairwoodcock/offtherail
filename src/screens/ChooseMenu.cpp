@@ -21,18 +21,18 @@ namespace ChooseMenu {
 		game->chooseTrain->size = glm::vec3(1.0f);
 		updateScale();
 
-        game->chooseFloor = new Entity();
+		game->chooseFloor = new Entity();
 		game->chooseFloor->x = 0.0f;
 		game->chooseFloor->y = game->ground;
 		game->chooseFloor->z = 0.0f;
 		
 		float logo_vertices[] = {
-			-0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
-			 0.5f, -0.5f, -0.5f,    1.0f, 0.0f,
-			 0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-			 0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-			-0.5f,  0.5f, -0.5f,    0.0f, 1.0f,
-			-0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	1.0f, 0.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			-0.5f,	0.5f, -0.5f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
 		};
 
 		game->chooseRight = new MenuImage();
@@ -86,6 +86,7 @@ namespace ChooseMenu {
 
 		if(input->space_pressed || input->enter_pressed) {
 			changeScreen(GAME);
+			reset();
 			game->input_timeout = 0.5;
 		}
 
@@ -99,9 +100,9 @@ namespace ChooseMenu {
 		train->y_rot += 0.5 * deltaTime;
 		train->y = game->ground + sin(time) * 0.8;
 
-        // Update Mr Floor
-        Entity *floor = game->chooseFloor;
-        floor->y_rot -= deltaTime;
+		// Update Mr Floor
+		Entity *floor = game->chooseFloor;
+		floor->y_rot -= deltaTime;
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){
@@ -137,7 +138,7 @@ namespace ChooseMenu {
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
 
-		// Anothe temp grass/rock shit    
+		// Anothe temp grass/rock shit	  
 		if (rock) {
 			shaderSetVec3(ID, "objectColor", 1.0f, 1.0f, 1.0f);
 			shaderSetVec3(ID, "lightColor", 1.0f, 0.0f, 0.0f);
@@ -156,22 +157,22 @@ namespace ChooseMenu {
 			trainModel->Draw(trainShader);
 		
 			// Reflections??
-            Entity *floor = game->chooseFloor;
-		    
-            Shader floorShader = Shaders::get("particle");
-    		unsigned int floorID = floorShader.ID;
-    		useShader(floorID);
+			Entity *floor = game->chooseFloor;
+			
+			Shader floorShader = Shaders::get("particle");
+			unsigned int floorID = floorShader.ID;
+			useShader(floorID);
 
 			glBindVertexArray(game->Particle_VAO);
 			model = glm::mat4();
 			model = glm::translate(model, glm::vec3(floor->x, floor->y, floor->z));
 			model = glm::scale(model, glm::vec3(14.0f));
-		    model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
+			model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
 			model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
 			
-		    shaderSetMat4(floorID, "projection", projection);
-		    shaderSetMat4(floorID, "view", view);
-            shaderSetMat4(floorID, "model", model);
+			shaderSetMat4(floorID, "projection", projection);
+			shaderSetMat4(floorID, "view", view);
+			shaderSetMat4(floorID, "model", model);
 			shaderSetVec3(floorID, "color", glm::vec3(0.9, 0.9, 1.0));
 			shaderSetFloat(floorID, "alpha", 1.0);
 
@@ -191,8 +192,8 @@ namespace ChooseMenu {
 			glDepthMask(GL_TRUE);
 			glBindVertexArray(0);
 		
-            // Swap back to train shader
-            useShader(ID);
+			// Swap back to train shader
+			useShader(ID);
 			model = glm::mat4(); 
 			model = glm::translate(model, glm::vec3(train->x, 3*floor->y - train->y, train->z));
 			
