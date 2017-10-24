@@ -10,7 +10,7 @@ namespace Switches {
 
 	float START_X = 0.0;
 	float START_Z = 0.0;
-	const float DIST_BETWEEN_TRACKS = 5;
+	const float DIST_BETWEEN_TRACKS = 3.4;
 	const float SWITCH_LENGTH = 20;
 	const float CP_LENGTH = SWITCH_LENGTH / 2;
 	int numberOfSegments = 25;
@@ -71,16 +71,15 @@ namespace Switches {
 
 		//update tracks and also get the furthest behind
 		int lastTrack = 0;
-		float deltaPos = 0.02;
 		Switch* s = game->curvedSwitches;
-		s->z -= deltaPos;
+		float deltaPos = game->speed * deltaTime;
+		//s->z += deltaPos;
 
 		//Update the control points so the getPointAt method still works.
-		//Note this should be plus delta not minus to move towards the camera.
-		game->curvedSwitches->controlPoints[0][2] -= deltaPos;
-		game->curvedSwitches->controlPoints[1][2] -= deltaPos;
-		game->curvedSwitches->controlPoints[2][2] -= deltaPos;
-		game->curvedSwitches->controlPoints[3][2] -= deltaPos;
+		game->curvedSwitches->controlPoints[0][2] += deltaPos;
+		game->curvedSwitches->controlPoints[1][2] += deltaPos;
+		game->curvedSwitches->controlPoints[2][2] += deltaPos;
+		game->curvedSwitches->controlPoints[3][2] += deltaPos;
 		
 	}
 
@@ -343,7 +342,7 @@ namespace Switches {
 
 		model = glm::translate(model, position);
 
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::scale(model, glm::vec3(0.26f, 0.26f, 0.26f));
 
 		//model = glm::rotate(model, cosTheta, rotationAxis);
 		model = glm::rotate(model, theta, rotationAxis);
