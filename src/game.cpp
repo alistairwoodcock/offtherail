@@ -234,7 +234,7 @@ static void updateAndRender(){
 			}
 
 			if(game->bogieFront->currentTrack != game->bogieBack->currentTrack){
-				if(game->pointCountdown <= 0){
+				if(game->pointCountdown <= 0 && !game->fallen) {
 					game->pointCountdown = 0.5;
 					game->score += 1;
 
