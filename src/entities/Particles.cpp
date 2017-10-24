@@ -45,7 +45,17 @@ namespace Particles {
 			p->z_vel = game->speed;//((std::rand()%100) - (std::rand()%100))/1000.0;
 			p->render = false;
 			
+			auto color = glm::vec3(0.95,0.9,0.5);
+			float r = std::rand()%2;
+			if(r != 0) color = glm::vec3(0.95,0.4,0.4);
+			
+			p->r = color.r;
+			p->g = color.g;
+			p->b = color.b;
+			
 			game->particles[i] = *p;
+
+
 		}
 
 
@@ -70,6 +80,10 @@ namespace Particles {
 			p->y_vel += 0.98 * deltaTime;
 
 			p->z_rot += (std::rand()%100/123.4f) * deltaTime;
+			
+			static float sad = 0;
+			sad += 0.01;
+			p->x_rot = 0.01;
 
 			p->alpha -= 0.1 * deltaTime;
 			
@@ -91,6 +105,15 @@ namespace Particles {
 				p->alpha = 0.5 + r/50.0f;
 				
 				p->render = sparkTime;
+
+				auto color = glm::vec3(0.95,0.9,0.5);
+				r = std::rand()%2;
+				if(r != 0) color = glm::vec3(0.95,0.4,0.4);
+				
+				p->r = color.r;
+				p->g = color.g;
+				p->b = color.b;
+				
 			}
 		}
 	}
@@ -119,45 +142,12 @@ namespace Particles {
 			glm::mat4 model;
 			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
 			model = glm::scale(model, glm::vec3(p->scale));
-			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
+			// model = model*glm::lookAt(glm::vec3(p->x, p->y, p->z), game->camera.Position, glm::vec3(0.0,1.0,0.0));
 			
 			shaderSetMat4(ID, "model", model);
 			shaderSetFloat(ID, "alpha", p->alpha);
+			shaderSetVec3(ID, "color", glm::vec3(p->r,p->g,p->b));
 
-			float r = std::rand()%2;
-
-			if(r == 0){
-				shaderSetVec3(ID, "color", glm::vec3(0.95,0.9,0.5));
-			} else{//} if(r == 1){
-				shaderSetVec3(ID, "color", glm::vec3(0.95,0.4,0.4));
-			} /*else {
-				shaderSetVec3(ID, "color", glm::vec3(0.95,0.0,0.0));
-			} */
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
-
-		glBindVertexArray(0);
-	}
-
-	void renderShadow(Shader &shader){
-		Particle *particles = game->particles;
-		int particle_count = game->particle_count;
-
-		glBindVertexArray(game->Particle_VAO);
-
-		for(int i = 0; i < particle_count; i++)
-		{
-
-			Particle *p = particles+i;
-
-			glm::mat4 model;
-			model = glm::translate(model, glm::vec3(p->x,p->y,p->z));
-			model = glm::scale(model, glm::vec3(p->scale));
-			model = glm::rotate(model, glm::radians(p->z_rot), glm::vec3(0.0, 0.0, 1.0));
-			
-			shaderSetMat4(shader.ID, "model", model);
-			
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 		}
 

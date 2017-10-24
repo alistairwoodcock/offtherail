@@ -3,45 +3,22 @@
 
 namespace Switches {
 	void generateCurveSegments(Vertex p0, Vertex p1, Vertex p2, Vertex p3);
-	void loadModel();
 	Vertex getTangentAt(unsigned int curveIndex, GLfloat t);
 	glm::mat4 getModelMatrix(Vertex direction, glm::vec3 position);
 	void bufferData(GameState* game);
 
-	float START_X = 0.0;
-	float START_Z = 0.0;
-	const float DIST_BETWEEN_TRACKS = 5;
-	const float SWITCH_LENGTH = 20;
-	const float CP_LENGTH = SWITCH_LENGTH / 2;
-	int numberOfSegments = 25;
-
 	void setup() {
+		print("SETTING UP SWITCH");
 		
-		std::cout << "Setting Up Switch" << std::endl;
-		game->curvedSwitches = new Switch();
-		loadModel();
-		
-		float XDIFF = DIST_BETWEEN_TRACKS;
-		
-		bool left = false;		//Is the track switching to the left?
-		if (left) {
-			XDIFF = -XDIFF;
-		}
+		game->switchesCount = 0;
+		game->maxSwitches = 20;
+		game->selectedTrack = 0;
 
-		Vertex p0 = Vertex({ START_X, 0, START_Z });
-		Vertex p1 = Vertex({ START_X, 0, START_Z - CP_LENGTH });
-		Vertex p2 = Vertex({ START_X + XDIFF, 0, START_Z - CP_LENGTH });
-		Vertex p3 = Vertex({ START_X + XDIFF, 0, START_Z - SWITCH_LENGTH });
-
-		generateCurveSegments(p0, p1, p2, p3);
-
-	}
-	void loadModel()
-	{
+		//Load the Track Model and setup the vertex buffer
 		game->switchModel = new Model("switch", "models/track/singlerailtexturedJoined.obj");
 
-		glGenBuffers(1, &game->curvedSwitches->switchVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, game->curvedSwitches->switchVBO);
+		glGenBuffers(1, &game->switchVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, game->switchVBO);
 
 		for (unsigned int i = 0; i < game->trackModel->meshes.size(); i++)
 		{
@@ -64,14 +41,122 @@ namespace Switches {
 
 			glBindVertexArray(0);
 		}
+
+	}
+
+	void changeSwitch(int i, int toTrack){
+		if(i == -1 || i > game->switchesCount) return;
+
+		bool canSwitch = true;
+
+		int fromTrack = game->switches[i].fromTrack;
+
+		if(fromTrack == 0 && toTrack == 2){
+			canSwitch = false;
+		}
+
+		if(fromTrack == 2 && toTrack == 0){
+			canSwitch = false;
+		}
+
+		if(canSwitch){
+			game->switches[i].toTrack = toTrack;
+		}
+		
+		game->switches[i].target_y_rot = M_PI/14 * (game->switches[i].fromTrack - game->switches[i].toTrack);
+		game->switches[i].rotate_speed = 1.0f;
+
+		printf("from: %i, to: %i\n", game->switches[i].fromTrack, game->switches[i].toTrack);
+
+	}
+
+
+	void toggleSwitch(int i){
+		if(i == -1 || i > game->switchesCount) return;
+
+		int fromTrack = game->switches[i].fromTrack;
+		int toTrack = game->switches[i].toTrack;
+
+		if(fromTrack == 0) {
+			if(toTrack == 0) {
+				toTrack = 1;
+			} else {
+				toTrack = 0;
+			}
+		} else if(fromTrack == 1) {
+			if(toTrack == 0) {
+				toTrack = 1;
+			} else if(toTrack == 1) {
+				toTrack = 2;
+			} else {
+				toTrack = 0;
+			}
+		} else if(fromTrack == 2) {
+			if(toTrack == 2) {
+				toTrack = 1;
+			} else {
+				toTrack = 2;
+			}
+		}
+
+
+		changeSwitch(i, toTrack);
+	}
+
+	void update(float time, float deltaTime){
+		//PULLED FROM Track.cpp
+
+		//update switches and set the current one
+		int closestSwitch = -1;
+
+		for(int i = 0; i < game->switchesCount; i++){
+			Switch *s = &game->switches[i];
+
+			s->z += game->speed * deltaTime;
+
+			float rot_diff = s->target_y_rot - s->y_rot;
+
+			if(rot_diff != 0)
+			{
+				float dir = abs(rot_diff) / rot_diff;
+
+				s->y_rot += dir * game->switches[i].rotate_speed * deltaTime;
+
+				if(abs(rot_diff) < 0.01){
+					s->y_rot = s->target_y_rot;
+					s->rotate_speed = 0;
+				}
+			}
+
+			if(s->z > 125 * 0.3){
+				for(int f = 0; f < game->switchesCount; f++){
+					game->switches[f] = game->switches[f+1];
+				}
+				game->switchesCount--;
+			}
+
+			bool onSelectedTrack = s->fromTrack == game->selectedTrack;
+			
+			if(onSelectedTrack && s->z < 10)
+			{
+				if(closestSwitch == -1) closestSwitch = i;
+				
+				if(s->z > game->switches[closestSwitch].z) closestSwitch = i;
+			}
+		}
+
+		game->selectedSwitch = closestSwitch;
+
+		if(input.space_pressed)
+		{
+			toggleSwitch(game->selectedSwitch);
+			game->input_timeout = 0.1;
+		}
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view)
 	{
-		
-		std::cout << "Render Switch" << game->curvedSwitches->trackPieceTransforms.size() << std::endl;
 		Model* switchModel = game->switchModel;
-
 		Shader switchShader = Shaders::get("switch");
 		unsigned int ID = switchShader.ID;
 
@@ -79,31 +164,89 @@ namespace Switches {
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
-		//Loop through each mesh of the model and draw an instance of the track	
-		for (unsigned int i = 0; i < switchModel->meshes.size(); i++)
-		{
-			//Bind the meshes texture
-			//trackShader->setInt("texture_diffuse1", 0);
-			shaderSetInt(ID, "texture_diffuse1", 0);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, switchModel->meshes[i].textures[0].id);
+		//THIS IS FROM track.cpp
+		for(int i = 0; i < game->switchesCount; i++){
+			Switch *s = &game->switches[i];
+			
+			if(i == game->selectedSwitch){
+				shaderSetVec3(ID, "colour", glm::vec3(0.5f, 1.0f, 1.0f));
+			} else {
+				shaderSetVec3(ID, "colour", glm::vec3(0.0f, 0.0f, 0.0f));
+			}
 
-			//Bind the vertex array
-			glBindVertexArray(switchModel->meshes[i].VAO);
-			glDrawElementsInstanced(GL_TRIANGLES, switchModel->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, game->curvedSwitches->trackPieceTransforms.size());
-			glBindVertexArray(0);
+			glm::mat4 model;
+			model = glm::translate(model, glm::vec3(s->x, s->y, s->z));
+			model = glm::rotate(model, s->y_rot, glm::vec3(0.0, 1.0, 0.0));
+			model = glm::scale(model, glm::vec3(0.3f));
+			shaderSetMat4(ID, "model", model);
+			trackModel->Draw(trackShader);
+
+
+			//Loop through each mesh of the model and draw an instance of the track	
+			for (unsigned int i = 0; i < switchModel->meshes.size(); i++)
+			{
+				//Bind the meshes texture
+				//trackShader->setInt("texture_diffuse1", 0);
+				shaderSetInt(ID, "texture_diffuse1", 0);
+				// shaderSetFloat(ID, "zOffset", s->z);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, switchModel->meshes[i].textures[0].id);
+
+				//Bind the vertex array
+				glBindVertexArray(switchModel->meshes[i].VAO);
+				glDrawElementsInstanced(GL_TRIANGLES, switchModel->meshes[i].indices.size(), GL_UNSIGNED_INT, 0, game->trackPieceTransforms.size());
+				glBindVertexArray(0);
+			}
+			
 		}
-		
 
 	}
 
-	void generateCurveSegments(Vertex p0, Vertex p1, Vertex p2, Vertex p3)
+	float START_X = 0.0;
+	float START_Z = 0.0;
+	const float DIST_BETWEEN_TRACKS = 5;
+	const float SWITCH_LENGTH = 20;
+	const float CP_LENGTH = SWITCH_LENGTH / 2;
+	int numberOfSegments = 25;
+
+	void addSwitch(int x, int y, int z, int from, int to){
+		if(game->switchesCount == game->maxSwitches) return;
+
+		int i = game->switchesCount;
+
+		game->switches[i].x = x;
+		game->switches[i].y = y;
+		game->switches[i].z = z;
+		game->switches[i].fromTrack = from;
+		game->switches[i].toTrack = to;
+
+
+
+		float XDIFF = DIST_BETWEEN_TRACKS;
+		
+		bool left = false;		//Is the track switching to the left?
+		if (left) {
+			XDIFF = -XDIFF;
+		}
+
+		Vertex p0 = Vertex({ x, 0, z });
+		Vertex p1 = Vertex({ x, 0, z - CP_LENGTH });
+		Vertex p2 = Vertex({ x + XDIFF, 0, z - CP_LENGTH });
+		Vertex p3 = Vertex({ x + XDIFF, 0, z - SWITCH_LENGTH });
+
+		generateCurveSegments(game->switches[i], p0, p1, p2, p3);
+		
+
+		game->switchesCount++;
+	}
+
+	void generateCurveSegments(Switch &s, Vertex p0, Vertex p1, Vertex p2, Vertex p3)
 	{
 		//Add the vertices to the control points vector
-		game->curvedSwitches->controlPoints.push_back({ p0.Position.x, p0.Position.y, p0.Position.z });
-		game->curvedSwitches->controlPoints.push_back({ p1.Position.x, p1.Position.y, p1.Position.z });
-		game->curvedSwitches->controlPoints.push_back({ p2.Position.x, p2.Position.y, p2.Position.z });
-		game->curvedSwitches->controlPoints.push_back({ p3.Position.x, p3.Position.y, p3.Position.z });
+		s.controlPoints.push_back({ p0.Position.x, p0.Position.y, p0.Position.z });
+		s.controlPoints.push_back({ p1.Position.x, p1.Position.y, p1.Position.z });
+		s.controlPoints.push_back({ p2.Position.x, p2.Position.y, p2.Position.z });
+		s.controlPoints.push_back({ p3.Position.x, p3.Position.y, p3.Position.z });
 
 		//Using the constants in the header create the Control points.
 		std::cout << "Generating Curve Segments" <<std::endl;
@@ -151,7 +294,7 @@ namespace Switches {
 
 			//Form Transofrm matrix here and put it into the vector
 			glm::vec3 position = glm::vec3(x, y, z);
-			game->curvedSwitches->trackPieceTransforms.push_back(getModelMatrix(tangent, position));
+			s.trackPieceTransforms.push_back(getModelMatrix(tangent, position));
 		}
 		//Buffer the data
 		bufferData(game);
@@ -163,11 +306,11 @@ namespace Switches {
 
 	void bufferData(GameState* game)
 	{
-		std::cout << "Buffering Data" << game->curvedSwitches->trackPieceTransforms.size() << std::endl;
+		std::cout << "Buffering Data" << game->trackPieceTransforms.size() << std::endl;
 		//Generate and bind a new buffer
-		glGenBuffers(1, &game->curvedSwitches->switchVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, game->curvedSwitches->switchVBO);
-		glBufferData(GL_ARRAY_BUFFER, game->curvedSwitches->trackPieceTransforms.size() * sizeof(glm::mat4), &game->curvedSwitches->trackPieceTransforms[0], GL_STATIC_DRAW);
+		glGenBuffers(1, &game->switchVBO);
+		glBindBuffer(GL_ARRAY_BUFFER, game->switchVBO);
+		glBufferData(GL_ARRAY_BUFFER, game->trackPieceTransforms.size() * sizeof(glm::mat4), &game->trackPieceTransforms[0], GL_STATIC_DRAW);
 
 		std::cout << "Loop Over Meshes" << std::endl;
 		for (unsigned int i = 0; i < game->switchModel->meshes.size(); i++)
@@ -212,10 +355,10 @@ namespace Switches {
 
 		//Skip through the cotrol points until we get to the current curve
 		unsigned int index = 0; //curveIndex * 4;
-		vector<GLfloat> p0 = game->curvedSwitches->controlPoints[index];
-		vector<GLfloat> p1 = game->curvedSwitches->controlPoints[index + 1];
-		vector<GLfloat> p2 = game->curvedSwitches->controlPoints[index + 2];
-		vector<GLfloat> p3 = game->curvedSwitches->controlPoints[index + 3];
+		vector<GLfloat> p0 = game->controlPoints[index];
+		vector<GLfloat> p1 = game->controlPoints[index + 1];
+		vector<GLfloat> p2 = game->controlPoints[index + 2];
+		vector<GLfloat> p3 = game->controlPoints[index + 3];
 
 		// nice to pre-calculate 1.0f-t because we will need it frequently
 		float it = 1.0f - t;
@@ -274,10 +417,10 @@ namespace Switches {
 		float b3 = -3 * it * it;
 
 		unsigned int index = 0;  //curveIndex * 4;
-		vector<float> p0 = game->curvedSwitches->controlPoints[index];
-		vector<float> p1 = game->curvedSwitches->controlPoints[index + 1];
-		vector<float> p2 = game->curvedSwitches->controlPoints[index + 2];
-		vector<float> p3 = game->curvedSwitches->controlPoints[index + 3];
+		vector<float> p0 = game->controlPoints[index];
+		vector<float> p1 = game->controlPoints[index + 1];
+		vector<float> p2 = game->controlPoints[index + 2];
+		vector<float> p3 = game->controlPoints[index + 3];
 
 		// calculate the x,y and z of the curve point by summing
 		// the Control vertices weighted by their respective blending

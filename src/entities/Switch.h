@@ -6,10 +6,16 @@
 
 class Switch : public Entity {
 public:
-	
-	unsigned int switchVBO;
-	vector<glm::mat4> trackPieceTransforms;
+	int fromTrack;
+	int toTrack;
 	vector<vector<GLfloat>> controlPoints;
+
+	// float rotate_speed;
+	// float target_y_rot;
+	
+	// unsigned int switchVBO;
+	// vector<glm::mat4> trackPieceTransforms;
+	// vector<vector<GLfloat>> controlPoints;
 
 };
 
