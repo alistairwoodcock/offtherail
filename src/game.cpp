@@ -294,6 +294,7 @@ static void updateAndRender(){
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
 				Tracks::update(platform->currTime, platform->deltaTime);
+				Switches::update(platform->currTime, platform->deltaTime);
 
 			}	
 

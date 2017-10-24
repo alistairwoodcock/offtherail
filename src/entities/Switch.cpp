@@ -10,7 +10,7 @@ namespace Switches {
 
 	float START_X = 0.0;
 	float START_Z = 0.0;
-	const float DIST_BETWEEN_TRACKS = 5;
+	const float DIST_BETWEEN_TRACKS = 3.4;
 	const float SWITCH_LENGTH = 20;
 	const float CP_LENGTH = SWITCH_LENGTH / 2;
 	int numberOfSegments = 25;
@@ -66,11 +66,29 @@ namespace Switches {
 		}
 	}
 
+
+	void update(float time, float deltaTime) {
+
+		//update tracks and also get the furthest behind
+		int lastTrack = 0;
+		Switch* s = game->curvedSwitches;
+		float deltaPos = game->speed * deltaTime;
+		//s->z += deltaPos;
+
+		//Update the control points so the getPointAt method still works.
+		game->curvedSwitches->controlPoints[0][2] += deltaPos;
+		game->curvedSwitches->controlPoints[1][2] += deltaPos;
+		game->curvedSwitches->controlPoints[2][2] += deltaPos;
+		game->curvedSwitches->controlPoints[3][2] += deltaPos;
+		
+	}
+
 	void render(glm::mat4 &projection, glm::mat4 &view)
 	{
 		
 		std::cout << "Render Switch" << game->curvedSwitches->trackPieceTransforms.size() << std::endl;
 		Model* switchModel = game->switchModel;
+		Switch* s = game->curvedSwitches;
 
 		Shader switchShader = Shaders::get("switch");
 		unsigned int ID = switchShader.ID;
@@ -78,6 +96,11 @@ namespace Switches {
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
+
+		//Create model matrix to translate the switch to the correct position
+		glm::mat4 model;
+		model = glm::translate(model, glm::vec3(s->x, s->y, s->z));
+		shaderSetMat4(ID, "model", model);
 
 		//Loop through each mesh of the model and draw an instance of the track	
 		for (unsigned int i = 0; i < switchModel->meshes.size(); i++)
@@ -319,7 +342,7 @@ namespace Switches {
 
 		model = glm::translate(model, position);
 
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
+		model = glm::scale(model, glm::vec3(0.26f, 0.26f, 0.26f));
 
 		//model = glm::rotate(model, cosTheta, rotationAxis);
 		model = glm::rotate(model, theta, rotationAxis);
