@@ -5,32 +5,32 @@ namespace Particles {
 	void setup(){
 		printf("SETUP PARTICLES\n");
 		float particle_vertices[] = {
-	        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 		};
 
 		GLuint VAO;
-	    GLuint VBO;
+		GLuint VBO;
 
-	    glGenVertexArrays(1, &VAO);
-	    glGenBuffers(1, &VBO);
+		glGenVertexArrays(1, &VAO);
+		glGenBuffers(1, &VBO);
 
-	    glBindVertexArray(VAO);
-	    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
-	    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
-	    glEnableVertexAttribArray(0);
+		glBindVertexArray(VAO);
+		glBindBuffer(GL_ARRAY_BUFFER, VBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(particle_vertices), particle_vertices, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(0*sizeof(float)));
+		glEnableVertexAttribArray(0);
 
-	    game->Particle_VAO = VAO;
-	    game->Particle_VBO = VBO;
+		game->Particle_VAO = VAO;
+		game->Particle_VBO = VBO;
 
-	    game->particle_count = 5000;
+		game->particle_count = 5000;
 
-	    int particle_count = game->particle_count;
+		int particle_count = game->particle_count;
 		
 		game->particles = (Particle*)malloc(particle_count*sizeof(Particle));
 
@@ -51,7 +51,7 @@ namespace Particles {
 
 	}
 
-    void reset(Particle *p, bool sparkTime) {
+	void reset(Particle *p, bool sparkTime) {
 		float r = std::rand()%100/12.3f;
 		// printf("%f\n", r);
 		p->y = -1.7;
@@ -67,14 +67,14 @@ namespace Particles {
 		p->alpha = 0.5 + r/50.0f;
 				
 		p->render = sparkTime;
-    }
+	}
 
 	void update(float time, float deltaTime){
 		int particle_count = game->particle_count;
 		Particle *particles = game->particles;
 
 		bool sparkTime = (game->bogieBack->currentTrack != game->bogieFront->currentTrack);
-        sparkTime = sparkTime && !game->fallen;
+		sparkTime = sparkTime && !game->fallen;
 
 		for(int i = 0; i < particle_count; i++)
 		{	
@@ -97,7 +97,7 @@ namespace Particles {
 			p->alpha -= 0.1 * deltaTime;
 			
 			if(p->y < -2 || p->z > 30) {
-		        reset(p, sparkTime);		
+				reset(p, sparkTime);		
 			}
 		}
 	}

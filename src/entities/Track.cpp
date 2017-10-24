@@ -6,12 +6,12 @@
 
 namespace Tracks {
 	
-    void reset() {
+	void reset() {
 
 		game->nextSwitchCountdown = rand()%30;
 		game->switchesCount = 0;
 		game->selectedTrack = 0;		
-    }
+	}
 
 	void setup() {
 		std::cout << "SETTING UP TRACK" << std::endl;
@@ -41,7 +41,7 @@ namespace Tracks {
 			game->track3[i].z = game->trackLen - i*game->trackLen;
 		}
 
-        reset();
+		reset();
 	}
 
 	Track* getTrack(int trackNum){
@@ -134,7 +134,7 @@ namespace Tracks {
 	void placeSwitch(){
 		printf("place switch\n");
 
-        // Ignore if already at max switches
+		// Ignore if already at max switches
 		int i = game->switchesCount;
 		if(game->switchesCount == game->maxSwitches) return;
 
@@ -242,7 +242,7 @@ namespace Tracks {
 				}
 			}
 
-            // Remove switch
+			// Remove switch
 			if(s->z > 125 * 0.3){
 				for(int f = 0; f < game->switchesCount; f++){
 					game->switches[f] = game->switches[f+1];
