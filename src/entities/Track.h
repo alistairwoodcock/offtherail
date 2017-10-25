@@ -6,7 +6,6 @@
 class Track : public Entity {
 public:
 	
-
 };
 
 class TrackSwitch : public Entity {
@@ -17,6 +16,5 @@ public:
 	float target_y_rot;
 
 };
-
 
 #endif

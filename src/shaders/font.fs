@@ -11,7 +11,7 @@ void main()
 {
 	vec4 c = texture(mainTex, uv0);
 
-	// if(c.r == 0 && c.g == 0 && c.b == 0) discard;
+	if(c.r == 0) discard;
 	fragColor = vec4(textColour.r, textColour.g, textColour.b, c.r);
 
 

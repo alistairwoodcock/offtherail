@@ -6,9 +6,17 @@
 
 namespace Tracks {
 	
+	void reset() {
+
+		game->nextSwitchCountdown = rand()%30;
+		game->switchesCount = 0;
+		game->selectedTrack = 0;		
+	}
+
 	void setup() {
 		std::cout << "SETTING UP TRACK" << std::endl;
 
+		game->maxSwitches = 20;
 		game->trackModel = new Model("track", "models/smalltrack/smallstraighttextured.obj");
 		
 		game->trackLen = 62.5 * 0.3;
@@ -18,7 +26,6 @@ namespace Tracks {
 		game->track1 = game->tracks+0;
 		game->track2 = game->tracks+10;
 		game->track3 = game->tracks+20;
-
 
 		for(int i = 0; i < game->trackCount; i++){
 			game->track1[i].x = -20*0.2;
@@ -34,13 +41,7 @@ namespace Tracks {
 			game->track3[i].z = game->trackLen - i*game->trackLen;
 		}
 
-		game->nextSwitchCountdown = rand()%30;
-		game->switchesCount = 0;
-		game->maxSwitches = 20;
-		game->selectedTrack = 0;		
-
-
-
+		reset();
 	}
 
 	Track* getTrack(int trackNum){
@@ -133,56 +134,46 @@ namespace Tracks {
 	void placeSwitch(){
 		printf("place switch\n");
 
-		// game->speed += 4;
-
+		// Ignore if already at max switches
+		int i = game->switchesCount;
 		if(game->switchesCount == game->maxSwitches) return;
 
-		int i = game->switchesCount;
-		
 		game->switches[i].y = game->ground;
 		game->switches[i].z = game->trackLen - (game->trackCount-1)*game->trackLen;
 		game->switches[i].y_rot = 0;
 		
 		int rndTrackNum = (int)(rand()%3);
-		int toTrack = 0;
-		
 		game->switches[i].fromTrack = rndTrackNum;
 
 		Track *t = NULL;
+		int toTrack = 0;
 		switch(rndTrackNum){
 			case 0:{
 				t = game->track1;
 				toTrack = 1;
-
 			} break;
+
 			case 1: {
 				t = game->track2; 
-				
 				toTrack = 0;
 
 				int switchDir = (int)rand()%2;
 				if(switchDir == 1){
 					toTrack = 2;
 				}
-
 			} break;
-			case 2: {
 
+			case 2: {
 				t = game->track3;
 				toTrack = 1;
-
 			} break;
 		}
 
 		changeSwitch(i, toTrack);
 
 		game->switches[i].x = t->x;
-
-
 		game->switchesCount++;
 	}
-
-
 
 	void update(float time, float deltaTime) {
 		
@@ -251,6 +242,7 @@ namespace Tracks {
 				}
 			}
 
+			// Remove switch
 			if(s->z > 125 * 0.3){
 				for(int f = 0; f < game->switchesCount; f++){
 					game->switches[f] = game->switches[f+1];

@@ -1,36 +1,36 @@
 
 namespace Ground {
 
-    void setup() {
-    	float planeVertices[] = {
-            // positions            // normals         // texcoords
-             80.0f, 0.0f, 40.0f,    0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
-        	-80.0f, 0.0f, 40.0f,    0.0f, 1.0f, 0.0f,  0.0f,  0.0f,
-        	-80.0f, 0.0f, -200.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+	void setup() {
+		float planeVertices[] = {
+			// positions			// normals		   // texcoords
+			 80.0f, 0.0f, 40.0f,	0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+			-80.0f, 0.0f, 40.0f,	0.0f, 1.0f, 0.0f,  0.0f,  0.0f,
+			-80.0f, 0.0f, -200.0f,	0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
 
-        	 80.0f, 0.0f, 40.0f,    0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
-        	-80.0f, 0.0f, -200.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
-        	 80.0f, 0.0f, -200.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f
-        };
-    	
-    	// plane VAO
-        unsigned int planeVAO;
-        unsigned int planeVBO;
-        glGenVertexArrays(1, &planeVAO);
-        glGenBuffers(1, &planeVBO);
-        glBindVertexArray(planeVAO);
-        glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-        glBindVertexArray(0);
+			 80.0f, 0.0f, 40.0f,	0.0f, 1.0f, 0.0f,  1.0f,  0.0f,
+			-80.0f, 0.0f, -200.0f,	0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
+			 80.0f, 0.0f, -200.0f,	0.0f, 1.0f, 0.0f,  1.0f, 1.0f
+		};
+		
+		// plane VAO
+		unsigned int planeVAO;
+		unsigned int planeVBO;
+		glGenVertexArrays(1, &planeVAO);
+		glGenBuffers(1, &planeVBO);
+		glBindVertexArray(planeVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, planeVBO);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		glBindVertexArray(0);
 
-        game->Plane_VAO = planeVAO;
-        game->Plane_VBO = planeVBO;
+		game->Plane_VAO = planeVAO;
+		game->Plane_VBO = planeVBO;
 
 	}
 
@@ -40,7 +40,7 @@ namespace Ground {
 
 	void render(glm::mat4 &projection, glm::mat4 &view, glm::mat4 &lightSpaceMatrix){
 		
-        Shader shader = Shaders::get("ground");
+		Shader shader = Shaders::get("ground");
 		unsigned int ID = shader.ID;
 
 		glm::mat4 model;

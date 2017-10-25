@@ -2,51 +2,55 @@
 
 namespace Trains {
 
-    void updateScale() {
-        glm::vec3 mSize = game->trainModel->size;
-        glm::vec3 tSize = game->train->size;
-        game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
-    }
+	void updateScale() {
+		glm::vec3 mSize = game->trainModel->size;
+		glm::vec3 tSize = game->train->size;
+		game->train->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
+	}
 
-    void setupTrainModels(){
-    	game->trainModels[0] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
-        game->trainModels[1] = new Model("taxi", "models/train/Taxi/Taxi.obj", glm::vec3(5.0f));
-        game->trainModels[2] = new Model("train2", "models/rocks/rock1.obj", glm::vec3(0.3f));
-    }
+	void setupTrainModels(){
+		game->trainModels[0] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
+		game->trainModels[1] = new Model("taxi", "models/train/Taxi/Taxi.obj", glm::vec3(5.0f));
+		game->trainModels[2] = new Model("train2", "models/rocks/rock1.obj", glm::vec3(0.3f));
+	}
 
-    void setTrainModel(TrainTypes type){
-        if (type < 0 || type > TRAIN_MODEL_NUM) {
-            type = DEFAULT;
-        }
+	void setTrainModel(TrainTypes type){
+		if (type < 0 || type > TRAIN_MODEL_NUM) {
+			type = DEFAULT;
+		}
 		game->trainModel = game->trainModels[type];
 		game->currentTrain = type;
-    }
-    
-	void setup(){
+	}
+   
+	void reset() {
+		// Size and scale for the train
+		game->train->size = glm::vec3(1.0f);
+		updateScale();
 
-
-        setupTrainModels();
-
-		game->train = new Train();
-		setTrainModel(DEFAULT);
-
-        glm::vec3 s = game->trainModel->size;
-        printf("Train size is %f,%f,%f\n", s.x,s.y,s.z);
-
+		// Train location itself
 		game->train->x = 0;
 		game->train->y = game->ground;
 		game->train->z = 0.0f;
 
-        game->train->size = glm::vec3(1.0f);
-        updateScale();
-
-		game->bogieFront = new Bogie();
+		// Bogie positions for the front and back of the train
 		game->bogieFront->z = -1;
 		game->bogieFront->currentTrack = 1;
-
-		game->bogieBack = new Bogie();
 		game->bogieBack->z = 9;
 		game->bogieBack->currentTrack = 1;
+
+		game->fallen = false;
+	}
+
+	void setup() {
+		setupTrainModels();
+
+		game->train = new Train();
+		setTrainModel(DEFAULT);
+
+		game->bogieFront = new Bogie();
+		game->bogieBack = new Bogie();
+		
+		reset();
 	}
 
 	void update(float time, float deltaTime){
@@ -58,19 +62,19 @@ namespace Trains {
 		Input input = platform->input;
 
 		// if(input.a_pressed){
-		// 	bogieFront->x_vel = -5;
+		//	bogieFront->x_vel = -5;
 		// } else if(input.d_pressed) {
-		// 	bogieFront->x_vel = 5;
+		//	bogieFront->x_vel = 5;
 		// } else {
-		// 	bogieFront->x_vel = 0;
+		//	bogieFront->x_vel = 0;
 		// }
 
 		// if(input.s_pressed){
-		// 	bogieFront->z_vel = 5;
+		//	bogieFront->z_vel = 5;
 		// } else if(input.w_pressed){
-		// 	bogieFront->z_vel = -5;
+		//	bogieFront->z_vel = -5;
 		// } else {
-		// 	bogieFront->z_vel = 0;
+		//	bogieFront->z_vel = 0;
 		// }
 
 		float bogie_mid_x = (bogieBack->x + bogieFront->x)/2;
@@ -105,6 +109,17 @@ namespace Trains {
 
 		// Track *t = Tracks::getSelectedTrack();
 		// bogieFront->x = t->x;
+		
+		if(game->fallen) {
+			train->z_rot = M_PI / 2;
+			if(bogieFront->x > bogieBack->x){
+				train->z_rot *= -1;	
+			}
+			
+			if(game->speed > 0) game->speed -= 50 * deltaTime;
+			if(game->speed < 0) game->speed = 0;
+			return;
+		}
 		
 		for(int i = 0; i < game->switchesCount; i++)
 		{
@@ -147,15 +162,9 @@ namespace Trains {
 			train->z = (bogieBack->z + bogieFront->z)/2;
 			train->z_rot = 0;
 		} else {
-			train->z_rot = M_PI / 2;
-			if(bogieFront->x > bogieBack->x){
-				train->z_rot *= -1;	
-				
-				//TODO(AL): Make this a flag for fallen over we can check
-				if(game->speed > 0) game->speed -= 50 * deltaTime;
-				if(game->speed < 0) game->speed = 0;
-			}
+			game->fallen = true;
 		}
+
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view){

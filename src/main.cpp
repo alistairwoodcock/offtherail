@@ -183,6 +183,29 @@ int main(){
 			game.state->platform.currTime = glfwGetTime();
 			game.state->platform.deltaTime = game.state->platform.currTime - game.state->platform.prevTime;
 
+			float frame = game.state->platform.deltaTime*1000;
+			#define avg_max 50
+			static float avg[avg_max] = {0};
+			static int avg_i = 0;
+
+			avg[avg_i] = frame;
+
+			if(avg_i+1 == avg_max)
+			{
+				float total = 0;
+				for(int i = 0; i < avg_max; i++) total += avg[i];
+				total /= avg_max;
+				printf("time: %f\n", total);
+				
+				avg_i = 0;
+			}
+			else
+			{
+				avg_i++;
+			}
+			
+
+
 			float sleep_time_ms = 33 - game.state->platform.deltaTime * 1000;
 
 			if(sleep_time_ms > 0){
@@ -231,6 +254,7 @@ Input get_current_input(GLFWwindow* window){
 	in.p_pressed = (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS);
 	in.u_pressed = (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS);
 	in.c_pressed = (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS);
+	in.m_pressed = (glfwGetKey(window, GLFW_KEY_M) == GLFW_PRESS);
 	in.up_pressed = (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS);
 	in.down_pressed = (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS);
 	in.left_pressed = (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS);
