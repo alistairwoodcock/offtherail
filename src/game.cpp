@@ -25,6 +25,7 @@
 #include "entities/Particles.cpp"
 #include "entities/Grass.cpp"
 #include "entities/Puddle.cpp"
+#include "entities/Switch.cpp"
 #include "entities/Track.cpp"
 #include "entities/Train.cpp"
 #include "entities/Lights.cpp"
@@ -85,7 +86,7 @@ static void init(State *state)
 	
 	/* -- Camera Setup -- */
 	game->camera = Camera(glm::vec3(0.0f, 11.71f, 34.0f), glm::vec3(0.0f, 1.0f, 0.0f), -90.0f, -17.0f);
-	
+
 	/* -- Font Setup -- */
 	game->openSans = createFont("./fonts/OpenSans-Regular.ttf");
 	game->comicSans = createFont("./fonts/comic.ttf");
@@ -98,6 +99,8 @@ static void init(State *state)
 
 	/* -- Track Setup -- */
 	Tracks::setup();
+
+	Switches::setup();
 	
 	/* -- Menu Setup --*/
 	MainMenu::setup();
@@ -295,6 +298,7 @@ static void updateAndRender(){
 				Particles::update(platform->currTime, platform->deltaTime);
 				Lights::update(platform->currTime, platform->deltaTime);
 				Tracks::update(platform->currTime, platform->deltaTime);
+				Switches::update(platform->currTime, platform->deltaTime);
 
 			}	
 
@@ -330,16 +334,17 @@ static void updateAndRender(){
 		glDepthMask(GL_FALSE);
 			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
 			Puddles::render(projection, view);
+
 		glDepthMask(GL_TRUE);
 
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
 			Tracks::render(projection, view);
+			Switches::render(projection, view);
 			Trains::render(projection, view);
 			Particles::render(projection, view);
 			OverlayMenu::render(projection, view);
 
-			
 			if(game->showDepthMap)
 			{
 				Shader debug = Shaders::get("debugQuad");

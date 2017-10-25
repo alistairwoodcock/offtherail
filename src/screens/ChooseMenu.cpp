@@ -173,6 +173,7 @@ namespace ChooseMenu {
 			shaderSetMat4(floorID, "projection", projection);
 			shaderSetMat4(floorID, "view", view);
 			shaderSetMat4(floorID, "model", model);
+
 			shaderSetVec3(floorID, "color", glm::vec3(0.9, 0.9, 1.0));
 			shaderSetFloat(floorID, "alpha", 1.0);
 
@@ -194,6 +195,7 @@ namespace ChooseMenu {
 		
 			// Swap back to train shader
 			useShader(ID);
+
 			model = glm::mat4(); 
 			model = glm::translate(model, glm::vec3(train->x, 3*floor->y - train->y, train->z));
 			

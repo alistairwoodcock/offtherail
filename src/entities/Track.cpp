@@ -14,7 +14,7 @@ namespace Tracks {
 	}
 
 	void setup() {
-		std::cout << "SETTING UP TRACK" << std::endl;
+		printf("SETTING UP TRACK\n");
 
 		game->maxSwitches = 20;
 		game->trackModel = new Model("track", "models/smalltrack/smallstraighttextured.obj");
@@ -41,6 +41,7 @@ namespace Tracks {
 			game->track3[i].z = game->trackLen - i*game->trackLen;
 		}
 
+
 		reset();
 	}
 
@@ -57,96 +58,18 @@ namespace Tracks {
 		return getTrack(game->selectedTrack);
 	}
 
-	void changeSwitch(int i, int toTrack){
-		if(i == -1 || i > game->switchesCount) return;
-
-		bool canSwitch = true;
-
-		int fromTrack = game->switches[i].fromTrack;
-
-		if(fromTrack == 0 && toTrack == 2){
-			canSwitch = false;
-		}
-
-		if(fromTrack == 2 && toTrack == 0){
-			canSwitch = false;
-		}
-
-		if(canSwitch){
-			game->switches[i].toTrack = toTrack;
-		}
-		
-		game->switches[i].target_y_rot = M_PI/14 * (game->switches[i].fromTrack - game->switches[i].toTrack);
-		game->switches[i].rotate_speed = 1.0f;
-
-		printf("from: %i, to: %i\n", game->switches[i].fromTrack, game->switches[i].toTrack);
-
-	}
-
-	void toggleSwitch(int i){
-		if(i == -1 || i > game->switchesCount) return;
-
-		int fromTrack = game->switches[i].fromTrack;
-		int toTrack = game->switches[i].toTrack;
-
-		if(fromTrack == 0)
-		{
-			if(toTrack == 0)
-			{
-				toTrack = 1;
-			}
-			else
-			{
-				toTrack = 0;
-			}
-		}
-		else if(fromTrack == 1)
-		{
-			if(toTrack == 0)
-			{
-				toTrack = 1;
-			}
-			else if(toTrack == 1)
-			{
-				toTrack = 2;
-			}
-			else
-			{
-				toTrack = 0;
-			}
-		}
-		else if(fromTrack == 2)
-		{
-			if(toTrack == 2)
-			{
-				toTrack = 1;
-			}
-			else
-			{
-				toTrack = 2;
-			}
-		}
-
-
-		changeSwitch(i, toTrack);
-	}
-
+	
 	void placeSwitch(){
 		printf("place switch\n");
 
-		// Ignore if already at max switches
-		int i = game->switchesCount;
 		if(game->switchesCount == game->maxSwitches) return;
 
-		game->switches[i].y = game->ground;
-		game->switches[i].z = game->trackLen - (game->trackCount-1)*game->trackLen;
-		game->switches[i].y_rot = 0;
-		
+		int x, y, z;
 		int rndTrackNum = (int)(rand()%3);
-		game->switches[i].fromTrack = rndTrackNum;
-
-		Track *t = NULL;
 		int toTrack = 0;
+		int fromTrack = rndTrackNum;
+		
+		Track *t = NULL;
 		switch(rndTrackNum){
 			case 0:{
 				t = game->track1;
@@ -169,10 +92,11 @@ namespace Tracks {
 			} break;
 		}
 
-		changeSwitch(i, toTrack);
+		y = game->ground;
+		z = game->trackLen - (game->trackCount-1)*game->trackLen;
+		x = t->x;
 
-		game->switches[i].x = t->x;
-		game->switchesCount++;
+		Switches::addSwitch(x, y, z, fromTrack, toTrack);
 	}
 
 	void update(float time, float deltaTime) {
@@ -219,54 +143,6 @@ namespace Tracks {
 			}
 			game->input_timeout = 0.1;
 		}
-
-		//update switches and set the current one
-		int closestSwitch = -1;
-
-		for(int i = 0; i < game->switchesCount; i++){
-			TrackSwitch *s = &game->switches[i];
-
-			s->z += game->speed * deltaTime;
-
-			float rot_diff = s->target_y_rot - s->y_rot;
-
-			if(rot_diff != 0)
-			{
-				float dir = abs(rot_diff) / rot_diff;
-
-				s->y_rot += dir * game->switches[i].rotate_speed * deltaTime;
-
-				if(abs(rot_diff) < 0.01){
-					s->y_rot = s->target_y_rot;
-					s->rotate_speed = 0;
-				}
-			}
-
-			// Remove switch
-			if(s->z > 125 * 0.3){
-				for(int f = 0; f < game->switchesCount; f++){
-					game->switches[f] = game->switches[f+1];
-				}
-				game->switchesCount--;
-			}
-
-			bool onSelectedTrack = s->fromTrack == game->selectedTrack;
-			
-			if(onSelectedTrack && s->z < 10)
-			{
-				if(closestSwitch == -1) closestSwitch = i;
-				
-				if(s->z > game->switches[closestSwitch].z) closestSwitch = i;
-			}
-		}
-
-		game->selectedSwitch = closestSwitch;
-
-		if(input.space_pressed)
-		{
-			toggleSwitch(game->selectedSwitch);
-			game->input_timeout = 0.1;
-		}
 	}
 
 	void render(glm::mat4 &projection, glm::mat4 &view) {
@@ -281,14 +157,45 @@ namespace Tracks {
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
+		bool switchSelected = false;
+		Switch *selectedSwitch = NULL;
+
+		if(game->selectedSwitch >= 0){
+			switchSelected = true;
+			selectedSwitch = &game->switches[game->selectedSwitch];
+		}
+
+
 		for(int i = 0; i < game->trackCount * 3; i++){
 			Track *track = &game->tracks[i];
 
-			bool highlight = (i < 10 && i >= 0 && game->selectedTrack == 0) || 
+			//tracks are separated into 3 groups (0-9, 10-19, 20-29)
+			//so we only wanna higlight certain tracks if their selected track matches
+
+			int trackNum = 0;
+			if(i < 20 && i >= 10) trackNum = 1;
+			if(i < 30 && i >= 20) trackNum = 2;
+
+			bool highlight = false;
+
+			if(switchSelected)
+			{
+				if(track->z <= selectedSwitch->z && selectedSwitch->toTrack == trackNum){
+					highlight = true;
+				}
+
+				if(track->z > selectedSwitch->z && selectedSwitch->fromTrack == trackNum){
+					highlight = true;
+				}
+			}
+			else 
+			{
+				highlight = (i < 10 && i >= 0 && game->selectedTrack == 0) || 
 							 (i < 20 && i >= 10 && game->selectedTrack == 1) ||
-							 (i < 30 && i >= 20 && game->selectedTrack == 2);
-
-
+							 (i < 30 && i >= 20 && game->selectedTrack == 2);	
+			}
+			
+			
 			if(highlight){
 				shaderSetVec3(ID, "colour", glm::vec3(0.7f, 0.7f, 0.95f));
 			} else {
@@ -304,24 +211,7 @@ namespace Tracks {
 
 			
 		}
-		
-		
-		for(int i = 0; i < game->switchesCount; i++){
-			TrackSwitch *s = &game->switches[i];
-			
-			if(i == game->selectedSwitch){
-				shaderSetVec3(ID, "colour", glm::vec3(0.5f, 1.0f, 1.0f));
-			} else {
-				shaderSetVec3(ID, "colour", glm::vec3(0.0f, 0.0f, 0.0f));
-			}
 
-			glm::mat4 model;
-			model = glm::translate(model, glm::vec3(s->x, s->y, s->z));
-			model = glm::rotate(model, s->y_rot, glm::vec3(0.0, 1.0, 0.0));
-			model = glm::scale(model, glm::vec3(0.3f));
-			shaderSetMat4(ID, "model", model);
-			trackModel->Draw(trackShader);
-		}
 	}
 	
 }

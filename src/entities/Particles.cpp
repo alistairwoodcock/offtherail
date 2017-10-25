@@ -115,7 +115,7 @@ namespace Particles {
 			p->alpha -= 0.1 * deltaTime;
 
 			if(p->y < -2 || p->z > 30) {
-				reset(p, sparkTime);		
+				reset(p, sparkTime);
 			}
 		}
 	}
