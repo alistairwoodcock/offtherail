@@ -101,7 +101,6 @@ namespace Music {
 	// Role: Close our OpenAL instance
 	//
 	void destroy() {
-		//alDeleteBuffers(1, &Buffer);
 		alDeleteSources(1, &game->music.Source);
 		if (alutExit() == AL_FALSE) {
 			printf("Error unloading ALUT: %s\n", alutGetErrorString(alutGetError()));
