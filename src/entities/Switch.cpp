@@ -61,7 +61,7 @@ namespace Switches {
 			case 1: {
 				if(s->left)
 				{
-					if(to == 1) to == 0;
+					if(to == 1) to = 0;
 					else to = 1;
 				}
 				else
@@ -73,7 +73,7 @@ namespace Switches {
 
 			case 2: {
 				if(to == 2) to = 1;
-				else to = 0;
+				else to = 2;
 			} break;
 		}
 
