@@ -9,8 +9,8 @@ namespace ChooseMenu {
 		glm::vec3 mSize = game->trainModel->size;
 		glm::vec3 tSize = game->chooseTrain->size;
 		game->chooseTrain->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
-        // Update offset for the choose menu too!
-        game->chooseTrain->offset = glm::vec3(game->train->offset);
+		// Update offset for the choose menu too!
+		game->chooseTrain->offset = glm::vec3(game->train->offset);
 	}
 
 	void setup() {
@@ -115,19 +115,10 @@ namespace ChooseMenu {
 		// Draw Mr Train
 		Model *trainModel = game->trainModel;
 		Train *train = game->chooseTrain;
-		
-		// TEMP GRASS SHIT //
-		const char* curr = game->trainModel->name.c_str();
-		bool rock = strcmp(curr, "train2") == 0;
-	   
-		Shader grassShader = Shaders::get("grass");
+	  
+		// Get the shader 
 		Shader trainShader = Shaders::get("train");
-		unsigned int ID;
-		if (rock) {
-		ID = grassShader.ID;
-		} else {
-		ID = trainShader.ID;
-		}
+		unsigned int ID = trainShader.ID;
 
 		useShader(ID);
 		shaderSetMat4(ID, "projection", projection);
@@ -137,80 +128,64 @@ namespace ChooseMenu {
 		glm::mat4 model;
 		model = glm::translate(model, glm::vec3(train->x + train->offset.x, train->y + train->offset.y, train->z + train->offset.z));
 		model = glm::scale(model, train->scale);
-
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
 
-		// Anothe temp grass/rock shit	  
-		if (rock) {
-			shaderSetVec3(ID, "objectColor", 1.0f, 1.0f, 1.0f);
-			shaderSetVec3(ID, "lightColor", 1.0f, 0.0f, 0.0f);
-			shaderSetVec3(ID, "viewPos", game->camera.Position);
-			shaderSetVec3(ID, "material.ambient",  1.0f, 1.0f, 1.0f);
-			shaderSetVec3(ID, "material.diffuse",  0.5f, 0.5f, 0.31f);
-			shaderSetVec3(ID, "material.specular", 0.25f, 0.25f, 0.25f);
-			shaderSetFloat(ID, "material.shininess", 128.0f);
-				
-			shaderSetMat4(ID, "model", model);
-			shaderSetMat4(ID, "inverseModel", glm::inverse(model));
-				
-			trainModel->Draw(grassShader);
-		} else {
-			shaderSetMat4(ID, "model", model);
-			trainModel->Draw(trainShader);
+		shaderSetMat4(ID, "model", model);
+		trainModel->Draw(trainShader);
 		
-			// Reflections??
-			Entity *floor = game->chooseFloor;
+		// Begin floor reflections
+		Entity *floor = game->chooseFloor;
 			
-			Shader floorShader = Shaders::get("particle");
-			unsigned int floorID = floorShader.ID;
-			useShader(floorID);
+		Shader floorShader = Shaders::get("particle");
+		unsigned int floorID = floorShader.ID;
+		useShader(floorID);
 
-			glBindVertexArray(game->Particle_VAO);
-			model = glm::mat4();
-			model = glm::translate(model, glm::vec3(floor->x, floor->y, floor->z));
-			model = glm::scale(model, glm::vec3(14.0f));
-			model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
-			model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
+		// Transform floor
+		glBindVertexArray(game->Particle_VAO);
+		model = glm::mat4();
+		model = glm::translate(model, glm::vec3(floor->x, floor->y, floor->z));
+		model = glm::scale(model, glm::vec3(14.0f));
+		model = glm::rotate(model, floor->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		model = glm::rotate(model, -3.1415f / 2, glm::vec3(1.0, 0.0, 0.0));
 			
-			shaderSetMat4(floorID, "projection", projection);
-			shaderSetMat4(floorID, "view", view);
-			shaderSetMat4(floorID, "model", model);
+		shaderSetMat4(floorID, "projection", projection);
+		shaderSetMat4(floorID, "view", view);
+		shaderSetMat4(floorID, "model", model);
+		shaderSetVec3(floorID, "color", glm::vec3(0.9, 0.9, 1.0));
+		shaderSetFloat(floorID, "alpha", 1.0);
 
-			shaderSetVec3(floorID, "color", glm::vec3(0.9, 0.9, 1.0));
-			shaderSetFloat(floorID, "alpha", 1.0);
-
-			glEnable(GL_STENCIL_TEST);
-			
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-			glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-			glStencilMask(0xFF);
-			
-			glDepthMask(GL_FALSE);
-			glClear(GL_STENCIL_BUFFER_BIT);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-
-			glStencilFunc(GL_EQUAL, 1, 0xFF);
-			glStencilMask(0x00);
-			glDepthMask(GL_TRUE);
-			glBindVertexArray(0);
+		// Write to stencil buffer when we draw the floor
+		glEnable(GL_STENCIL_TEST);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+		glStencilMask(0xFF);
 		
-			// Swap back to train shader
-			useShader(ID);
+		glDepthMask(GL_FALSE);
+		glClear(GL_STENCIL_BUFFER_BIT);
 
-			model = glm::mat4(); 
-		    model = glm::translate(model, 
-                        glm::vec3(train->x + train->offset.x, 3*floor->y - train->y - train->offset.y, train->z + train->offset.z));
-			
-			model = glm::scale(model, glm::vec3(1, -1, 1));
-			model = glm::scale(model, train->scale);
-			model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
-			shaderSetMat4(ID, "model", model);
-			trainModel->Draw(trainShader);
-			
-			glDisable(GL_STENCIL_TEST);
-		}
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		// Floor is now drawn, change stencil mode so we only print on the floor
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+		glStencilMask(0x00);
+		glDepthMask(GL_TRUE);
+		glBindVertexArray(0);
+		
+		// Swap back to train shader
+		useShader(ID);
+
+		model = glm::mat4(); 
+		model = glm::translate(model, 
+					glm::vec3(train->x + train->offset.x, 3*floor->y - train->y - train->offset.y, train->z + train->offset.z));
+			
+		model = glm::scale(model, glm::vec3(1, -1, 1));
+		model = glm::scale(model, train->scale);
+		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
+		shaderSetMat4(ID, "model", model);
+		trainModel->Draw(trainShader);
+			
+		// Turn off stencils
+		glDisable(GL_STENCIL_TEST);
 	}
 
 }
