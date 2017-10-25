@@ -78,6 +78,8 @@ namespace Switches {
 		}
 
 		s->toTrack = to;
+
+		Music::soundEffect("sounds/ping.wav");
 	}
 
 	void update(float time, float deltaTime){
