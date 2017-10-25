@@ -148,7 +148,8 @@ namespace Switches {
 
 
 			if(i == game->selectedSwitch){
-				shaderSetVec3(ID, "colour", glm::vec3(0.5f, 1.0f, 1.0f));
+				// shaderSetVec3(ID, "colour", glm::vec3(0.5f, 1.0f, 1.0f));
+				shaderSetVec3(ID, "colour", glm::vec3(0.8f, 0.8f, 0.95f));
 			} else {
 				shaderSetVec3(ID, "colour", glm::vec3(0.0f, 0.0f, 0.0f));
 			}
