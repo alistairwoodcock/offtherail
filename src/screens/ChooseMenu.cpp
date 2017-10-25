@@ -9,6 +9,8 @@ namespace ChooseMenu {
 		glm::vec3 mSize = game->trainModel->size;
 		glm::vec3 tSize = game->chooseTrain->size;
 		game->chooseTrain->scale = glm::vec3(tSize.x/mSize.x, tSize.y/mSize.y, tSize.z/mSize.z);
+        // Update offset for the choose menu too!
+        game->chooseTrain->offset = glm::vec3(game->train->offset);
 	}
 
 	void setup() {
@@ -133,7 +135,7 @@ namespace ChooseMenu {
 
 		// render the loaded model
 		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
+		model = glm::translate(model, glm::vec3(train->x + train->offset.x, train->y + train->offset.y, train->z + train->offset.z));
 		model = glm::scale(model, train->scale);
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
@@ -197,7 +199,8 @@ namespace ChooseMenu {
 			useShader(ID);
 
 			model = glm::mat4(); 
-			model = glm::translate(model, glm::vec3(train->x, 3*floor->y - train->y, train->z));
+		    model = glm::translate(model, 
+                        glm::vec3(train->x + train->offset.x, 3*floor->y - train->y - train->offset.y, train->z + train->offset.z));
 			
 			model = glm::scale(model, glm::vec3(1, -1, 1));
 			model = glm::scale(model, train->scale);
