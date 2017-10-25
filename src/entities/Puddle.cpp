@@ -2,6 +2,7 @@
 
 namespace Puddles {
 
+
 	void resetPos(Puddle *p) {
 		p->alpha = 0.8;
 		
@@ -20,6 +21,8 @@ namespace Puddles {
 			case 0: return new Model("puddle1", "models/puddles/puddle1.obj");
 			case 1: return new Model("puddle2", "models/puddles/puddle2.obj");
 		}
+
+		return new Model("puddle1", "models/puddles/puddle1.obj");
 	}
 
 	void setup() {
@@ -57,6 +60,7 @@ namespace Puddles {
 
 			if (p->z > 26) {
 				resetPos(p);
+
 			}
 		}
 	}
@@ -76,6 +80,7 @@ namespace Puddles {
 		shaderSetFloat(ID, "alpha", 1.0f);
 
 		// ENABLE STENCIL
+
 		glEnable(GL_STENCIL_TEST);
 
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -109,7 +114,6 @@ namespace Puddles {
 		
 		glDepthMask(GL_TRUE);
 		glDisable(GL_STENCIL_TEST);
-		
 		glBindVertexArray(0);
 		useShader(0);
 	}

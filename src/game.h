@@ -17,6 +17,7 @@
 #include "entities/Particles.h"
 #include "entities/SkyBox.h"
 #include "entities/Grass.h"
+#include "entities/Switch.h"
 #include "entities/Puddle.h"
 
 #include "libs/font.h"
@@ -110,6 +111,7 @@ struct GameState {
 	//By having both these lines the game will not run propoerly, cannot
 	//remove the depth map with '
 	Model* trackModel;
+	Track* track;
 	float trackLen;
 	int trackCount;
 	Track *tracks;
@@ -119,13 +121,26 @@ struct GameState {
 	int selectedTrack;
 
 	/* TRACK SWITCH STATE */
-	TrackSwitch switches[20];
+	Switch switches[20];
 	int switchesCount;
 	int maxSwitches;
 	float nextSwitchCountdown;
 	int selectedSwitch;
 
-    /* GRASS STATE */
+	Model* leftSwitchModel;
+	unsigned int leftSwitchVBO;
+	vector<vector<GLfloat>> leftControlPoints;
+	vector<glm::mat4> leftTrackPieceTransforms;
+	
+	Model* rightSwitchModel;
+	unsigned int rightSwitchVBO;
+	vector<vector<GLfloat>> rightControlPoints;
+	vector<glm::mat4> rightTrackPieceTransforms;
+	
+
+
+
+	/* GRASS STATE */
     int grass_count;
     Grass* grass;
 
