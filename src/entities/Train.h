@@ -4,12 +4,11 @@
 #include <glm/glm.hpp>
 #include "Entity.h"
 
-const unsigned int TRAIN_MODEL_NUM = 3;
+const unsigned int TRAIN_MODEL_NUM = 2;
 
 enum TrainTypes {
 	DEFAULT = 0,
-	ROCK,
-	OUR_BOY_THOMAS
+	TAXI
 };
 
 
@@ -17,6 +16,7 @@ class Train: public Entity {
 public:
 	glm::vec3 size;
 	glm::vec3 scale;
+	glm::vec3 offset;
 };
 
 class Bogie: public Entity {

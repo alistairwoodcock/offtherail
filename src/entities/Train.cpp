@@ -11,7 +11,7 @@ namespace Trains {
 	void setupTrainModels(){
 		game->trainModels[0] = new Model("locomotive", "models/train/locomotive/Locomotive C36.obj", glm::vec3(65.0f));
 		game->trainModels[1] = new Model("taxi", "models/train/Taxi/Taxi.obj", glm::vec3(5.0f));
-		game->trainModels[2] = new Model("train2", "models/rocks/rock1.obj", glm::vec3(0.3f));
+		// game->trainModels[2] = new Model("train2", "models/rocks/rock1.obj", glm::vec3(0.3f));
 	}
 
 	void setTrainModel(TrainTypes type){
@@ -20,6 +20,18 @@ namespace Trains {
 		}
 		game->trainModel = game->trainModels[type];
 		game->currentTrain = type;
+
+		switch(type)
+		{
+			case TAXI: {
+				game->train->offset = glm::vec3(0,3,2);
+			} break;
+
+			case DEFAULT:
+			default: {
+				game->train->offset = glm::vec3(0);
+			} break;
+		}
 	}
    
 	void reset() {
@@ -181,7 +193,7 @@ namespace Trains {
 
 		// render the loaded model
 		glm::mat4 model;
-		model = glm::translate(model, glm::vec3(train->x, train->y, train->z));
+		model = glm::translate(model, glm::vec3(train->x + train->offset.x, train->y + train->offset.y, train->z + train->offset.z));
 		model = glm::scale(model, game->train->scale);
 
 		model = glm::rotate(model, train->y_rot, glm::vec3(0.0, 1.0, 0.0));
