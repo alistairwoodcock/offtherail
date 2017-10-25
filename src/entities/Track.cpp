@@ -156,16 +156,45 @@ namespace Tracks {
 		shaderSetMat4(ID, "projection", projection);
 		shaderSetMat4(ID, "view", view);
 
+		bool switchSelected = false;
+		Switch *selectedSwitch = NULL;
+
+		if(game->selectedSwitch >= 0){
+			switchSelected = true;
+			selectedSwitch = &game->switches[game->selectedSwitch];
+		}
+
+
 		for(int i = 0; i < game->trackCount * 3; i++){
 			Track *track = &game->tracks[i];
 
 			//tracks are separated into 3 groups (0-9, 10-19, 20-29)
 			//so we only wanna higlight certain tracks if their selected track matches
-			bool highlight = (i < 10 && i >= 0 && game->selectedTrack == 0) || 
+
+			int trackNum = 0;
+			if(i < 20 && i >= 10) trackNum = 1;
+			if(i < 30 && i >= 20) trackNum = 2;
+
+			bool highlight = false;
+
+			if(switchSelected)
+			{
+				if(track->z <= selectedSwitch->z && selectedSwitch->toTrack == trackNum){
+					highlight = true;
+				}
+
+				if(track->z > selectedSwitch->z && selectedSwitch->fromTrack == trackNum){
+					highlight = true;
+				}
+			}
+			else 
+			{
+				highlight = (i < 10 && i >= 0 && game->selectedTrack == 0) || 
 							 (i < 20 && i >= 10 && game->selectedTrack == 1) ||
-							 (i < 30 && i >= 20 && game->selectedTrack == 2);
-
-
+							 (i < 30 && i >= 20 && game->selectedTrack == 2);	
+			}
+			
+			
 			if(highlight){
 				shaderSetVec3(ID, "colour", glm::vec3(0.7f, 0.7f, 0.95f));
 			} else {
