@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "libs/stb_image.h"
@@ -17,11 +29,11 @@
 #include "game.h"
 
 struct Game {
-    void *handle;
-    ino_t id;
-    GameAPI api;
-    State *state;
-    GLFWwindow *window;
+	void *handle;
+	ino_t id;
+	GameAPI api;
+	State *state;
+	GLFWwindow *window;
 };
 
 //Func definitions
@@ -43,73 +55,73 @@ bool first_load = true;
 void load_game_lib(Game *game){
 #ifdef _WIN32
 
-    if(load_counter++ > 66){
-        load_counter = 0;
-    
-        if (game->handle) {
-            game->api.unload(game->state);
-            FreeLibrary((HINSTANCE)game->handle);
-        }
+	if(load_counter++ > 66){
+		load_counter = 0;
+	
+		if (game->handle) {
+			game->api.unload(game->state);
+			FreeLibrary((HINSTANCE)game->handle);
+		}
 
-        CopyFile(GAME_LIBRARY, GAME_LIBRARY_TMP, false);
-        void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
-        
-        if(handle){
-            game->handle = handle;
-            
-            const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
-        
-            if(api != NULL){
-                game->api = *api;
-                if(first_load){
-                    first_load = false;
-                    game->api.init(game->state);
-                }
+		CopyFile(GAME_LIBRARY, GAME_LIBRARY_TMP, false);
+		void* handle = (void*)LoadLibrary(GAME_LIBRARY_TMP);
+		
+		if(handle){
+			game->handle = handle;
+			
+			const struct GameAPI *api = (GameAPI*)GetProcAddress((HINSTANCE)game->handle, "GAME_API");
+		
+			if(api != NULL){
+				game->api = *api;
+				if(first_load){
+					first_load = false;
+					game->api.init(game->state);
+				}
 
-                game->api.reload(game->state);
-            } else {
-                FreeLibrary((HINSTANCE)game->handle);
-                game->handle = NULL;
-                game->id = 0;
+				game->api.reload(game->state);
+			} else {
+				FreeLibrary((HINSTANCE)game->handle);
+				game->handle = NULL;
+				game->id = 0;
 
-            }
-        } else {
-            game->handle = NULL;
-            game->id = 0;
-        }
-    }
+			}
+		} else {
+			game->handle = NULL;
+			game->id = 0;
+		}
+	}
 
 	
 #else
 	struct stat attr;
-    if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
-        if (game->handle) {
-            game->api.unload(game->state);
-            dlclose(game->handle);
-        }
-        void *handle = dlopen(GAME_LIBRARY, RTLD_LAZY);
-        if (handle) {
-            game->handle = handle;
-            game->id = attr.st_ino;
-            const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
-            if (api != NULL) {
-                game->api = *api;
-                if (first_load){
-                	first_load = false;
-                    game->api.init(game->state);
-                }
+	if ((stat(GAME_LIBRARY, &attr) == 0) && (game->id != attr.st_ino)) {
+		if (game->handle) {
+			game->api.unload(game->state);
+			dlclose(game->handle);
+		}
+		void *handle = dlopen(GAME_LIBRARY, RTLD_LAZY);
+		if (handle) {
+			game->handle = handle;
+			game->id = attr.st_ino;
+			const struct GameAPI *api = (GameAPI*)dlsym(game->handle, "GAME_API");
+			if (api != NULL) {
+				game->api = *api;
+				if (first_load){
+					first_load = false;
+					game->api.init(game->state);
+				}
 
-                game->api.reload(game->state);
-            } else {
-                dlclose(game->handle);
-                game->handle = NULL;
-                game->id = 0;
-            }
-        } else {
-            game->handle = NULL;
-            game->id = 0;
-        }
-    }
+				game->api.reload(game->state);
+			} else {
+				dlclose(game->handle);
+				game->handle = NULL;
+				game->id = 0;
+			}
+		} else {
+			game->handle = NULL;
+			game->id = 0;
+		}
+	}
 #endif
 }
 
@@ -155,7 +167,7 @@ int main(){
 	game.state->platform.window = game.window;
 
 	glfwSetFramebufferSizeCallback(game.window, window_resize);
-    glfwMakeContextCurrent(game.window);
+	glfwMakeContextCurrent(game.window);
 
 	glfwGetFramebufferSize( game.window, &screenWidth, &screenHeight );
 	game.state->platform.screenWidth = screenWidth;
@@ -163,7 +175,7 @@ int main(){
 
 	printf("SCREEN width: %i\n", screenWidth);
 
-    glewExperimental = GL_TRUE;
+	glewExperimental = GL_TRUE;
 	if(glewInit() != GLEW_OK) {
 		printf("Failed to initialize GLEW\n");
 		glfwTerminate();

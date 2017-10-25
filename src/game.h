@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #ifndef GAME_H
 #define GAME_H
 
@@ -83,11 +95,11 @@ struct GameState {
 
 	/* MUSIC STATE */
 	std::map<const char*, Sound> *sounds;
-    Sound music;
+	Sound music;
 	const char* current;
 
 	/* LEVEL STATE */
-    float speed; //Speed of train, scenery, etc.
+	float speed; //Speed of train, scenery, etc.
 	
 	/* PARTICLE STATE */
 	int particle_count;
@@ -141,19 +153,19 @@ struct GameState {
 
 
 	/* GRASS STATE */
-    int grass_count;
-    Grass* grass;
+	int grass_count;
+	Grass* grass;
 
-    /* PUDDLE STATE */
-    int puddle_count;
-    Puddle* puddle;
+	/* PUDDLE STATE */
+	int puddle_count;
+	Puddle* puddle;
 
 	/* TRAIN STATE */ 
 	Model *trainModel;
 	Train *train;
 	Bogie *bogieFront;
 	Bogie *bogieBack;
-    bool fallen; // Help I've fallen and I can't get up
+	bool fallen; // Help I've fallen and I can't get up
 
 	Model* trainModels[TRAIN_MODEL_NUM];
 
@@ -173,12 +185,12 @@ struct GameState {
 	bool start_active;
 	bool exit_active;
 
-    /* CHOOSE SCREEN STATE */
-    Train *chooseTrain;
-    Entity *chooseFloor;
-    TrainTypes currentTrain;
-    MenuImage *chooseRight;
-    MenuImage *chooseLeft;
+	/* CHOOSE SCREEN STATE */
+	Train *chooseTrain;
+	Entity *chooseFloor;
+	TrainTypes currentTrain;
+	MenuImage *chooseRight;
+	MenuImage *chooseLeft;
 
 	/* OVERLAY SCREEN STATE */
 	Entity *overlay;

@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include "Switch.h"
 #include "../libs/mesh.h"
 
@@ -377,12 +389,12 @@ namespace Switches {
 		vector<float> p0, p1, p2, p3;
 		
 		if(left){
-		 	p0 = game->leftControlPoints[index];
+			p0 = game->leftControlPoints[index];
 			p1 = game->leftControlPoints[index + 1];
 			p2 = game->leftControlPoints[index + 2];
 			p3 = game->leftControlPoints[index + 3];
 		} else {
-		 	p0 = game->rightControlPoints[index];
+			p0 = game->rightControlPoints[index];
 			p1 = game->rightControlPoints[index + 1];
 			p2 = game->rightControlPoints[index + 2];
 			p3 = game->rightControlPoints[index + 3];

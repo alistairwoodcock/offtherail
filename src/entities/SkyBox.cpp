@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include "SkyBox.h"
 //INclude mesh for the vertex struct
 //TODO Probs make the vertex struct a separate class
@@ -14,19 +26,19 @@ namespace SkyBoxes {
 		game->skybox = new SkyBox();
 
 		float skyboxVertices[] = {
-			// positions          
-			-1.0f,  1.0f, -1.0f,
+			// positions		  
+			-1.0f,	1.0f, -1.0f,
 			-1.0f, -1.0f, -1.0f,
 			1.0f, -1.0f, -1.0f,
 			1.0f, -1.0f, -1.0f,
 			1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
+			-1.0f,	1.0f, -1.0f,
 
 			-1.0f, -1.0f,  1.0f,
 			-1.0f, -1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f, -1.0f,
-			-1.0f,  1.0f,  1.0f,
+			-1.0f,	1.0f, -1.0f,
+			-1.0f,	1.0f, -1.0f,
+			-1.0f,	1.0f,  1.0f,
 			-1.0f, -1.0f,  1.0f,
 
 			1.0f, -1.0f, -1.0f,
@@ -37,18 +49,18 @@ namespace SkyBoxes {
 			1.0f, -1.0f, -1.0f,
 
 			-1.0f, -1.0f,  1.0f,
-			-1.0f,  1.0f,  1.0f,
+			-1.0f,	1.0f,  1.0f,
 			1.0f,  1.0f,  1.0f,
 			1.0f,  1.0f,  1.0f,
 			1.0f, -1.0f,  1.0f,
 			-1.0f, -1.0f,  1.0f,
 
-			-1.0f,  1.0f, -1.0f,
+			-1.0f,	1.0f, -1.0f,
 			1.0f,  1.0f, -1.0f,
 			1.0f,  1.0f,  1.0f,
 			1.0f,  1.0f,  1.0f,
-			-1.0f,  1.0f,  1.0f,
-			-1.0f,  1.0f, -1.0f,
+			-1.0f,	1.0f,  1.0f,
+			-1.0f,	1.0f, -1.0f,
 
 			-1.0f, -1.0f, -1.0f,
 			-1.0f, -1.0f,  1.0f,

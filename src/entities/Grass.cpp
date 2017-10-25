@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include "Grass.h"
 
 namespace Grasses {
@@ -13,23 +25,23 @@ namespace Grasses {
 		p->y_vel = 0.0;
 		p->z_vel = game->speed;
 
-        p->y_rot = std::rand()%5;
-    }
+		p->y_rot = std::rand()%5;
+	}
 
-    Model* randomModel() {
-        switch(rand()%8) {
-            case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
-            case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
-            case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
-            case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(0.2f));
-            case 4: return new Model("grass5", "models/grass/grass1.obj", glm::vec3(0.05f));
-            case 5: return new Model("grass6", "models/grass/grass2.obj", glm::vec3(0.05f));
-            case 6: return new Model("grass7", "models/grass/grass3.obj", glm::vec3(0.05f));
-            case 7: return new Model("grass8", "models/grass/grass4.obj", glm::vec3(0.05f));
-        }
+	Model* randomModel() {
+		switch(rand()%8) {
+			case 0: return new Model("grass1", "models/rocks/rock1.obj", glm::vec3(0.2f));
+			case 1: return new Model("grass2", "models/rocks/rock2.obj", glm::vec3(0.2f));
+			case 2: return new Model("grass3", "models/rocks/rock3.obj", glm::vec3(0.2f));
+			case 3: return new Model("grass4", "models/rocks/rock4.obj", glm::vec3(0.2f));
+			case 4: return new Model("grass5", "models/grass/grass1.obj", glm::vec3(0.05f));
+			case 5: return new Model("grass6", "models/grass/grass2.obj", glm::vec3(0.05f));
+			case 6: return new Model("grass7", "models/grass/grass3.obj", glm::vec3(0.05f));
+			case 7: return new Model("grass8", "models/grass/grass4.obj", glm::vec3(0.05f));
+		}
 
-        return new Model("grass7", "models/grass/grass4.obj", glm::vec3(0.05f));
-    }
+		return new Model("grass7", "models/grass/grass4.obj", glm::vec3(0.05f));
+	}
 
 	//we have to take (void *state) because of the dependency 
 	//structure of our includes. Requires casting when receiving

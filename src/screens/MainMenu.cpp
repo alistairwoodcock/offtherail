@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include "MenuImage.h"
 #include "ImageFuncs.h"
 
@@ -12,15 +24,15 @@ namespace MainMenu{
 	   // glBindTexture(GL_TEXTURE_2D, ftex);
 	   // glBegin(GL_QUADS);
 	   // while (*text) {
-	   //    if (*text >= 32 && *text < 128) {
-	   //       stbtt_aligned_quad q;
-	   //       stbtt_GetBakedQuad(cdata, 512,512, *text-32, &x,&y,&q,1);//1=opengl & d3d10+,0=d3d9
-	   //       glTexCoord2f(q.s0,q.t1); glVertex2f(q.x0,q.y0);
-	   //       glTexCoord2f(q.s1,q.t1); glVertex2f(q.x1,q.y0);
-	   //       glTexCoord2f(q.s1,q.t0); glVertex2f(q.x1,q.y1);
-	   //       glTexCoord2f(q.s0,q.t0); glVertex2f(q.x0,q.y1);
-	   //    }
-	   //    ++text;
+	   //	 if (*text >= 32 && *text < 128) {
+	   //		stbtt_aligned_quad q;
+	   //		stbtt_GetBakedQuad(cdata, 512,512, *text-32, &x,&y,&q,1);//1=opengl & d3d10+,0=d3d9
+	   //		glTexCoord2f(q.s0,q.t1); glVertex2f(q.x0,q.y0);
+	   //		glTexCoord2f(q.s1,q.t1); glVertex2f(q.x1,q.y0);
+	   //		glTexCoord2f(q.s1,q.t0); glVertex2f(q.x1,q.y1);
+	   //		glTexCoord2f(q.s0,q.t0); glVertex2f(q.x0,q.y1);
+	   //	 }
+	   //	 ++text;
 	   // }
 	   // glEnd();
 	}
@@ -31,12 +43,12 @@ namespace MainMenu{
 		game->exit_active = false;
 
 		float logo_vertices[] = {
-	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
-	         0.5f, -0.5f, -0.5f,    1.0f, 0.0f,
-	         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-	         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-	        -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,
-	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	1.0f, 0.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			-0.5f,	0.5f, -0.5f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
 		};
 
 		game->logo = new MenuImage();
@@ -111,25 +123,25 @@ namespace MainMenu{
 		if(game->start_active && input->s_pressed){
 			game->start_active = false;
 			game->exit_active = true;
-            Music::soundEffect("sounds/oh.wav");
+			Music::soundEffect("sounds/oh.wav");
 		}
 
 		if(game->exit_active && input->w_pressed){
 			game->start_active = true;
 			game->exit_active = false;
-            Music::soundEffect("sounds/oh.wav");
+			Music::soundEffect("sounds/oh.wav");
 		}
 
 		if(input->space_pressed || input->enter_pressed){
 			
 			if(game->exit_active){
-                Music::pause(true);
-                Music::soundEffect("sounds/exit.wav", true);
+				Music::pause(true);
+				Music::soundEffect("sounds/exit.wav", true);
 				game->quit_game = true;
 			} 
 			if(game->start_active){
-                changeScreen(CHOOSE);
-                game->input_timeout = 0.5;
+				changeScreen(CHOOSE);
+				game->input_timeout = 0.5;
 			}
 		}
 

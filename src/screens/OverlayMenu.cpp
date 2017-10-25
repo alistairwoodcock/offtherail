@@ -1,3 +1,15 @@
+/* 
+ * Course: COMP3320
+ * Project: Off The Rail
+ * Members: 
+ *	Alistair Woodcock	(c3138738)
+ *	Lachlan Meyer		(c3203676)
+ *	Joshua Crompton		(c3165877)
+ *	Scott Walker		(c3232582)
+ *	Timothy Pitts		(c3220826)
+ *
+ */
+
 #include "MenuImage.h"
 #include "ImageFuncs.h"
 
@@ -10,12 +22,12 @@ namespace OverlayMenu{
 		game->exit_active = false;
 
 		float logo_vertices[] = {
-	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
-	         0.5f, -0.5f, -0.5f,    1.0f, 0.0f,
-	         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-	         0.5f,  0.5f, -0.5f,    1.0f, 1.0f,
-	        -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,
-	        -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	1.0f, 0.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			 0.5f,	0.5f, -0.5f,	1.0f, 1.0f,
+			-0.5f,	0.5f, -0.5f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,
 		};
 
 		game->overlay = new Entity();
@@ -41,7 +53,7 @@ namespace OverlayMenu{
 		if(!game->overlay_active && (input.p_pressed || input.escape_pressed)){
 			game->overlay_active = true;
 			game->resume_active = true;
-            paused(true);
+			paused(true);
 		} 
 
 		if(!game->overlay_active){
@@ -89,8 +101,8 @@ namespace OverlayMenu{
 		if(input.space_pressed || input.enter_pressed){
 			
 			if(game->exit_active){
-                changeScreen(MAIN_MENU);
-                paused(false);
+				changeScreen(MAIN_MENU);
+				paused(false);
 				game->overlay_active = false;
 				game->exit_active = false;
 				game->resume_active = false;
@@ -98,8 +110,8 @@ namespace OverlayMenu{
 				game->input_timeout = 0.5;
 			} 
 			if(game->resume_active){
-                changeScreen(GAME);
-                paused(false);
+				changeScreen(GAME);
+				paused(false);
 				game->overlay_active = false;
 			}
 		}
