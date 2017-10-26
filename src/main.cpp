@@ -28,6 +28,7 @@
 
 #include "game.h"
 
+// Game struct to handle state, api, and the window
 struct Game {
 	void *handle;
 	ino_t id;
@@ -52,6 +53,9 @@ int load_counter = 0;
 
 bool first_load = true;
 
+// -- Public --
+// Role: Load game library, different methods if unix or windows 
+//
 void load_game_lib(Game *game){
 #ifdef _WIN32
 
@@ -125,6 +129,9 @@ void load_game_lib(Game *game){
 #endif
 }
 
+// -- Public --
+// Role: Close down the dynamic game library
+//
 void unload_game_lib(Game *game){
 	if(game->handle){
 		game->api.finalize(game->state);
@@ -144,6 +151,9 @@ int screenHeight = 500;
 
 bool windowResized = false;
 
+// -- Public --
+// Role: Main game loop, this controls the window and accessing the dynamic library 
+//
 int main(){
 	Game game = {0};
 	State *state = (State *)malloc(sizeof(*state));
@@ -182,6 +192,7 @@ int main(){
 		return 1;
 	}
 
+	// While the game is meant to be running
 	bool close = false;
 	while(!close)
 	{
@@ -201,9 +212,8 @@ int main(){
 			static int avg_i = 0;
 
 			avg[avg_i] = frame;
-
-			if(avg_i+1 == avg_max)
-			{
+			// Calculate average framerate
+			if(avg_i+1 == avg_max) {
 				float total = 0;
 				for(int i = 0; i < avg_max; i++) total += avg[i];
 				total /= avg_max;
@@ -211,15 +221,13 @@ int main(){
 				
 				avg_i = 0;
 			}
-			else
-			{
+			else {
 				avg_i++;
 			}
 			
 
-
+			// Limit fps
 			float sleep_time_ms = 33 - game.state->platform.deltaTime * 1000;
-
 			if(sleep_time_ms > 0){
 				#ifdef _WIN32
 				Sleep(sleep_time_ms);
@@ -238,23 +246,24 @@ int main(){
 			game.state->platform.screenWidth = screenWidth;
 			game.state->platform.screenHeight = screenHeight;
 				
+			// Call updates and reders for the entire game
 			game.api.updateAndRender();
 
 			close = game.api.shouldClose();
-
-
 		}
 
 		glfwSwapBuffers(game.window);
-
 		close = (close || glfwWindowShouldClose(game.window));
 	}
 
+	// Close down the game
 	unload_game_lib(&game);
-
 	return 0;
 }
 
+// -- Public --
+// Role: Assign booleans in the input state to be true if the key is currently being pressed.
+//
 Input get_current_input(GLFWwindow* window){
 	Input in = {0};
 
@@ -283,6 +292,9 @@ Input get_current_input(GLFWwindow* window){
 	return in;
 }
 
+// -- Public --
+// Role: Resize the given window to be the specified size.
+//
 void window_resize(GLFWwindow* window, int width, int height)
 {
 	screenWidth = width;

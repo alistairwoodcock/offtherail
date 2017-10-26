@@ -51,6 +51,9 @@
 //the larger these are, the higher resolution shadow we can have
 const unsigned int SHADOW_WIDTH = 1024*4, SHADOW_HEIGHT = 1024*4;
 
+// -- Public --
+// Role: Initialise the gamestate
+//
 static void init(State *state)
 {
 	printf("INIT\n");
@@ -85,7 +88,6 @@ static void init(State *state)
 	/* -- Shaders Setup -- */
 	Shaders::setup();
 
- 
 	/* -- Particles Setup -- */
 	Particles::setup();
 	
@@ -132,7 +134,6 @@ static void init(State *state)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);  
 
-
 	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
 	glDrawBuffer(GL_NONE);
@@ -158,7 +159,7 @@ static void init(State *state)
 	game->scoreText->scale = glm::vec3(0.3);
 	game->scoreText->scale_vel = 0;
 
-
+	// Set current screen to main menu, we're about to begin
 	changeScreen(MAIN_MENU);
 }
 
@@ -191,8 +192,10 @@ void renderQuad()
 	glBindVertexArray(0);
 }
 
-
-static void updateAndRender(){
+// -- Public --
+// Role: Called from main.cpp, updates and renders the entire game
+//
+static void updateAndRender() {
 
 	glm::vec3 background(1,1,1);
 	glClearColor(background.x, background.y, background.z, 1.0f);
@@ -223,6 +226,7 @@ static void updateAndRender(){
 	// update shaders
 	Shaders::update();
 	
+	// Depending on which screen is selected
 	switch(game->current_screen)
 	{
 		case MAIN_MENU: {
@@ -343,11 +347,11 @@ static void updateAndRender(){
 			
 			// render scene 
 			SkyBoxes::render(projection, view);
-		glDepthMask(GL_FALSE);
+			
+			glDepthMask(GL_FALSE);
 			Ground::render(projection, view, lightSpaceMatrix); //ground first for shadows
 			Puddles::render(projection, view);
-
-		glDepthMask(GL_TRUE);
+			glDepthMask(GL_TRUE);
 
 			Lights::render(projection, view);
 			Grasses::render(projection, view);
@@ -407,6 +411,9 @@ static void updateAndRender(){
 
 }
 
+// -- Public --
+// Role: Reset the gamestate for gameplay 
+//
 void reset() {
 	game->score = 0;
 	setText(game->scoreText, "SCORE: 00000");
@@ -415,6 +422,9 @@ void reset() {
 	Tracks::reset();
 }
 
+// -- Public --
+// Role: Change the currently selected screen
+//
 void changeScreen(Screens screen) {
 	game->current_screen = screen; 
 
@@ -434,11 +444,17 @@ void changeScreen(Screens screen) {
 
 }
 
+// -- Public --
+// Role: Pause or unpause the game
+//
 void paused(bool paused) {
 	game->paused = paused;
 	Music::pause(paused);
 }
 
+// -- Public --
+// Role: If the game should be closing 
+//
 static bool shouldClose(){
 	if(game->quit_game){
 		printf("SHOULD CLOSE\n");
@@ -446,18 +462,25 @@ static bool shouldClose(){
 	return game->quit_game;
 }
 
+// -- Public --
+// Role: Clean up all data
+//
 static void finalize(State *state){
 	printf("FINALIZE\n");
 	free(state);
 	Music::destroy();
 }
 
+// -- Public --
+// Role: Reload data dynamically
+//
 static void reload(State *state){
 	printf("RELOAD\n");
 	GlobalState = state;
 	game = &state->game_state;
 	platform = &state->platform;
 }
+
 static void unload(State *state){
 	printf("UNLOAD\n");
 }

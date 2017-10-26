@@ -35,15 +35,14 @@
 #include "libs/font.h"
 #include "screens/MenuImage.h"
 
-
-
-
+// Our currently displayed screen
 enum Screens {
 	MAIN_MENU,
 	CHOOSE,
 	GAME
 };
 
+// What keys are pressed
 struct Input {
 	bool a_pressed;
 	bool d_pressed;
@@ -68,6 +67,7 @@ struct Input {
 	bool right_shift_pressed;
 };
 
+// Information about how the game is running
 struct PlatformState {
 	GLFWwindow* window;
 	Input input;
@@ -81,7 +81,7 @@ struct PlatformState {
 	float deltaTime;
 };
 
-
+// All other data directly relating to the game state itself
 struct GameState {
 	bool game_started;
 	bool quit_game;
@@ -150,8 +150,6 @@ struct GameState {
 	vector<glm::mat4> rightTrackPieceTransforms;
 	
 
-
-
 	/* GRASS STATE */
 	int grass_count;
 	Grass* grass;
@@ -180,8 +178,6 @@ struct GameState {
 	MenuImage *logo;
 	TextArea *startText;
 	TextArea *exitText;
-	
-
 	bool start_active;
 	bool exit_active;
 
@@ -211,9 +207,7 @@ struct GameState {
 	/* SCORING STATE */
 	int score;
 	float pointCountdown;
-
 	TextArea *scoreText;
-
 	
 };
 
